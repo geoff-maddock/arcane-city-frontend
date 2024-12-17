@@ -13,6 +13,9 @@ export interface Event {
     door_price?: number;
     min_age?: number;
     tags?: Tag[];
+    ticket_link?: string;
+    primary_photo?: string;
+    primary_photo_thumbnail?: string;
 }
 
 export interface EntityResponse {
@@ -39,4 +42,12 @@ export interface EntityType {
 export interface EntityStatus {
     id: number;
     name: string;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
 }

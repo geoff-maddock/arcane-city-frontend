@@ -1,17 +1,18 @@
 // src/hooks/useEvents.ts
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import type { Event } from '../types/api';
+import type { Event, PaginatedResponse } from '../types/api';
 
-interface EventsResponse {
-    data: Event[];
-    current_page: number;
-    total: number;
-    per_page: number;
-}
+// interface EventsResponse {
+//     data: Event[];
+//     current_page: number;
+//     total: number;
+//     per_page: number;
+// }
 
 interface UseEventsParams {
     page?: number;
+    itemsPerPage?: number;
     filters?: {
         name?: string;
         venue?: string;
@@ -21,21 +22,28 @@ interface UseEventsParams {
             end?: string;
         };
     };
+    sort?: string;
+    direction?: 'desc' | 'asc';
+
 }
 
-export const useEvents = ({ page = 1, filters }: UseEventsParams = {}) => {
+export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort, direction = 'desc' }: UseEventsParams = {}) => {
     return useQuery({
-        queryKey: ['events', page, filters],
+        queryKey: ['events', page, itemsPerPage, filters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
 
+            params.append('page', page.toString());
+            params.append('limit', itemsPerPage.toString());
             if (filters?.name) params.append('filters[name]', filters.name);
             if (filters?.venue) params.append('filters[venue]', filters.venue);
             if (filters?.promoter) params.append('filters[promoter]', filters.promoter);
             if (filters?.start_at?.start) params.append('filters[start_at][start]', filters.start_at.start);
             if (filters?.start_at?.end) params.append('filters[start_at][end]', filters.start_at.end);
+            if (sort) params.append('sort', sort);
+            if (direction) params.append('direction', direction);
 
-            const { data } = await api.get<EventsResponse>(`/events?${params.toString()}`);
+            const { data } = await api.get<PaginatedResponse<Event>>(`/events?${params.toString()}`);
             return data;
         },
     });

@@ -1,7 +1,7 @@
 // src/lib/api.ts
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'https://dev.arcane.city';
+const baseURL = import.meta.env.VITE_API_URL || '';
 
 // You'll want to store these in environment variables
 const API_USERNAME = import.meta.env.VITE_API_USERNAME;
