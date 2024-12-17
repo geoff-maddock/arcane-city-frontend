@@ -1,3 +1,8 @@
+# Arcane City Frontend
+
+This is a frontend for the Arcane City project, which leverages the [Events-Tracker API](https://github.com/geoff-maddock/events-tracker).  
+It is built using React and TypeScript.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
