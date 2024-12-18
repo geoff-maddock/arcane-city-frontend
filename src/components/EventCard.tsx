@@ -1,4 +1,5 @@
 // src/components/EventCard.tsx
+import { useNavigate } from '@tanstack/react-router';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -27,6 +28,15 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate({
+      to: '/events/$eventId',
+      params: { eventId: event.id.toString() }
+    });
+  };
   const ageRestriction = getAgeRestriction(event.min_age);
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md">
@@ -47,7 +57,13 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             <div className="space-y-2">
               <div className="flex justify-between items-start">
                 <h3 className="line-clamp-2 text-xl font-semibold leading-tight text-gray-900">
-                  {event.name}
+                  <a
+                    href={`/events/${event.id}`}
+                    onClick={handleClick}
+                    className="hover:text-primary transition-colors"
+                  >
+                    {event.name}
+                  </a>
                 </h3>
               </div>
               {event.short && (

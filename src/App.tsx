@@ -1,18 +1,15 @@
 // src/App.tsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import Events from './components/Events';
+import { RouterProvider } from '@tanstack/react-router';
+import { router } from './router';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-50">
-        <main className="mx-auto px-4 py-8">
-          <Events />
-        </main>
-      </div>
+      <RouterProvider router={router} />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
