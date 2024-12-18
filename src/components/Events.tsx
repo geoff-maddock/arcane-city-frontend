@@ -37,6 +37,15 @@ export default function Events() {
         direction
     });
 
+    // Create array of all event images
+    const allEventImages = data?.data
+        .filter(event => event.primary_photo && event.primary_photo_thumbnail)
+        .map(event => ({
+            src: event.primary_photo!,
+            alt: event.name,
+            thumbnail: event.primary_photo_thumbnail
+        })) ?? [];
+
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -125,9 +134,16 @@ export default function Events() {
                         <>
                             {renderPagination()}
 
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 3xl:grid-cols-4">
                                 {data.data.map((event) => (
-                                    <EventCard key={event.id} event={event} />
+                                    <EventCard
+                                        key={event.id}
+                                        event={event}
+                                        allImages={allEventImages}
+                                        imageIndex={allEventImages.findIndex(
+                                            img => img.src === event.primary_photo
+                                        )}
+                                    />
                                 ))}
                             </div>
 

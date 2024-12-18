@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
 import { ImageLightbox } from './ImageLightbox';
-import { ImageModal } from './ImageModal';
 
 const getAgeRestriction = (minAge: number | null | undefined): string => {
   if (minAge === null || minAge === undefined) return 'Age requirement unknown';
@@ -23,9 +22,11 @@ const getAgeRestriction = (minAge: number | null | undefined): string => {
 
 interface EventCardProps {
   event: Event;
+  allImages: Array<{ src: string; alt: string }>;
+  imageIndex: number;
 }
 
-const EventCard = ({ event }: EventCardProps) => {
+const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   const ageRestriction = getAgeRestriction(event.min_age);
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md">
@@ -36,6 +37,8 @@ const EventCard = ({ event }: EventCardProps) => {
               thumbnailUrl={event.primary_photo_thumbnail}
               fullImageUrl={event.primary_photo}
               alt={event.name}
+              allImages={allImages}
+              initialIndex={imageIndex}
             />
           </div>
         )}
