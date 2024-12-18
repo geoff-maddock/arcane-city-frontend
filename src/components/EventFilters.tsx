@@ -129,7 +129,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                                 <Calendar
                                     mode="single"
                                     selected={filters.start_at?.start ? new Date(filters.start_at.start) : undefined}
-                                    onSelect={(date) => handleDateChange('start', date)}
+                                    onSelect={(date) => handleDateChange('start', date ?? null)}
                                     initialFocus
                                 />
                                 {filters.start_at?.start && (
@@ -138,7 +138,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                                             type="time"
                                             value={format(new Date(filters.start_at.start), "HH:mm")}
                                             onChange={(e) => {
-                                                const date = new Date(filters.start_at.start!);
+                                                const date = filters.start_at?.start ? new Date(filters.start_at.start) : new Date();
                                                 const [hours, minutes] = e.target.value.split(':');
                                                 date.setHours(parseInt(hours), parseInt(minutes));
                                                 handleDateChange('start', date);
@@ -170,7 +170,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                                 <Calendar
                                     mode="single"
                                     selected={filters.start_at?.end ? new Date(filters.start_at.end) : undefined}
-                                    onSelect={(date) => handleDateChange('end', date)}
+                                    onSelect={(date) => handleDateChange('end', date ?? null)}
                                     initialFocus
                                 />
                                 {filters.start_at?.end && (
@@ -179,7 +179,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                                             type="time"
                                             value={format(new Date(filters.start_at.end), "HH:mm")}
                                             onChange={(e) => {
-                                                const date = new Date(filters.start_at.end!);
+                                                const date = filters.start_at?.end ? new Date(filters.start_at.end) : new Date();
                                                 const [hours, minutes] = e.target.value.split(':');
                                                 date.setHours(parseInt(hours), parseInt(minutes));
                                                 handleDateChange('end', date);

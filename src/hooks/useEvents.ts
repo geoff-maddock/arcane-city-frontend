@@ -3,13 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Event, PaginatedResponse } from '../types/api';
 
-// interface EventsResponse {
-//     data: Event[];
-//     current_page: number;
-//     total: number;
-//     per_page: number;
-// }
-
 interface UseEventsParams {
     page?: number;
     itemsPerPage?: number;
@@ -34,7 +27,7 @@ export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort, directio
             const params = new URLSearchParams();
 
             params.append('page', page.toString());
-            params.append('per_page', itemsPerPage.toString());
+            params.append('limit', itemsPerPage.toString());
             if (filters?.name) params.append('filters[name]', filters.name);
             if (filters?.venue) params.append('filters[venue]', filters.venue);
             if (filters?.promoter) params.append('filters[promoter]', filters.promoter);
