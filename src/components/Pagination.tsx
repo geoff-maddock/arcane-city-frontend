@@ -76,7 +76,7 @@ export function Pagination({
                         </Button>
 
                         <div className="flex items-center gap-1">
-                            {currentPage > 3 && (
+                            {currentPage > 2 && (
                                 <>
                                     <Button
                                         variant="outline"
@@ -86,14 +86,13 @@ export function Pagination({
                                     >
                                         1
                                     </Button>
-                                    {currentPage > 4 && <span className="mx-1">...</span>}
+                                    {currentPage > 3 && <span className="mx-1">...</span>}
                                 </>
                             )}
 
                             {Array.from({ length: totalPages }, (_, i) => i + 1)
                                 .filter(page => {
                                     if (totalPages <= 7) return true;
-                                    if (page === 1 || page === totalPages) return true;
                                     if (page >= currentPage - 1 && page <= currentPage + 1) return true;
                                     return false;
                                 })
@@ -109,9 +108,9 @@ export function Pagination({
                                     </Button>
                                 ))}
 
-                            {currentPage < totalPages - 2 && (
+                            {currentPage < totalPages - 1 && (
                                 <>
-                                    {currentPage < totalPages - 3 && <span className="mx-1">...</span>}
+                                    {currentPage < totalPages - 2 && <span className="mx-1">...</span>}
                                     <Button
                                         variant="outline"
                                         onClick={() => onPageChange(totalPages)}
