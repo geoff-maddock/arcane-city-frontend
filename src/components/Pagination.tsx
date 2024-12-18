@@ -24,7 +24,6 @@ export function Pagination({
     currentPage,
     totalPages,
     onPageChange,
-    itemCount,
     totalItems,
     itemsPerPage,
     onItemsPerPageChange,

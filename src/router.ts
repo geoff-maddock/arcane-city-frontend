@@ -2,7 +2,7 @@
 import { createRouter, createRoute } from '@tanstack/react-router';
 import { rootRoute } from './routes/root';
 import Events from './components/Events';
-import { EventDetailRoute } from './routes/event-detail';
+import { EventDetailRoute } from './routes/event-detail.tsx';
 
 // Create routes
 const indexRoute = createRoute({
