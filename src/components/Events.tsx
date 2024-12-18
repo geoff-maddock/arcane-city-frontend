@@ -10,6 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
+
+interface DateRange {
+    start?: string;
+    end?: string;
+}
+
+interface EventFilters {
+    name: string;
+    venue: string;
+    promoter: string;
+    start_at?: DateRange | undefined;
+}
+
 const sortOptions = [
     { value: 'start_at', label: 'Date' },
     { value: 'name', label: 'Name' },
@@ -22,6 +35,7 @@ export default function Events() {
         name: '',
         venue: '',
         promoter: '',
+        start_at: undefined as { start: string; end: string } | undefined
     });
     const [page, setPage] = useState(1);
     // Replace useState with useLocalStorage
@@ -78,7 +92,7 @@ export default function Events() {
                 <div className="space-y-8">
                     <div className="flex flex-col space-y-2">
                         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                            Upcoming Events
+                            Event Listings
                         </h1>
                         <p className="text-lg text-gray-500">
                             Discover and explore upcoming events in your area

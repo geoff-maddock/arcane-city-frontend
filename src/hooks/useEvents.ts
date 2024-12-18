@@ -27,14 +27,14 @@ interface UseEventsParams {
 
 }
 
-export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort, direction = 'desc' }: UseEventsParams = {}) => {
-    return useQuery({
+export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort, direction }: UseEventsParams = {}) => {
+    return useQuery<PaginatedResponse<Event>>({
         queryKey: ['events', page, itemsPerPage, filters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
 
             params.append('page', page.toString());
-            params.append('limit', itemsPerPage.toString());
+            params.append('per_page', itemsPerPage.toString());
             if (filters?.name) params.append('filters[name]', filters.name);
             if (filters?.venue) params.append('filters[venue]', filters.venue);
             if (filters?.promoter) params.append('filters[promoter]', filters.promoter);
