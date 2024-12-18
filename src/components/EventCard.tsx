@@ -45,7 +45,6 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
           <div className="w-1/3">
             <ImageLightbox
               thumbnailUrl={event.primary_photo_thumbnail}
-              fullImageUrl={event.primary_photo}
               alt={event.name}
               allImages={allImages}
               initialIndex={imageIndex}
