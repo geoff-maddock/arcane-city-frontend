@@ -34,6 +34,9 @@ export default function EventDetail({ eventId }: { eventId: string }) {
         );
     }
 
+    // Replace newlines with <br /> tags in the description
+    const formattedDescription = event.description ? event.description.replace(/\n/g, '<br />') : '';
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
             <div className="mx-auto px-6 py-8 max-w-[1600px]">
@@ -75,7 +78,7 @@ export default function EventDetail({ eventId }: { eventId: string }) {
                             {event.description && (
                                 <Card>
                                     <CardContent className="prose max-w-none p-6">
-                                        <div dangerouslySetInnerHTML={{ __html: event.description }} />
+                                        <div dangerouslySetInnerHTML={{ __html: formattedDescription }} />
                                     </CardContent>
                                 </Card>
                             )}
