@@ -40,10 +40,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
     const handleClearDates = () => {
         onFilterChange({
             ...filters,
-            start_at: {
-                start: undefined,
-                end: undefined
-            }
+            start_at: undefined
         });
     };
 

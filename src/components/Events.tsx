@@ -20,7 +20,7 @@ interface EventFilters {
     name: string;
     venue: string;
     promoter: string;
-    start_at?: DateRange | undefined;
+    start_at?: DateRange;
 }
 
 const sortOptions = [
@@ -31,11 +31,11 @@ const sortOptions = [
 ];
 
 export default function Events() {
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<EventFilters>({  // Add the type annotation here
         name: '',
         venue: '',
         promoter: '',
-        start_at: undefined as { start: string; end: string } | undefined
+        start_at: undefined
     });
     const [page, setPage] = useState(1);
     // Replace useState with useLocalStorage
