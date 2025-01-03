@@ -31,17 +31,28 @@ const sortOptions = [
 ];
 
 export default function Events() {
+
+    // Helper to get start of today
+    const getTodayStart = () => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today.toISOString();
+    };
+
     const [filters, setFilters] = useState<EventFilters>({  // Add the type annotation here
         name: '',
         venue: '',
         promoter: '',
-        start_at: undefined
+        start_at: {
+            start: getTodayStart(),
+            end: undefined
+        }
     });
     const [page, setPage] = useState(1);
     // Replace useState with useLocalStorage
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('eventsPerPage', 25);
     const [sort, setSort] = useState('start_at');
-    const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
+    const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
 
     const { data, isLoading, error } = useEvents({
         filters,
