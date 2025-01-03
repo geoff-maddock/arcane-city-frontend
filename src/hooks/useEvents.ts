@@ -20,7 +20,7 @@ interface UseEventsParams {
 
 }
 
-export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort, direction }: UseEventsParams = {}) => {
+export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort = 'start_at', direction = 'asc' }: UseEventsParams = {}) => {
     return useQuery<PaginatedResponse<Event>>({
         queryKey: ['events', page, itemsPerPage, filters, sort, direction],
         queryFn: async () => {
