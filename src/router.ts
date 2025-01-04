@@ -1,8 +1,8 @@
-// src/router.ts
 import { createRouter, createRoute } from '@tanstack/react-router';
 import { rootRoute } from './routes/root';
 import Events from './components/Events';
 import { EventDetailRoute } from './routes/event-detail.tsx';
+import Entities from './components/Entities'; // Import the new Entities component
 
 // Create routes
 const indexRoute = createRoute({
@@ -17,10 +17,17 @@ const eventRoute = createRoute({
     component: Events,
 });
 
+const entityRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/entities',
+    component: Entities,
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
     indexRoute,
     eventRoute,
+    entityRoute,
     EventDetailRoute
 ]);
 

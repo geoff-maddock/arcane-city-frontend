@@ -1,4 +1,3 @@
-// src/types/api.ts
 export interface Event {
     id: number;
     name: string;
@@ -37,11 +36,52 @@ export interface Tag {
 export interface EntityType {
     id: number;
     name: string;
+    slug: string;
+    short?: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface EntityStatus {
     id: number;
     name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Link {
+    id: number;
+    title: string;
+    text: string;
+    url: string;
+    is_primary: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+export interface Entity {
+    id: number;
+    name: string;
+    slug: string;
+    short?: string;
+    description?: string;
+    entity_type: EntityType;
+    entity_status: EntityStatus;
+    created_by: User;
+    updated_by: User;
+    created_at: string;
+    updated_at: string;
+    started_at: string;
+    facebook_username?: string;
+    twitter_username?: string;
+    links: Link[];
+    tags: Tag[];
 }
 
 export interface PaginatedResponse<T> {
