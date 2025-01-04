@@ -1,3 +1,4 @@
+import { endOfWeek, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay, addDays } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,36 @@ interface EventFiltersProps {
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
 
+// Add predefined date range options
+const getDateRanges = () => {
+    const now = new Date();
+
+    // Get this weekend (next Saturday and Sunday if today is not weekend)
+    const getWeekend = () => {
+        const today = now.getDay(); // 0 is Sunday, 6 is Saturday
+        const daysUntilFriday = today === 5 ? 0 : ((5 - today + 7) % 7);
+        const weekendStart = addDays(startOfDay(now), daysUntilFriday);
+        const weekendEnd = endOfDay(addDays(weekendStart, 2)); // End of Sunday
+        return { start: weekendStart, end: weekendEnd };
+    };
+
+    return {
+        today: {
+            start: startOfDay(now),
+            end: endOfDay(now)
+        },
+        week: {
+            start: startOfWeek(now, { weekStartsOn: 1 }), // Start on Monday
+            end: endOfWeek(now, { weekStartsOn: 1 })
+        },
+        month: {
+            start: startOfMonth(now),
+            end: endOfMonth(now)
+        },
+        weekend: getWeekend()
+    };
+};
+
 export default function EventFilters({ filters, onFilterChange }: EventFiltersProps) {
     const handleDateChange = (field: 'start' | 'end', value: Date | null) => {
         onFilterChange({
@@ -41,6 +72,17 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
         onFilterChange({
             ...filters,
             start_at: undefined
+        });
+    };
+
+    const handleQuickFilter = (range: 'today' | 'week' | 'month' | 'weekend') => {
+        const ranges = getDateRanges();
+        onFilterChange({
+            ...filters,
+            start_at: {
+                start: ranges[range].start.toISOString(),
+                end: ranges[range].end.toISOString()
+            }
         });
     };
 
@@ -189,6 +231,67 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     </div>
                 </div>
             </div>
+
+
+
+            <div className="space-y-2">
+                <div className="h-6 flex items-center justify-between">
+                    <Label>Date Range</Label>
+                    {(filters.start_at?.start || filters.start_at?.end) && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleClearDates}
+                            className="h-6 px-2 text-gray-500 hover:text-gray-900"
+                        >
+                            Clear dates
+                            <X className="ml-1 h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
+
+                {/* Quick filter buttons */}
+                <div className="flex gap-2 mb-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickFilter('today')}
+                        className="flex-1"
+                    >
+                        Today
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickFilter('week')}
+                        className="flex-1"
+                    >
+                        This Week
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickFilter('month')}
+                        className="flex-1"
+                    >
+                        This Month
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickFilter('weekend')}
+                        className="flex-1"
+                    >
+                        Weekend
+                    </Button>
+                </div>
+
+                {/* Existing date pickers */}
+                <div className="grid grid-cols-2 gap-2">
+                    {/* ... existing Popover components ... */}
+                </div>
+            </div>
+
         </div>
     );
 }
