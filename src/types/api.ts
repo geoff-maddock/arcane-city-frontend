@@ -25,6 +25,14 @@ export interface EntityResponse {
     description?: string;
     entity_type?: EntityType;
     entity_status?: EntityStatus;
+    primary_photo?: string;
+    primary_photo_thumbnail?: string;
+}
+
+export interface Role {
+    id: number;
+    name: string;
+    slug: string;
 }
 
 export interface Tag {
@@ -82,6 +90,9 @@ export interface Entity {
     twitter_username?: string;
     links: Link[];
     tags: Tag[];
+    roles: Role[];
+    primary_photo?: string;
+    primary_photo_thumbnail?: string;
 }
 
 export interface PaginatedResponse<T> {
