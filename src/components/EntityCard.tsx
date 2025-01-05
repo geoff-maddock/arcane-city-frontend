@@ -24,6 +24,11 @@ interface Tag {
     name: string;
 }
 
+interface Role {
+    id: number;
+    name: string;
+}
+
 interface EntityCardProps {
     entity: {
         id: number;
@@ -37,6 +42,7 @@ interface EntityCardProps {
         twitter_username?: string;
         links: Link[];
         tags: Tag[];
+        roles: Role[];
         primary_photo?: string;
         primary_photo_thumbnail?: string;
     };
