@@ -1,4 +1,3 @@
-// src/components/EventDetail.tsx
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';

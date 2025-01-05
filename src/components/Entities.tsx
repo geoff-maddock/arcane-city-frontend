@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useEntities } from '../hooks/useEntities';
 import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { Card, CardContent } from '@/components/ui/card';
+import EntityCard from './EntityCard';
+import EntityFilters from './EntityFilters';
 
 interface DateRange {
     start?: string;
@@ -15,14 +17,15 @@ interface DateRange {
 
 interface EntityFilters {
     name: string;
-    type: string;
+    entity_type: string;
+    role: string;
     status: string;
-    start_at?: DateRange;
+    created_at?: DateRange;
 }
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
-    { value: 'type', label: 'Type' },
+    { value: 'entity_type', label: 'Type' },
     { value: 'status', label: 'Status' },
     { value: 'created_at', label: 'Recently Added' }
 ];
@@ -30,16 +33,19 @@ const sortOptions = [
 export default function Entities() {
     const [filters, setFilters] = useState<EntityFilters>({
         name: '',
-        type: '',
+        entity_type: '',
+        role: '',
         status: '',
-        start_at: {
+        created_at: {
             start: undefined,
             end: undefined
         }
     });
+
     const [page, setPage] = useState(1);
+    // Replace useState with useLocalStorage
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('entitiesPerPage', 25);
-    const [sort, setSort] = useState('name');
+    const [sort, setSort] = useState('created_at');
     const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
 
     const { data, isLoading, error } = useEntities({
@@ -50,6 +56,16 @@ export default function Entities() {
         direction
     });
 
+
+    // Create array of all entity images
+    const allEntityImages = data?.data
+        .filter(entity => entity.primary_photo && entity.primary_photo_thumbnail)
+        .map(entity => ({
+            src: entity.primary_photo!,
+            alt: entity.name,
+            thumbnail: entity.primary_photo_thumbnail
+        })) ?? [];
+
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -57,7 +73,7 @@ export default function Entities() {
 
     const handleItemsPerPageChange = (count: number) => {
         setItemsPerPage(count);
-        setPage(1);
+        setPage(1); // Reset to first page when changing items per page
     };
 
     const renderPagination = () => {
@@ -85,13 +101,14 @@ export default function Entities() {
                             Entity Listings
                         </h1>
                         <p className="text-lg text-gray-500">
-                            Discover and explore entities
+                            Discover and explore entities in our database.
                         </p>
                     </div>
 
                     <Card className="border-gray-100 shadow-sm">
                         <CardContent className="p-6 space-y-4">
-                            {/* Add EntityFilters component here when created */}
+                            <EntityFilters filters={filters} onFilterChange={setFilters} />
+
                             <div className="flex items-center justify-between pt-4 border-t">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-gray-500">Sort by:</span>
@@ -126,7 +143,7 @@ export default function Entities() {
                     {error ? (
                         <Alert variant="destructive">
                             <AlertDescription>
-                                There was an error loading entities. Please try again later.
+                                There was an error loading events. Please try again later.
                             </AlertDescription>
                         </Alert>
                     ) : isLoading ? (
@@ -139,12 +156,14 @@ export default function Entities() {
 
                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 3xl:grid-cols-4">
                                 {data.data.map((entity) => (
-                                    <div key={entity.id} className="border p-4 rounded shadow-sm">
-                                        <h2 className="text-xl font-bold">{entity.name}</h2>
-                                        <p className="text-gray-500">{entity.entity_type.name}</p>
-                                        <p className="text-gray-500">{entity.entity_status.name}</p>
-                                        <p className="text-gray-500">{entity.description}</p>
-                                    </div>
+                                    <EntityCard
+                                        key={entity.id}
+                                        entity={entity}
+                                        allImages={allEntityImages}
+                                        imageIndex={allEntityImages.findIndex(
+                                            img => img.src === entity.primary_photo
+                                        )}
+                                    />
                                 ))}
                             </div>
 
@@ -153,7 +172,7 @@ export default function Entities() {
                     ) : (
                         <Card className="border-gray-100">
                             <CardContent className="flex h-96 items-center justify-center text-gray-500">
-                                No entities found. Try adjusting your filters.
+                                No events found. Try adjusting your filters.
                             </CardContent>
                         </Card>
                     )}
@@ -161,4 +180,5 @@ export default function Entities() {
             </div>
         </div>
     );
+
 }
