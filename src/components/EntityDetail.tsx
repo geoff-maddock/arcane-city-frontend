@@ -4,8 +4,7 @@ import { api } from '../lib/api';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
-import { formatDate } from '../lib/utils';
+import { Loader2, ArrowLeft, MapPin, Users, } from 'lucide-react';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
 
