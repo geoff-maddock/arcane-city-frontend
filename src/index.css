@@ -57,4 +57,20 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .menu-bar {
+    @apply fixed top-0 left-0 h-full w-64 bg-gray-800 text-white flex flex-col p-4;
+  }
+
+  .menu-bar h1 {
+    @apply text-2xl font-bold mb-4;
+  }
+
+  .menu-bar nav {
+    @apply flex flex-col gap-2;
+  }
+
+  .menu-bar .toggle-theme-button {
+    @apply mt-auto;
+  }
 }
