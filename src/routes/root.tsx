@@ -3,9 +3,11 @@ import MenuBar from '../components/MenuBar';
 
 export const Root = () => {
     return (
-        <div className="flex">
-            <MenuBar />
-            <div className="flex-1">
+        <div className="min-h-screen">
+            <div className="hidden md:block fixed left-0 top-0 h-full w-20 lg:w-64 bg-gray-800">
+                <MenuBar />
+            </div>
+            <div className="md:ml-20 lg:ml-64">
                 <Outlet />
             </div>
         </div>
