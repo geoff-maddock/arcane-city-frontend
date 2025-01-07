@@ -10,14 +10,16 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex">
-        <MenuBar />
-        <div className="flex-1">
-          <RouterProvider router={router} />
+      <RouterProvider router={router}>
+        <div className="flex">
+          <MenuBar />
+          <div className="flex-1">
+            {/* Other components that need routing */}
+          </div>
         </div>
-      </div>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Analytics />
+        <ReactQueryDevtools initialIsOpen={false} />
+        <Analytics />
+      </RouterProvider>
     </QueryClientProvider>
   );
 }
