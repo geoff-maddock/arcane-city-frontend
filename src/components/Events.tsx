@@ -103,7 +103,7 @@ export default function Events() {
 
     return (
         <div className="bg-background text-foreground min-h-screen p-4">
-            <div className="mx-auto px-6 py-8 max-w-[1600px]">
+            <div className="mx-auto px-6 py-8 max-w-[2400px]">
                 <div className="space-y-8">
                     <div className="flex flex-col space-y-2">
                         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
@@ -163,7 +163,7 @@ export default function Events() {
                         <>
                             {renderPagination()}
 
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 3xl:grid-cols-4">
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
                                 {data.data.map((event) => (
                                     <EventCard
                                         key={event.id}
