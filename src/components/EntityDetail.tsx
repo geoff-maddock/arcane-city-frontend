@@ -37,7 +37,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
 
     return (
         <div className="min-h-screen">
-            <div className="mx-auto px-6 py-8 max-w-[1600px]">
+            <div className="mx-auto px-6 py-8 max-w-[2400px]">
                 <div className="space-y-6">
                     <div className="flex items-center gap-4">
                         <Button

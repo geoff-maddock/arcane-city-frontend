@@ -14,7 +14,7 @@ const MenuBar: React.FC = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 h-full w-20 lg:w-64 bg-gray-800 text-white flex flex-col items-center justify-center p-4">
+    <div className="fixed top-0 left-0 h-full w-20 lg:w-64 flex flex-col items-center justify-center p-4">
       <h1 className="hidden lg:block text-2xl font-bold mb-4 text-center">Arcane City</h1>
       <div className="block lg:hidden mb-4">
         <HiOfficeBuilding size={24} />

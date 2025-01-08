@@ -127,10 +127,9 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
                     )}
                     {entity.links.length > 0 && (
                         <div className="space-y-2">
-                            <h3 className="font-semibold">Links</h3>
-                            <ul className="list-disc list-inside">
+                            <ul className="list-inside overflow-hidden text-ellipsis">
                                 {entity.links.map((link) => (
-                                    <li key={link.id}>
+                                    <li key={link.id} className="truncate">
                                         <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">
                                             {link.url}
                                         </a>
