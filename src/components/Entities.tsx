@@ -93,7 +93,7 @@ export default function Entities() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="bg-background text-foreground min-h-screen p-4">
             <div className="mx-auto px-6 py-8 max-w-[1600px]">
                 <div className="space-y-8">
                     <div className="flex flex-col space-y-2">
