@@ -22,6 +22,7 @@ interface EventFiltersProps {
         name: string;
         venue: string;
         promoter: string;
+        event_type: string;
         start_at?: DateRange;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
@@ -127,6 +128,20 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             className="pl-9"
                             value={filters.promoter}
                             onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="type">Type</Label>
+                    <div className="relative">
+                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="type"
+                            placeholder="Filter by type..."
+                            className="pl-9"
+                            value={filters.event_type}
+                            onChange={(e) => onFilterChange({ ...filters, event_type: e.target.value })}
                         />
                     </div>
                 </div>

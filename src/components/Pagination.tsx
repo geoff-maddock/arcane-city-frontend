@@ -29,7 +29,7 @@ export function Pagination({
     onItemsPerPageChange,
 }: PaginationProps) {
     return (
-        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+        <div className="flex items-center justify-between border-t px-4 py-3 sm:px-6">
             <div className="flex flex-1 items-center justify-between">
                 <div className="flex items-center gap-4">
                     <p className="text-sm text-gray-700">
