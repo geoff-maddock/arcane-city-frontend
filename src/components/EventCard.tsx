@@ -76,7 +76,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
 
 
                 {event.event_type && (
-                  <div className="flex items-center">
+                  <div className="items-center">
                     <span className="text-gray-500 font-bold">
                       {event.event_type.name}
                     </span>

@@ -37,7 +37,7 @@ export default function EventDetail({ eventId }: { eventId: string }) {
     const formattedDescription = event.description ? event.description.replace(/\n/g, '<br />') : '';
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen">
             <div className="mx-auto px-6 py-8 max-w-[1600px]">
                 <div className="space-y-6">
                     <div className="flex items-center gap-4">
@@ -93,9 +93,9 @@ export default function EventDetail({ eventId }: { eventId: string }) {
                                             <span>{formatDate(event.start_at)}</span>
                                         </div>
 
-                                        {event.type && (
+                                        {event.event_type && (
                                             <h2>
-                                                <span>{event.type.name}</span>
+                                                <span>{event.event_type.name}</span>
                                             </h2>
                                         )}
 
