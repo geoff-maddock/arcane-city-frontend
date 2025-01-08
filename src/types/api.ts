@@ -8,6 +8,7 @@ export interface Event {
     end_at?: string;
     venue?: EntityResponse;
     promoter?: EntityResponse;
+    event_type?: EventType;
     presale_price?: number;
     door_price?: number;
     min_age?: number;
@@ -42,6 +43,15 @@ export interface Tag {
 }
 
 export interface EntityType {
+    id: number;
+    name: string;
+    slug: string;
+    short?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface EventType {
     id: number;
     name: string;
     slug: string;

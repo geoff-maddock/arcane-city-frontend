@@ -73,6 +73,26 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
           <CardContent className="p-4 pt-2">
             <div className="space-y-4">
               <div className="space-y-2">
+
+
+                {event.event_type && (
+                  <div className="flex items-center">
+                    <span className="text-gray-500 font-bold">
+                      {event.event_type.name}
+                    </span>
+                    {event.promoter && (
+                      <span>
+                        <span className="m-1 text-gray-500 ">
+                          by
+                        </span>
+                        <span className=" text-gray-500 font-bold">
+                          {event.promoter.name}
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex items-center text-sm text-gray-500">
                   <CalendarDays className="mr-2 h-4 w-4" />
                   {formatDate(event.start_at)}

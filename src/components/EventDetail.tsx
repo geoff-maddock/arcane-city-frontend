@@ -93,6 +93,12 @@ export default function EventDetail({ eventId }: { eventId: string }) {
                                             <span>{formatDate(event.start_at)}</span>
                                         </div>
 
+                                        {event.type && (
+                                            <h2>
+                                                <span>{event.type.name}</span>
+                                            </h2>
+                                        )}
+
                                         {event.venue && (
                                             <div className="flex items-center gap-2 text-gray-600">
                                                 <MapPin className="h-5 w-5" />
