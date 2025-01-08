@@ -116,10 +116,6 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
                         <MapPin className="h-5 w-5" />
                         <span>{entity.entity_type.name}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                        <Users className="h-5 w-5" />
-                        <span>{entity.entity_status.name}</span>
-                    </div>
                     {entity.roles.length > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
                             <Users className="h-5 w-5" />

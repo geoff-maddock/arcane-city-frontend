@@ -36,7 +36,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen">
             <div className="mx-auto px-6 py-8 max-w-[1600px]">
                 <div className="space-y-6">
                     <div className="flex items-center gap-4">
@@ -90,6 +90,12 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                         <div className="flex items-center gap-2 text-gray-600">
                                             <MapPin className="h-5 w-5" />
                                             <span>{entity.entity_type.name}</span>
+                                            {entity.primary_location && (
+                                                <div>
+                                                    {entity.primary_location.address_line_one}
+                                                    {entity.primary_location.city}, {entity.primary_location.state}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex items-center gap-2 text-gray-600">
                                             <Users className="h-5 w-5" />

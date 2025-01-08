@@ -30,6 +30,35 @@ export interface EntityResponse {
     primary_photo_thumbnail?: string;
 }
 
+export interface LocationResponse {
+    id: number;
+    name: string;
+    slug: string;
+    address_line_one?: string;
+    address_line_two?: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+    map_url?: string;
+}
+
+export interface Location {
+    id: number;
+    name: string;
+    slug: string;
+    address_line_one?: string;
+    address_line_two?: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+    map_url?: string;
+}
+
+
 export interface Role {
     id: number;
     name: string;
@@ -103,6 +132,7 @@ export interface Entity {
     roles: Role[];
     primary_photo?: string;
     primary_photo_thumbnail?: string;
+    primary_location?: LocationResponse;
 }
 
 export interface PaginatedResponse<T> {
