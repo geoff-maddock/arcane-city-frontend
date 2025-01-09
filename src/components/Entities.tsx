@@ -3,14 +3,13 @@ import { useEntities } from '../hooks/useEntities';
 import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Card, CardContent } from '@/components/ui/card';
 import EntityCard from './EntityCard';
 import EntityFilters from './EntityFilters';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import SortControls from './SortControls';
 
 interface DateRange {
     start?: string;
@@ -27,8 +26,8 @@ interface EntityFilters {
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
-    { value: 'entity_type', label: 'Type' },
-    { value: 'status', label: 'Status' },
+    { value: 'entity_type_id', label: 'Type' },
+    { value: 'entity_status_id', label: 'Status' },
     { value: 'created_at', label: 'Recently Added' }
 ];
 
@@ -142,35 +141,13 @@ export default function Entities() {
                             <Card className="border-gray-100 shadow-sm">
                                 <CardContent className="p-6 space-y-4">
                                     <EntityFilters filters={filters} onFilterChange={setFilters} />
-
-                                    <div className="flex items-center justify-between pt-4 border-t">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-gray-500">Sort by:</span>
-                                            <Select
-                                                value={sort}
-                                                onValueChange={(value) => setSort(value)}
-                                            >
-                                                <SelectTrigger className="w-[180px]">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {sortOptions.map((option) => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            {option.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setDirection(direction === 'asc' ? 'desc' : 'asc')}
-                                                className="text-gray-500"
-                                            >
-                                                {direction === 'asc' ? '↑' : '↓'}
-                                            </Button>
-                                        </div>
-                                    </div>
+                                    <SortControls
+                                        sort={sort}
+                                        setSort={setSort}
+                                        direction={direction}
+                                        setDirection={setDirection}
+                                        sortOptions={sortOptions}
+                                    />
                                 </CardContent>
                             </Card>
                         )}
