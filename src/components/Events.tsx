@@ -6,11 +6,10 @@ import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import SortControls from './SortControls';
 
 
 interface DateRange {
@@ -29,9 +28,9 @@ interface EventFilters {
 const sortOptions = [
     { value: 'start_at', label: 'Date' },
     { value: 'name', label: 'Name' },
-    { value: 'venue', label: 'Venue' },
-    { value: 'promoter', label: 'Promoter' },
-    { value: 'event-type', label: 'Type' },
+    { value: 'venue_id', label: 'Venue' },
+    { value: 'promoter_id', label: 'Promoter' },
+    { value: 'event_type_id', label: 'Type' },
     { value: 'created_at', label: 'Recently Added' }
 ];
 
@@ -153,34 +152,13 @@ export default function Events() {
                             <Card className="shadow-sm">
                                 <CardContent className="p-6 space-y-4">
                                     <EventFilters filters={filters} onFilterChange={setFilters} />
-                                    <div className="flex items-center justify-between pt-4 border-t">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-gray-500">Sort by:</span>
-                                            <Select
-                                                value={sort}
-                                                onValueChange={(value) => setSort(value)}
-                                            >
-                                                <SelectTrigger className="w-[180px]">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {sortOptions.map((option) => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            {option.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setDirection(direction === 'asc' ? 'desc' : 'asc')}
-                                                className="text-gray-500"
-                                            >
-                                                {direction === 'asc' ? '↑' : '↓'}
-                                            </Button>
-                                        </div>
-                                    </div>
+                                    <SortControls
+                                        sort={sort}
+                                        setSort={setSort}
+                                        direction={direction}
+                                        setDirection={setDirection}
+                                        sortOptions={sortOptions}
+                                    />
                                 </CardContent>
                             </Card>
                         )}
