@@ -33,8 +33,8 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate({
-      to: '/events/$eventId',
-      params: { eventId: event.id.toString() }
+      to: '/events/$slug',
+      params: { slug: event.slug }
     });
   };
   const ageRestriction = getAgeRestriction(event.min_age);
@@ -57,7 +57,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
               <div className="flex justify-between items-start">
                 <h3 className="line-clamp-2 text-xl font-semibold leading-tight text-gray-900">
                   <a
-                    href={`/events/${event.id}`}
+                    href={`/events/${event.slug}`}
                     onClick={handleClick}
                     className="hover:text-primary transition-colors"
                   >

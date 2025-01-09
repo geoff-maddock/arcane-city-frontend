@@ -5,9 +5,9 @@ import EventDetail from '../components/EventDetail';
 
 export const EventDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/events/$eventId',
+    path: '/events/$slug',
     component: function EventDetailWrapper() {
         const params = EventDetailRoute.useParams();
-        return <EventDetail eventId={params.eventId} />;
+        return <EventDetail slug={params.slug} />;
     },
 });

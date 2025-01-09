@@ -89,7 +89,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-4 2xl:grid-cols-5">
                 <div className="space-y-2">
                     <Label htmlFor="name">Event Name</Label>
                     <div className="relative">
@@ -301,10 +301,6 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     </Button>
                 </div>
 
-                {/* Existing date pickers */}
-                <div className="grid grid-cols-2 gap-2">
-                    {/* ... existing Popover components ... */}
-                </div>
             </div>
 
         </div>

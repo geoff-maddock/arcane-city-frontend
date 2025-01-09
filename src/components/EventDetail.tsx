@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
 import { formatDate } from '../lib/utils';
 
-export default function EventDetail({ eventId }: { eventId: string }) {
+export default function EventDetail({ slug }: { slug: string }) {
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
-        queryKey: ['event', eventId],
+        queryKey: ['event', slug],
         queryFn: async () => {
-            const { data } = await api.get<Event>(`/events/${eventId}`);
+            const { data } = await api.get<Event>(`/events/${slug}`);
             return data;
         },
     });
