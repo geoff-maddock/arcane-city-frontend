@@ -1,4 +1,3 @@
-// src/components/Pagination.tsx
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -29,9 +28,9 @@ export function Pagination({
     onItemsPerPageChange,
 }: PaginationProps) {
     return (
-        <div className="flex items-center justify-between border-t px-4 py-3 sm:px-6">
-            <div className="flex flex-1 items-center justify-between">
-                <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 md:gap-0 border-t px-4 py-3 md:px-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center justify-between md:justify-start gap-4">
                     <p className="text-sm text-gray-700">
                         Showing{' '}
                         <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span>{' '}
@@ -61,8 +60,8 @@ export function Pagination({
                     </Select>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0">
+                    <div className="flex items-center justify-between w-full">
                         <Button
                             variant="outline"
                             onClick={() => onPageChange(currentPage - 1)}
@@ -74,7 +73,7 @@ export function Pagination({
                             Previous
                         </Button>
 
-                        <div className="flex items-center gap-1">
+                        <div className="hidden md:flex items-center gap-1">
                             {currentPage > 2 && (
                                 <>
                                     <Button
@@ -120,6 +119,11 @@ export function Pagination({
                                     </Button>
                                 </>
                             )}
+                        </div>
+                        <div className="flex md:hidden items-center">
+                            <span className="text-sm text-gray-700 mx-2">
+                                Page {currentPage} of {totalPages}
+                            </span>
                         </div>
 
                         <Button
