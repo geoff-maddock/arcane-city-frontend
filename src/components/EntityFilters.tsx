@@ -47,7 +47,7 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-4 2xl:grid-cols-5">
                 <div className="space-y-2">
                     <Label htmlFor="name">Entity Name</Label>
                     <div className="relative">

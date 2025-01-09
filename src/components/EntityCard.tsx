@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from '@tanstack/react-router';
 import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
+import { Badge } from '@/components/ui/badge';
 
 interface EntityType {
     id: number;
@@ -143,9 +144,13 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
                             <h3 className="font-semibold">Tags</h3>
                             <div className="flex flex-wrap gap-2">
                                 {entity.tags.map((tag) => (
-                                    <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded">
+                                    <Badge
+                                        key={tag.id}
+                                        variant="secondary"
+                                        className="bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                    >
                                         {tag.name}
-                                    </span>
+                                    </Badge>
                                 ))}
                             </div>
                         </div>

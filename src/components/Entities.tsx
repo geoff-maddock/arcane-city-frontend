@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useEntities } from '../hooks/useEntities';
 import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
@@ -9,6 +9,8 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Card, CardContent } from '@/components/ui/card';
 import EntityCard from './EntityCard';
 import EntityFilters from './EntityFilters';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
 interface DateRange {
     start?: string;
@@ -31,6 +33,20 @@ const sortOptions = [
 ];
 
 export default function Entities() {
+
+    const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
+        const savedState = localStorage.getItem('filtersVisible');
+        return savedState ? JSON.parse(savedState) : true;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('filtersVisible', JSON.stringify(filtersVisible));
+    }, [filtersVisible]);
+
+    const toggleFilters = () => {
+        setFiltersVisible(!filtersVisible);
+    };
+
     const [filters, setFilters] = useState<EntityFilters>({
         name: '',
         entity_type: '',
@@ -105,40 +121,60 @@ export default function Entities() {
                         </p>
                     </div>
 
-                    <Card className="border-gray-100 shadow-sm">
-                        <CardContent className="p-6 space-y-4">
-                            <EntityFilters filters={filters} onFilterChange={setFilters} />
+                    <div className="relative">
+                        <button
+                            onClick={toggleFilters}
+                            className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
+                        >
+                            {filtersVisible ? (
+                                <>
+                                    <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
+                                    Hide Filters
+                                </>
+                            ) : (
+                                <>
+                                    <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
+                                    Show Filters
+                                </>
+                            )}
+                        </button>
+                        {filtersVisible && (
+                            <Card className="border-gray-100 shadow-sm">
+                                <CardContent className="p-6 space-y-4">
+                                    <EntityFilters filters={filters} onFilterChange={setFilters} />
 
-                            <div className="flex items-center justify-between pt-4 border-t">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-500">Sort by:</span>
-                                    <Select
-                                        value={sort}
-                                        onValueChange={(value) => setSort(value)}
-                                    >
-                                        <SelectTrigger className="w-[180px]">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {sortOptions.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setDirection(direction === 'asc' ? 'desc' : 'asc')}
-                                        className="text-gray-500"
-                                    >
-                                        {direction === 'asc' ? '↑' : '↓'}
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    <div className="flex items-center justify-between pt-4 border-t">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm text-gray-500">Sort by:</span>
+                                            <Select
+                                                value={sort}
+                                                onValueChange={(value) => setSort(value)}
+                                            >
+                                                <SelectTrigger className="w-[180px]">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {sortOptions.map((option) => (
+                                                        <SelectItem key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setDirection(direction === 'asc' ? 'desc' : 'asc')}
+                                                className="text-gray-500"
+                                            >
+                                                {direction === 'asc' ? '↑' : '↓'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
 
                     {error ? (
                         <Alert variant="destructive">
