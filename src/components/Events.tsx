@@ -10,6 +10,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import SortControls from './SortControls';
+import { EventFilterContext } from '../context/EventFilterContext';
 
 
 interface DateRange {
@@ -122,90 +123,92 @@ export default function Events() {
     };
 
     return (
-        <div className="bg-background text-foreground min-h-screen p-4">
-            <div className="mx-auto px-6 py-8 max-w-[2400px]">
-                <div className="space-y-8">
-                    <div className="flex flex-col space-y-2">
-                        <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                            Event Listings
-                        </h1>
-                        <p className="text-lg text-gray-500">
-                            Discover and explore upcoming events in your area
-                        </p>
-                    </div>
+        <EventFilterContext.Provider value={{ filters, setFilters }}>
+            <div className="bg-background text-foreground min-h-screen p-4">
+                <div className="mx-auto px-6 py-8 max-w-[2400px]">
+                    <div className="space-y-8">
+                        <div className="flex flex-col space-y-2">
+                            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+                                Event Listings
+                            </h1>
+                            <p className="text-lg text-gray-500">
+                                Discover and explore upcoming events in your area
+                            </p>
+                        </div>
 
-                    <div className="relative">
-                        <button
-                            onClick={toggleFilters}
-                            className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
-                        >
-                            {filtersVisible ? (
-                                <>
-                                    <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
-                                    Hide Filters
-                                </>
-                            ) : (
-                                <>
-                                    <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
-                                    Show Filters
-                                </>
+                        <div className="relative">
+                            <button
+                                onClick={toggleFilters}
+                                className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
+                            >
+                                {filtersVisible ? (
+                                    <>
+                                        <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
+                                        Hide Filters
+                                    </>
+                                ) : (
+                                    <>
+                                        <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
+                                        Show Filters
+                                    </>
+                                )}
+                            </button>
+
+                            {filtersVisible && (
+                                <Card className="shadow-sm">
+                                    <CardContent className="p-6 space-y-4">
+                                        <EventFilters filters={filters} onFilterChange={setFilters} />
+                                        <SortControls
+                                            sort={sort}
+                                            setSort={setSort}
+                                            direction={direction}
+                                            setDirection={setDirection}
+                                            sortOptions={sortOptions}
+                                        />
+                                    </CardContent>
+                                </Card>
                             )}
-                        </button>
+                        </div>
 
-                        {filtersVisible && (
-                            <Card className="shadow-sm">
-                                <CardContent className="p-6 space-y-4">
-                                    <EventFilters filters={filters} onFilterChange={setFilters} />
-                                    <SortControls
-                                        sort={sort}
-                                        setSort={setSort}
-                                        direction={direction}
-                                        setDirection={setDirection}
-                                        sortOptions={sortOptions}
-                                    />
+                        {error ? (
+                            <Alert variant="destructive">
+                                <AlertDescription>
+                                    There was an error loading events. Please try again later.
+                                </AlertDescription>
+                            </Alert>
+                        ) : isLoading ? (
+                            <div className="flex h-96 items-center justify-center">
+                                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                            </div>
+                        ) : data?.data && data.data.length > 0 ? (
+                            <>
+                                {renderPagination()}
+
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
+                                    {data.data.map((event) => (
+                                        <EventCard
+                                            key={event.slug}
+                                            event={event}
+                                            allImages={allEventImages}
+                                            imageIndex={allEventImages.findIndex(
+                                                img => img.src === event.primary_photo
+                                            )}
+                                        />
+                                    ))}
+                                </div>
+
+                                {renderPagination()}
+                            </>
+                        ) : (
+                            <Card className="border-gray-100">
+                                <CardContent className="flex h-96 items-center justify-center text-gray-500">
+                                    No events found. Try adjusting your filters.
                                 </CardContent>
                             </Card>
                         )}
                     </div>
-
-                    {error ? (
-                        <Alert variant="destructive">
-                            <AlertDescription>
-                                There was an error loading events. Please try again later.
-                            </AlertDescription>
-                        </Alert>
-                    ) : isLoading ? (
-                        <div className="flex h-96 items-center justify-center">
-                            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                        </div>
-                    ) : data?.data && data.data.length > 0 ? (
-                        <>
-                            {renderPagination()}
-
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
-                                {data.data.map((event) => (
-                                    <EventCard
-                                        key={event.slug}
-                                        event={event}
-                                        allImages={allEventImages}
-                                        imageIndex={allEventImages.findIndex(
-                                            img => img.src === event.primary_photo
-                                        )}
-                                    />
-                                ))}
-                            </div>
-
-                            {renderPagination()}
-                        </>
-                    ) : (
-                        <Card className="border-gray-100">
-                            <CardContent className="flex h-96 items-center justify-center text-gray-500">
-                                No events found. Try adjusting your filters.
-                            </CardContent>
-                        </Card>
-                    )}
                 </div>
             </div>
-        </div>
+        </EventFilterContext.Provider>
     );
 }
