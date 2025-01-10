@@ -21,7 +21,9 @@ interface EventFilters {
     name: string;
     venue: string;
     promoter: string;
+    entity: string;
     event_type: string;
+    tag: string;
     start_at?: DateRange;
 }
 
@@ -63,6 +65,8 @@ export default function Events() {
         venue: '',
         promoter: '',
         event_type: '',
+        entity: '',
+        tag: '',
         start_at: {
             start: getTodayStart(),
             end: undefined
