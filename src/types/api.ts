@@ -13,6 +13,7 @@ export interface Event {
     door_price?: number;
     min_age?: number;
     tags?: Tag[];
+    entities?: EntityResponse[];
     ticket_link?: string;
     primary_photo?: string;
     primary_photo_thumbnail?: string;

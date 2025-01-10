@@ -146,6 +146,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     </div>
                 </div>
 
+
                 <div className="space-y-2">
                     <div className="h-6 flex items-center justify-between">
                         <Label>Date Range</Label>
