@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
-import EventFilters from './EventFilters';
+import EventFilter from './EventFilters';
 import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,22 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import SortControls from './SortControls';
 import { EventFilterContext } from '../context/EventFilterContext';
-
-
-interface DateRange {
-    start?: string;
-    end?: string;
-}
-
-interface EventFilters {
-    name: string;
-    venue: string;
-    promoter: string;
-    entity: string;
-    event_type: string;
-    tag: string;
-    start_at?: DateRange;
-}
+import { EventFilters } from '../types/filters';
 
 const sortOptions = [
     { value: 'start_at', label: 'Date' },
@@ -36,7 +21,6 @@ const sortOptions = [
     { value: 'event_type_id', label: 'Type' },
     { value: 'created_at', label: 'Recently Added' }
 ];
-
 
 export default function Events() {
 
@@ -157,7 +141,7 @@ export default function Events() {
                             {filtersVisible && (
                                 <Card className="shadow-sm">
                                     <CardContent className="p-6 space-y-4">
-                                        <EventFilters filters={filters} onFilterChange={setFilters} />
+                                        <EventFilter filters={filters} onFilterChange={setFilters} />
                                         <SortControls
                                             sort={sort}
                                             setSort={setSort}

@@ -1,4 +1,3 @@
-// src/components/EventCard.tsx
 import { useNavigate } from '@tanstack/react-router';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
@@ -7,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext } from 'react';
-import { EventFilterContext } from '../context/EventFilterContext.tsx';
+import { EventFilterContext } from '../context/EventFilterContext';
 
 const getAgeRestriction = (minAge: number | null | undefined): string => {
   if (minAge === null || minAge === undefined) return 'Age requirement unknown';
@@ -44,7 +43,9 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
       params: { slug: event.slug }
     });
   };
+
   const ageRestriction = getAgeRestriction(event.min_age);
+
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md">
       <div className="flex">
@@ -80,8 +81,6 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
           <CardContent className="p-4 pt-2">
             <div className="space-y-4">
               <div className="space-y-2">
-
-
                 {event.event_type && (
                   <div className="items-center">
                     <span className="text-gray-500 font-bold">
@@ -99,7 +98,6 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                     )}
                   </div>
                 )}
-
 
                 <div className="flex items-center text-sm text-gray-500">
                   <CalendarDays className="mr-2 h-4 w-4" />
@@ -168,7 +166,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                     <Badge
                       key={tag.id}
                       variant="secondary"
-                      className="bg-gray-100 text-gray-800 hover:bg-gray-200"
+                      className="bg-gray-100 text-gray-800 hover:bg-gray-200 cursor-pointer"
                       onClick={() => handleTagClick(tag.name)}
                     >
                       {tag.name}
@@ -179,8 +177,8 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             </div>
           </CardContent>
         </div>
-      </div >
-    </Card >
+      </div>
+    </Card>
   );
 };
 
