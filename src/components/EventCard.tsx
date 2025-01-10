@@ -93,6 +93,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                   </div>
                 )}
 
+
                 <div className="flex items-center text-sm text-gray-500">
                   <CalendarDays className="mr-2 h-4 w-4" />
                   {formatDate(event.start_at)}
@@ -139,6 +140,20 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                   </div>
                 )}
               </div>
+
+              {event.entities && event.entities.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {event.entities.map((entity) => (
+                    <Badge
+                      key={entity.id}
+                      variant="default"
+                      className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1"
+                    >
+                      {entity.name}
+                    </Badge>
+                  ))}
+                </div>
+              )}
 
               {event.tags && event.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
