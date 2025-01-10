@@ -23,6 +23,8 @@ interface EventFiltersProps {
         venue: string;
         promoter: string;
         event_type: string;
+        entity: string;
+        tag: string;
         start_at?: DateRange;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
@@ -105,32 +107,19 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="venue">Venue</Label>
+                    <Label htmlFor="entity">Entity</Label>
                     <div className="relative">
                         <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                         <Input
-                            id="venue"
-                            placeholder="Filter by venue..."
+                            id="entity"
+                            placeholder="Filter by entity..."
                             className="pl-9"
-                            value={filters.venue}
-                            onChange={(e) => onFilterChange({ ...filters, venue: e.target.value })}
+                            value={filters.entity}
+                            onChange={(e) => onFilterChange({ ...filters, entity: e.target.value })}
                         />
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="promoter">Promoter</Label>
-                    <div className="relative">
-                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="promoter"
-                            placeholder="Filter by promoter..."
-                            className="pl-9"
-                            value={filters.promoter}
-                            onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
-                        />
-                    </div>
-                </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="type">Type</Label>
@@ -142,6 +131,20 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             className="pl-9"
                             value={filters.event_type}
                             onChange={(e) => onFilterChange({ ...filters, event_type: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="tag">Tag</Label>
+                    <div className="relative">
+                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="tag"
+                            placeholder="Filter by tag..."
+                            className="pl-9"
+                            value={filters.tag}
+                            onChange={(e) => onFilterChange({ ...filters, tag: e.target.value })}
                         />
                     </div>
                 </div>

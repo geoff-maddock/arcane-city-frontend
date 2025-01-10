@@ -12,6 +12,8 @@ interface UseEventsParams {
         venue?: string;
         promoter?: string;
         event_type?: string;
+        entity?: string;
+        tag?: string;
         start_at?: {
             start?: string;
             end?: string;
@@ -33,6 +35,8 @@ export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort = 'start_
             if (filters?.name) params.append('filters[name]', filters.name);
             if (filters?.venue) params.append('filters[venue]', filters.venue);
             if (filters?.promoter) params.append('filters[promoter]', filters.promoter);
+            if (filters?.tag) params.append('filters[tag]', filters.tag);
+            if (filters?.entity) params.append('filters[related]', filters.entity);
             if (filters?.event_type) params.append('filters[event_type]', toKebabCase(filters.event_type));
             if (filters?.start_at?.start) params.append('filters[start_at][start]', filters.start_at.start);
             if (filters?.start_at?.end) params.append('filters[start_at][end]', filters.start_at.end);
