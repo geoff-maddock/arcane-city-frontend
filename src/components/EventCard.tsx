@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
 import { ImageLightbox } from './ImageLightbox';
+import { useContext } from 'react';
+import { EventFilterContext } from '../context/EventFilterContext.tsx';
 
 const getAgeRestriction = (minAge: number | null | undefined): string => {
   if (minAge === null || minAge === undefined) return 'Age requirement unknown';
@@ -29,6 +31,11 @@ interface EventCardProps {
 
 const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   const navigate = useNavigate();
+  const { setFilters } = useContext(EventFilterContext);
+
+  const handleTagClick = (tagName: string) => {
+    setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -162,6 +169,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                       key={tag.id}
                       variant="secondary"
                       className="bg-gray-100 text-gray-800 hover:bg-gray-200"
+                      onClick={() => handleTagClick(tag.name)}
                     >
                       {tag.name}
                     </Badge>
