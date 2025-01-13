@@ -11,9 +11,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -22,6 +24,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -65,4 +68,25 @@
     justify-content: space-between;
     width: 100%;
   }
+}
+
+/* Add media queries to hide the sidebar on mobile viewports */
+@media (max-width: 768px) {
+  .menu-bar {
+    display: none;
+  }
+}
+
+/* Add styles for the toggle button */
+.toggle-button {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  background-color: #fff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
