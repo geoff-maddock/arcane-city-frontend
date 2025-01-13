@@ -40,3 +40,29 @@
 .read-the-docs {
   color: #888;
 }
+
+@media (max-width: 640px) {
+  .event-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .event-card .top-row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .event-card .top-row .thumbnail {
+    flex: 1;
+  }
+
+  .event-card .top-row .title-description {
+    flex: 2;
+  }
+
+  .event-card .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
