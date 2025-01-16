@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
+import EventCardCondensed from './EventCardCondensed';
 import EventFilter from './EventFilters';
 import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
@@ -170,7 +171,7 @@ export default function Events() {
 
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
                                     {data.data.map((event) => (
-                                        <EventCard
+                                        <EventCardCondensed
                                             key={event.slug}
                                             event={event}
                                             allImages={allEventImages}
