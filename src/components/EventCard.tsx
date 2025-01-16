@@ -52,7 +52,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
         {event.primary_photo_thumbnail && event.primary_photo && (
           <div className="thumbnail">
             <ImageLightbox
-              thumbnailUrl={event.primary_photo_thumbnail}
+              thumbnailUrl={event.primary_photo}
               alt={event.name}
               allImages={allImages}
               initialIndex={imageIndex}
