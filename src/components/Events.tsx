@@ -171,7 +171,7 @@ export default function Events() {
 
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
                                     {data.data.map((event) => (
-                                        <EventCardCondensed
+                                        <EventCard
                                             key={event.slug}
                                             event={event}
                                             allImages={allEventImages}
