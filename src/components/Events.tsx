@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
-import EventCardCondensed from './EventCardCondensed';
 import EventFilter from './EventFilters';
 import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
