@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { rootRoute } from '../routes/root'
+import { RouterProvider } from '@tanstack/react-router'
 import { router } from '../router'
 
 // Mock the components
@@ -19,7 +18,7 @@ vi.mock('../routes/account', () => ({
 
 describe('Router Configuration', () => {
     it('renders Events component at root path', async () => {
-        const result = render(
+        render(
             <RouterProvider router={router} />
         )
 
