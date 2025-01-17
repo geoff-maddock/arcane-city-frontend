@@ -5,7 +5,7 @@ export const Root = () => {
     return (
         <div className="min-h-screen">
             <MenuBar />
-            <div className="md:ml-20 xl:ml-64 pt-16 md:pt-0">
+            <div className="xl:ml-64 pt-16 xl:pt-0">
                 <Outlet />
             </div>
         </div>

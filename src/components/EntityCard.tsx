@@ -4,6 +4,8 @@ import { useNavigate } from '@tanstack/react-router';
 import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
 import { Badge } from '@/components/ui/badge';
+import { useContext } from 'react';
+import { EntityFilterContext } from '../context/EntityFilterContext';
 
 interface EntityType {
     id: number;
@@ -52,6 +54,21 @@ interface EntityCardProps {
 }
 
 const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
+    const { setFilters } = useContext(EntityFilterContext);
+    const navigate = useNavigate();
+
+    const handleTagClick = (tagName: string) => {
+        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
+    };
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        navigate({
+            to: '/entities/$entitySlug',
+            params: { entitySlug: entity.slug }
+        });
+    };
+
     const PlaceholderImage = () => (
         <svg
             width="100%"
@@ -78,15 +95,7 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
             />
         </svg>
     );
-    const navigate = useNavigate();
 
-    const handleClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        navigate({
-            to: '/entities/$entitySlug',
-            params: { entitySlug: entity.slug }
-        });
-    };
 
     return (
         <Card>
@@ -148,6 +157,7 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
                                         key={tag.id}
                                         variant="secondary"
                                         className="bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                        onClick={() => handleTagClick(tag.name)}
                                     >
                                         {tag.name}
                                     </Badge>
