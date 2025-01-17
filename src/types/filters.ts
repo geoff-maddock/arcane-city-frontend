@@ -1,3 +1,12 @@
+export interface EntityFilters {
+    name: string;
+    entity_type: string;
+    role: string;
+    status: string;
+    tag: string;
+    created_at?: DateRange;
+}
+
 export interface EventFilters {
     name: string;
     venue: string;

@@ -4,26 +4,6 @@ import { api } from '../lib/api';
 import type { Event, PaginatedResponse, UseEventsParams } from '../types/api';
 import { toKebabCase } from '../lib/utils';
 
-// interface UseEventsParams {
-//     page?: number;
-//     itemsPerPage?: number;
-//     filters?: {
-//         name?: string;
-//         venue?: string;
-//         promoter?: string;
-//         event_type?: string;
-//         entity?: string;
-//         tag?: string;
-//         start_at?: {
-//             start?: string;
-//             end?: string;
-//         };
-//     };
-//     sort?: string;
-//     direction?: 'desc' | 'asc';
-
-// }
-
 export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort = 'start_at', direction = 'asc' }: UseEventsParams = {}) => {
     return useQuery<PaginatedResponse<Event>>({
         queryKey: ['events', page, itemsPerPage, filters, sort, direction],

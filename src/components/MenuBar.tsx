@@ -16,18 +16,16 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
 
   return (
     <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`}>
-      <h1 className="hidden xl:block text-2xl font-bold mb-4 text-center">Arcane City</h1>
-      <div className="block xl:hidden mb-4">
-        <HiOfficeBuilding size={24} />
-      </div>
+      <h1 className=" xl:block text-2xl font-bold mb-4 text-center">Arcane City</h1>
+
       <nav className="flex flex-col gap-2 items-center">
         <Link to="/events" className="flex items-center gap-2 hover:underline">
           <HiCalendar />
-          <span className="hidden xl:inline">Event Listings</span>
+          <span className=" xl:inline">Event Listings</span>
         </Link>
         <Link to="/entities" className="flex items-center gap-2 hover:underline">
           <HiOfficeBuilding />
-          <span className="hidden xl:inline">Entity Listings</span>
+          <span className=" xl:inline">Entity Listings</span>
         </Link>
         {authService.isAuthenticated() && (
           <Link to="/account" className="flex items-center gap-2 hover:underline">
@@ -50,7 +48,7 @@ const MenuBar: React.FC = () => {
   return (
     <>
       {/* Mobile Menu */}
-      <div className="md:hidden fixed top-0 left-0 w-full p-4 flex items-center bg-background border-b">
+      <div className="xl:hidden fixed top-0 left-0 w-full p-4 flex items-center bg-background border-b">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -65,7 +63,7 @@ const MenuBar: React.FC = () => {
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden md:block fixed top-0 left-0 h-full w-20 xl:w-64">
+      <div className="hidden xl:block fixed top-0 left-0 h-full w-20 xl:w-64">
         <MenuContent />
       </div>
     </>

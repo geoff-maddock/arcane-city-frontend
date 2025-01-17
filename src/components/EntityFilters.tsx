@@ -22,6 +22,7 @@ interface EntityFiltersProps {
         entity_type: string;
         role: string;
         status: string;
+        tag: string;
         created_at?: DateRange;
     };
     onFilterChange: (filters: EntityFiltersProps['filters']) => void;
@@ -86,6 +87,20 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
                             className="pl-9"
                             value={filters.role}
                             onChange={(e) => onFilterChange({ ...filters, role: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="tag">Tag</Label>
+                    <div className="relative">
+                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="tag"
+                            placeholder="Filter by tag..."
+                            className="pl-9"
+                            value={filters.tag}
+                            onChange={(e) => onFilterChange({ ...filters, tag: e.target.value })}
                         />
                     </div>
                 </div>
