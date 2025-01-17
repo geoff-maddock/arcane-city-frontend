@@ -3,11 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Events from '../../components/Events'
 import { useEvents } from '../../hooks/useEvents'
 import EventFilters from '../../components/EventFilters'
-import { PaginatedResponse, Event } from '../../types/api'; // Adjust the import paths as necessary
+import { PaginatedResponse, Event, UseEventsParams } from '../../types/api'; // Adjust the import paths as necessary
 import { UseQueryResult } from '@tanstack/react-query'; // Import UseQueryResult
+// import { EventFilters as EventFilterParams, EventFiltersProps } from '../../types/filters';
 
 // Mock the custom hooks and components
 vi.mock('../../hooks/useEvents')
+
 vi.mock('../../hooks/useLocalStorage', () => ({
     useLocalStorage: () => [25, vi.fn()]
 }))
@@ -124,20 +126,64 @@ describe('Events Component', () => {
         // Mock the useEvents hook to return loading state
         vi.mocked(useEvents).mockReturnValue({
             data: undefined,
+            dataUpdatedAt: 0,
+            error: null,
+            errorUpdatedAt: 0,
+            errorUpdateCount: 0,
+            failureCount: 0,
+            failureReason: null,
+            fetchStatus: 'fetching',
+            isError: false,
+            isFetched: false,
+            isFetchedAfterMount: false,
+            isFetching: true,
+            isInitialLoading: false,
             isLoading: true,
-            error: null
-        })
+            isLoadingError: false,
+            isPaused: false,
+            isPending: true,
+            isPlaceholderData: false,
+            isRefetching: false,
+            isRefetchError: false,
+            isStale: true,
+            isSuccess: false,
+            promise: expect.any(Promise),
+            refetch: expect.any(Function),
+            status: 'pending',
+        });
 
-        render(<Events />)
-        expect(screen.getByRole('status')).toBeInTheDocument()
-    })
+        render(<Events />);
+        expect(screen.getByRole('status')).toBeInTheDocument();
+    });
 
     it('shows error message when loading fails', () => {
         // Mock the useEvents hook to return error state
         vi.mocked(useEvents).mockReturnValue({
-            data: null,
+            data: undefined,
+            dataUpdatedAt: 0,
+            error: new Error('Failed to load'),
+            errorUpdatedAt: 0,
+            errorUpdateCount: 0,
+            failureCount: 0,
+            failureReason: null,
+            fetchStatus: 'fetching',
+            isError: true,
+            isFetched: false,
+            isFetchedAfterMount: false,
+            isFetching: true,
+            isInitialLoading: false,
             isLoading: false,
-            error: new Error('Failed to load')
+            isLoadingError: true,
+            isPaused: false,
+            isPending: false,
+            isPlaceholderData: false,
+            isRefetching: false,
+            isRefetchError: false,
+            isStale: true,
+            isSuccess: false,
+            promise: expect.any(Promise),
+            refetch: expect.any(Function),
+            status: 'error',
         })
 
         render(<Events />)
@@ -148,9 +194,31 @@ describe('Events Component', () => {
         // Mock the useEvents hook to return empty data
         vi.mocked(useEvents).mockReturnValue({
             data: { ...mockEvents, data: [], total: 0 },
+            dataUpdatedAt: 0,
+            error: null,
+            errorUpdatedAt: 0,
+            errorUpdateCount: 0,
+            failureCount: 0,
+            failureReason: null,
+            fetchStatus: 'fetching',
+            isError: false,
+            isPending: false,
+            isLoadingError: false,
+            isFetched: false,
+            isFetchedAfterMount: false,
+            isFetching: true,
+            isInitialLoading: false,
             isLoading: false,
-            error: null
-        })
+            isPaused: false,
+            isPlaceholderData: false,
+            isRefetching: false,
+            isRefetchError: false,
+            isStale: true,
+            isSuccess: true,
+            promise: expect.any(Promise),
+            refetch: expect.any(Function),
+            status: 'success',
+        } as UseQueryResult<PaginatedResponse<Event>, Error>);
 
         render(<Events />)
         expect(screen.getByText(/no events found/i)).toBeInTheDocument()
@@ -159,8 +227,30 @@ describe('Events Component', () => {
     it('toggles filters visibility', () => {
         vi.mocked(useEvents).mockReturnValue({
             data: mockEvents,
+            dataUpdatedAt: 0,
+            error: null,
+            errorUpdatedAt: 0,
+            errorUpdateCount: 0,
+            failureCount: 0,
+            failureReason: null,
+            fetchStatus: 'fetching',
+            isError: false,
+            isPending: false,
+            isLoadingError: false,
+            isFetched: false,
+            isFetchedAfterMount: false,
+            isFetching: true,
+            isInitialLoading: false,
             isLoading: false,
-            error: null
+            isPaused: false,
+            isPlaceholderData: false,
+            isRefetching: false,
+            isRefetchError: false,
+            isStale: true,
+            isSuccess: true,
+            promise: expect.any(Promise),
+            refetch: expect.any(Function),
+            status: 'success',
         })
 
         render(<Events />)
@@ -178,16 +268,38 @@ describe('Events Component', () => {
     describe('Filter Interactions', () => {
         it('updates filters when changed', async () => {
             const mockUseEvents = vi.mocked(useEvents)
-            const capturedParams: any = {}
+            const capturedParams: UseEventsParams = {};
 
-            mockUseEvents.mockImplementation((params: any) => {
-                Object.assign(capturedParams, params)
+            mockUseEvents.mockImplementation((params: UseEventsParams = {}) => {
+                Object.assign(capturedParams, params);
                 return {
                     data: mockEvents,
                     isLoading: false,
-                    error: null
-                }
-            })
+                    error: null,
+                    isError: false,
+                    isPending: false,
+                    isLoadingError: false,
+                    isRefetchError: false,
+                    isSuccess: true,
+                    refetch: vi.fn(),
+                    fetchStatus: 'idle',
+                    isFetching: false,
+                    isFetched: true,
+                    isStale: false,
+                    isPlaceholderData: false,
+                    isInitialLoading: false,
+                    dataUpdatedAt: 0,
+                    errorUpdatedAt: 0,
+                    errorUpdateCount: 0,
+                    failureCount: 0,
+                    failureReason: null,
+                    status: 'success',
+                    promise: Promise.resolve(mockEvents),
+                    isFetchedAfterMount: false,
+                    isPaused: false,
+                    isRefetching: false,
+                } as UseQueryResult<PaginatedResponse<Event>, Error>;
+            });
 
             // Update the EventFilters mock to expose the onFilterChange prop
             vi.mocked(EventFilters).mockImplementation(({ onFilterChange }) => {
@@ -196,9 +308,12 @@ describe('Events Component', () => {
                     <div data-testid="event-filters">
                         <button
                             onClick={() => onFilterChange({
-                                name: 'Test Event',
-                                venue: 'Test Venue',
-                                event_type: 'concert'
+                                name: 'test_name',
+                                venue: 'test_venue',
+                                promoter: 'test_promoter',
+                                entity: 'test_entity',
+                                event_type: 'test_type',
+                                tag: 'test_tag',
                             })}
                             data-testid="update-filters-button"
                         >
@@ -215,9 +330,12 @@ describe('Events Component', () => {
 
             await waitFor(() => {
                 expect(capturedParams.filters).toMatchObject({
-                    name: 'Test Event',
-                    venue: 'Test Venue',
-                    event_type: 'concert'
+                    name: 'test_name',
+                    venue: 'test_venue',
+                    promoter: 'test_promoter',
+                    entity: 'test_entity',
+                    event_type: 'test_type',
+                    tag: 'test_tag',
                 })
             })
         })

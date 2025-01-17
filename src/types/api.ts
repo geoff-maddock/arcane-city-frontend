@@ -19,6 +19,26 @@ export interface Event {
     primary_photo_thumbnail?: string;
 }
 
+export interface UseEventsParams {
+    page?: number;
+    itemsPerPage?: number;
+    filters?: {
+        name?: string;
+        venue?: string;
+        promoter?: string;
+        event_type?: string;
+        entity?: string;
+        tag?: string;
+        start_at?: {
+            start?: string;
+            end?: string;
+        };
+    };
+    sort?: string;
+    direction?: 'desc' | 'asc';
+
+}
+
 export interface EntityResponse {
     id: number;
     name: string;
