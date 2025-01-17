@@ -36,6 +36,10 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
     setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
   };
 
+  const handleEntityClick = (entityName: string) => {
+    setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
+  };
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate({
@@ -156,6 +160,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                     key={entity.id}
                     variant="default"
                     className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1"
+                    onClick={() => handleEntityClick(entity.name)}
                   >
                     {entity.name}
                   </Badge>
