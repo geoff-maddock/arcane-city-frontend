@@ -161,7 +161,7 @@ export default function Events() {
                                 </AlertDescription>
                             </Alert>
                         ) : isLoading ? (
-                            <div className="flex h-96 items-center justify-center">
+                            <div className="flex h-96 items-center justify-center" role="status">
                                 <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
                             </div>
                         ) : data?.data && data.data.length > 0 ? (

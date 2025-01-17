@@ -254,20 +254,6 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
 
 
             <div className="space-y-2">
-                <div className="h-6 flex items-center justify-between">
-                    <Label>Date Range</Label>
-                    {(filters.start_at?.start || filters.start_at?.end) && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleClearDates}
-                            className="h-6 px-2 text-gray-500 hover:text-gray-900"
-                        >
-                            Clear dates
-                            <X className="ml-1 h-4 w-4" />
-                        </Button>
-                    )}
-                </div>
 
                 {/* Quick filter buttons */}
                 <div className="flex gap-2 mb-2">
