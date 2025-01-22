@@ -98,7 +98,7 @@ export default function Events() {
             entity: '',
             tag: '',
             start_at: {
-                start: getTodayStart(),
+                start: undefined,
                 end: undefined
             }
         });
