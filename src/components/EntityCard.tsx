@@ -69,33 +69,7 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
         });
     };
 
-    const PlaceholderImage = () => (
-        <svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 400 200"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="object-cover w-full h-full"
-        >
-            <rect width="400" height="200" fill="#E5E7EB" />
-            <path
-                d="M200 100C220.091 100 236 84.0914 236 64C236 43.9086 220.091 28 200 28C179.909 28 164 43.9086 164 64C164 84.0914 179.909 100 200 100Z"
-                stroke="#9CA3AF"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-            <path
-                d="M340 180V160C340 142.326 325.674 128 308 128H92C74.3261 128 60 142.326 60 160V180"
-                stroke="#9CA3AF"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-
+    const placeHolderImage = `${window.location.origin}/src/assets/entity-placeholder.png`;
 
     return (
         <Card>
@@ -112,15 +86,12 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
                     </h2>
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
                     <div className="aspect-video relative overflow-hidden rounded-lg">
-                        {entity.primary_photo ? (
-                            <img
-                                src={entity.primary_photo}
-                                alt={entity.name}
-                                className="object-cover w-full h-full"
-                            />
-                        ) : (
-                            <PlaceholderImage />
-                        )}
+                        <img
+                            src={entity.primary_photo || placeHolderImage}
+                            alt={entity.name}
+                            className="object-cover w-full h-full"
+                        />
+
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
                         <MapPin className="h-5 w-5" />

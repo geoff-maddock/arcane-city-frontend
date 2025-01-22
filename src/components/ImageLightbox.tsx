@@ -17,6 +17,8 @@ export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex }: Im
     const [open, setOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
+    console.log(thumbnailUrl);
+
     // Handle wheel event
     const handleWheel = (event: WheelEvent) => {
         event.preventDefault();
