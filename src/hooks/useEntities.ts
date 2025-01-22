@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Entity, PaginatedResponse } from '../types/api';
+import { toKebabCase } from '../lib/utils';
 
 interface DateRange {
     start?: string;
@@ -35,7 +36,7 @@ export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name
             if (filters?.name) params.append('filters[name]', filters.name);
             if (filters?.entity_type) params.append('filters[entity_type]', filters.entity_type);
             if (filters?.role) params.append('filters[role]', filters.role);
-            if (filters?.tag) params.append('filters[tag]', filters.tag);
+            if (filters?.tag) params.append('filters[tag]', toKebabCase(filters.tag));
             if (filters?.status) params.append('filters[status]', filters.status);
             if (filters?.start_at?.start) params.append('filters[start_at][start]', filters.start_at.start);
             if (filters?.start_at?.end) params.append('filters[start_at][end]', filters.start_at.end);

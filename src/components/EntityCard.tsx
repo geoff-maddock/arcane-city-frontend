@@ -58,7 +58,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const placeHolderImage = `${window.location.origin}/src/assets/entity-placeholder.png`;
 
     return (
-        <Card>
+        <Card className="group overflow-hidden transition-all hover:shadow-md">
             <CardContent className="p-6 space-y-4">
                 <div className="space-y-3">
                     <h2 className="text-xl font-bold">
@@ -90,7 +90,11 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                         </div>
                     )}
                     {entity.description && (
-                        <p className="text-gray-600">{entity.description}</p>
+                        <p className="text-gray-600">
+                            {entity.description.length > 1200
+                                ? `${entity.description.substring(0, 1200)}...`
+                                : entity.description}
+                        </p>
                     )}
                     {entity.links.length > 0 && (
                         <div className="space-y-2">
