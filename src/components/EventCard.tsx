@@ -49,20 +49,21 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   };
 
   const ageRestriction = getAgeRestriction(event.min_age);
+  const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
 
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md event-card">
       <div className="top-row">
-        {event.primary_photo_thumbnail && event.primary_photo && (
-          <div className="thumbnail">
-            <ImageLightbox
-              thumbnailUrl={event.primary_photo}
-              alt={event.name}
-              allImages={allImages}
-              initialIndex={imageIndex}
-            />
-          </div>
-        )}
+
+        <div className="thumbnail">
+          <ImageLightbox
+            thumbnailUrl={event.primary_photo || placeHolderImage}
+            alt={event.name}
+            allImages={allImages}
+            initialIndex={imageIndex}
+          />
+        </div>
+
         <div className="title-description">
           <CardHeader className="p-4 pb-2">
             <div className="space-y-2">

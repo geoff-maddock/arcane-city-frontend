@@ -34,6 +34,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
 
     // Replace newlines with <br /> tags in the description
     const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
+    const placeHolderImage = `${window.location.origin}/src/assets/entity-placeholder.png`;
 
     return (
         <div className="min-h-screen">
@@ -64,15 +65,15 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                 )}
                             </div>
 
-                            {entity.primary_photo && (
-                                <div className="aspect-video relative overflow-hidden rounded-lg">
-                                    <img
-                                        src={entity.primary_photo}
-                                        alt={entity.name}
-                                        className="object-cover w-full h-full"
-                                    />
-                                </div>
-                            )}
+
+                            <div className="aspect-video relative overflow-hidden rounded-lg">
+                                <img
+                                    src={entity.primary_photo || placeHolderImage}
+                                    alt={entity.name}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+
 
                             {entity.description && (
                                 <Card>

@@ -8,6 +8,8 @@ import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket } f
 import { formatDate } from '../lib/utils';
 
 export default function EventDetail({ slug }: { slug: string }) {
+    const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
+
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
         queryKey: ['event', slug],
@@ -64,15 +66,15 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 )}
                             </div>
 
-                            {event.primary_photo && (
-                                <div className="aspect-video relative overflow-hidden rounded-lg">
-                                    <img
-                                        src={event.primary_photo}
-                                        alt={event.name}
-                                        className="object-cover w-full h-full"
-                                    />
-                                </div>
-                            )}
+
+                            <div className="aspect-video relative overflow-hidden rounded-lg">
+                                <img
+                                    src={event.primary_photo || placeHolderImage}
+                                    alt={event.name}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+
 
                             {event.description && (
                                 <Card>
