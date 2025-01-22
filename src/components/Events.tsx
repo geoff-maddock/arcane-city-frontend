@@ -12,6 +12,9 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import SortControls from './SortControls';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { EventFilters } from '../types/filters';
+import { ActiveEventFilters as ActiveFilters } from './ActiveEventFilters';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 const sortOptions = [
     { value: 'start_at', label: 'Date' },
@@ -71,6 +74,37 @@ export default function Events() {
         direction
     });
 
+    const handleRemoveFilter = (key: keyof EventFilters) => {
+        setFilters(prev => {
+            if (key === 'start_at') {
+                return {
+                    ...prev,
+                    [key]: { start: undefined, end: undefined }
+                };
+            }
+            return {
+                ...prev,
+                [key]: ''
+            };
+        });
+    };
+
+    const handleClearAllFilters = () => {
+        setFilters({
+            name: '',
+            venue: '',
+            promoter: '',
+            event_type: '',
+            entity: '',
+            tag: '',
+            start_at: {
+                start: getTodayStart(),
+                end: undefined
+            }
+        });
+    };
+
+
     // Create array of all event images
     const allEventImages = data?.data
         .filter(event => event.primary_photo && event.primary_photo_thumbnail)
@@ -106,6 +140,15 @@ export default function Events() {
         );
     };
 
+    // Check if any filters are active
+    const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+        if (key === 'created_at') {
+            return value?.start || value?.end;
+        }
+        return value !== '';
+    });
+
+
     return (
         <EventFilterContext.Provider value={{ filters, setFilters }}>
             <div className="bg-background text-foreground min-h-screen p-4">
@@ -121,22 +164,45 @@ export default function Events() {
                         </div>
 
                         <div className="relative">
-                            <button
-                                onClick={toggleFilters}
-                                className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
-                            >
-                                {filtersVisible ? (
-                                    <>
-                                        <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
-                                        Hide Filters
-                                    </>
-                                ) : (
-                                    <>
-                                        <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
-                                        Show Filters
-                                    </>
-                                )}
-                            </button>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={toggleFilters}
+                                        className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
+                                    >
+                                        {filtersVisible ? (
+                                            <>
+                                                <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
+                                                Hide Filters
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
+                                                Show Filters
+                                            </>
+                                        )}
+                                    </button>
+
+                                    {!filtersVisible && (
+                                        <ActiveFilters
+                                            filters={filters}
+                                            onRemoveFilter={handleRemoveFilter}
+                                        />
+                                    )}
+
+                                    {hasActiveFilters && (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleClearAllFilters}
+                                            className="mb-4 text-gray-500 hover:text-gray-900"
+                                        >
+                                            Clear All
+                                            <X className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
 
                             {filtersVisible && (
                                 <Card className="shadow-sm">
@@ -193,6 +259,6 @@ export default function Events() {
                     </div>
                 </div>
             </div>
-        </EventFilterContext.Provider>
+        </EventFilterContext.Provider >
     );
 }
