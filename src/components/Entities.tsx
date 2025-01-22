@@ -1,30 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useEntities } from '../hooks/useEntities';
-import { Pagination } from './Pagination';
-import { Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { Card, CardContent } from '@/components/ui/card';
 import EntityCard from './EntityCard';
 import EntityFilter from './EntityFilters';
+import { Pagination } from './Pagination';
+import { Loader2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import SortControls from './SortControls';
 import { EntityFilterContext } from '../context/EntityFilterContext';
 import { EntityFilters } from '../types/filters';
 
-// interface DateRange {
-//     start?: string;
-//     end?: string;
-// }
-
-// interface EntityFilters {
-//     name: string;
-//     entity_type: string;
-//     role: string;
-//     status: string;
-//     created_at?: DateRange;
-// }
 
 const sortOptions = [
     { value: 'name', label: 'Name' },

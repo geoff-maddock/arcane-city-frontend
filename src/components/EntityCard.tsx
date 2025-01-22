@@ -1,61 +1,47 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from '@tanstack/react-router';
+import { Entity } from '../types/api';
+import { Card, CardContent } from '@/components/ui/card';
 import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
 import { Badge } from '@/components/ui/badge';
+import { ImageLightbox } from './ImageLightbox';
 import { useContext } from 'react';
 import { EntityFilterContext } from '../context/EntityFilterContext';
 
-interface EntityType {
-    id: number;
-    name: string;
-}
+// interface EntityType {
+//     id: number;
+//     name: string;
+// }
 
-interface EntityStatus {
-    id: number;
-    name: string;
-}
+// interface EntityStatus {
+//     id: number;
+//     name: string;
+// }
 
-interface Link {
-    id: number;
-    url: string;
-}
+// interface Link {
+//     id: number;
+//     url: string;
+// }
 
-interface Tag {
-    id: number;
-    name: string;
-}
+// interface Tag {
+//     id: number;
+//     name: string;
+// }
 
-interface Role {
-    id: number;
-    name: string;
-}
+// interface Role {
+//     id: number;
+//     name: string;
+// }
 
 interface EntityCardProps {
-    entity: {
-        id: number;
-        slug: string;
-        name: string;
-        short?: string;
-        description?: string;
-        entity_type: EntityType;
-        entity_status: EntityStatus;
-        facebook_username?: string;
-        twitter_username?: string;
-        links: Link[];
-        tags: Tag[];
-        roles: Role[];
-        primary_photo?: string;
-        primary_photo_thumbnail?: string;
-    };
+    entity: Entity;
     allImages: Array<{ src: string; alt: string }>;
     imageIndex: number;
 }
 
-const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
-    const { setFilters } = useContext(EntityFilterContext);
+const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const navigate = useNavigate();
+    const { setFilters } = useContext(EntityFilterContext);
 
     const handleTagClick = (tagName: string) => {
         setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
@@ -85,13 +71,13 @@ const EntityCard: React.FC<EntityCardProps> = ({ entity }) => {
                         </a>
                     </h2>
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
-                    <div className="aspect-video relative overflow-hidden rounded-lg">
-                        <img
-                            src={entity.primary_photo || placeHolderImage}
+                    <div className="thumbnail">
+                        <ImageLightbox
+                            thumbnailUrl={entity.primary_photo || placeHolderImage}
                             alt={entity.name}
-                            className="object-cover w-full h-full"
+                            allImages={allImages}
+                            initialIndex={imageIndex}
                         />
-
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
                         <MapPin className="h-5 w-5" />
