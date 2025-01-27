@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import SortControls from './SortControls';
 import { EntityFilterContext } from '../context/EntityFilterContext';
 import { EntityFilters } from '../types/filters';
 import { ActiveEntityFilters as ActiveFilters } from './ActiveEntityFilters';
@@ -126,6 +125,11 @@ export default function Entities() {
                 totalItems={data.total}
                 itemsPerPage={itemsPerPage}
                 onItemsPerPageChange={handleItemsPerPageChange}
+                sort={sort}
+                setSort={setSort}
+                direction={direction}
+                setDirection={setDirection}
+                sortOptions={sortOptions}
             />
         );
     };
@@ -198,13 +202,6 @@ export default function Entities() {
                                 <Card className="border-gray-100 shadow-sm">
                                     <CardContent className="p-6 space-y-4">
                                         <EntityFilter filters={filters} onFilterChange={setFilters} />
-                                        <SortControls
-                                            sort={sort}
-                                            setSort={setSort}
-                                            direction={direction}
-                                            setDirection={setDirection}
-                                            sortOptions={sortOptions}
-                                        />
                                     </CardContent>
                                 </Card>
                             )}

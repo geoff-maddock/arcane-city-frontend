@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import SortControls from './SortControls';
 
 interface PaginationProps {
     currentPage: number;
@@ -10,6 +11,11 @@ interface PaginationProps {
     totalItems: number;
     itemsPerPage: number;
     onItemsPerPageChange: (count: number) => void;
+    sort: string;
+    setSort: (value: string) => void;
+    direction: 'asc' | 'desc';
+    setDirection: (value: 'asc' | 'desc') => void;
+    sortOptions: { value: string; label: string }[];
 }
 
 const itemsPerPageOptions = [
@@ -26,12 +32,19 @@ export function Pagination({
     totalItems,
     itemsPerPage,
     onItemsPerPageChange,
+    sort,
+    setSort,
+    direction,
+    setDirection,
+    sortOptions
 }: PaginationProps) {
+
     return (
         <div className="flex flex-col gap-4 md:gap-0 border-t py-3 md:px-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center justify-between md:justify-start gap-4">
-                    <p className="text-sm text-gray-700">
+
+                    <p className="text-sm text-gray-700 hidden md:block">
                         Showing{' '}
                         <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span>{' '}
                         to{' '}
@@ -58,6 +71,14 @@ export function Pagination({
                             ))}
                         </SelectContent>
                     </Select>
+
+                    <SortControls
+                        sort={sort}
+                        setSort={setSort}
+                        direction={direction}
+                        setDirection={setDirection}
+                        sortOptions={sortOptions}
+                    />
                 </div>
 
                 <div className="flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0">

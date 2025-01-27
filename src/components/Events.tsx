@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import SortControls from './SortControls';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { EventFilters } from '../types/filters';
 import { ActiveEventFilters as ActiveFilters } from './ActiveEventFilters';
@@ -136,6 +135,11 @@ export default function Events() {
                 totalItems={data.total}
                 itemsPerPage={itemsPerPage}
                 onItemsPerPageChange={handleItemsPerPageChange}
+                sort={sort}
+                setSort={setSort}
+                direction={direction}
+                setDirection={setDirection}
+                sortOptions={sortOptions}
             />
         );
     };
@@ -208,13 +212,7 @@ export default function Events() {
                                 <Card className="shadow-sm">
                                     <CardContent className="p-6 space-y-4">
                                         <EventFilter filters={filters} onFilterChange={setFilters} />
-                                        <SortControls
-                                            sort={sort}
-                                            setSort={setSort}
-                                            direction={direction}
-                                            setDirection={setDirection}
-                                            sortOptions={sortOptions}
-                                        />
+
                                     </CardContent>
                                 </Card>
                             )}
