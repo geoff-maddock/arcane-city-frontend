@@ -2,8 +2,10 @@ import { createRouter, createRoute } from '@tanstack/react-router';
 import { rootRoute } from './routes/root';
 import Events from './components/Events';
 import Entities from './components/Entities';
+import Series from './components/Series';
 import { EventDetailRoute } from './routes/event-detail.tsx';
 import { EntityDetailRoute } from './routes/entity-detail.tsx';
+import { SeriesDetailRoute } from './routes/series-detail.tsx';
 import Account from './routes/account';
 
 // Create routes
@@ -25,6 +27,12 @@ const entityRoute = createRoute({
     component: Entities,
 });
 
+const seriesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/series',
+    component: Series,
+});
+
 const accountRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/account',
@@ -36,8 +44,10 @@ const routeTree = rootRoute.addChildren([
     indexRoute,
     eventRoute,
     entityRoute,
+    seriesRoute,
     EventDetailRoute,
     EntityDetailRoute,
+    SeriesDetailRoute,
     accountRoute,
 ]);
 
