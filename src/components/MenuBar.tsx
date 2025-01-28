@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
@@ -26,6 +26,10 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
         <Link to="/entities" className="flex items-center gap-2 hover:underline">
           <HiOfficeBuilding />
           <span className=" xl:inline">Entity Listings</span>
+        </Link>
+        <Link to="/series" className="flex items-center gap-2 hover:underline">
+          <HiCollection />
+          <span className=" xl:inline">Series Listings</span>
         </Link>
         {authService.isAuthenticated() && (
           <Link to="/account" className="flex items-center gap-2 hover:underline">
@@ -63,7 +67,7 @@ const MenuBar: React.FC = () => {
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden xl:block fixed top-0 left-0 h-full w-20 xl:w-64">
+      <div class="hidden xl:block fixed top-0 left-0 h-full w-20 xl:w-64">
         <MenuContent />
       </div>
     </>
