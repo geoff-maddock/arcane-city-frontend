@@ -17,6 +17,9 @@ export interface Event {
     ticket_link?: string;
     primary_photo?: string;
     primary_photo_thumbnail?: string;
+    is_benefit?: boolean;
+    attending: number;
+    like: number;
 }
 
 export interface UseEventsParams {
@@ -162,4 +165,53 @@ export interface PaginatedResponse<T> {
     last_page: number;
     per_page: number;
     total: number;
+}
+
+export interface Series {
+    id: number;
+    name: string;
+    slug: string;
+    short?: string;
+    description?: string;
+    start_at: string;
+    end_at?: string;
+    venue?: EntityResponse;
+    promoter?: EntityResponse;
+    event_type?: EventType;
+    presale_price?: number;
+    door_price?: number;
+    min_age?: number;
+    tags?: Tag[];
+    entities?: EntityResponse[];
+    ticket_link?: string;
+    primary_photo?: string;
+    primary_photo_thumbnail?: string;
+    occurrence_type?: OccurrenceType;
+    occurrence_week?: OccurrenceWeek;
+    occurrence_day?: OccurrenceDay;
+    occurrence_repeat?: string;
+    is_benefit?: boolean;
+    attending: number;
+    like: number;
+    founded_at: string;
+    canceled_at?: string;
+}
+
+export interface OccurrenceType {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface OccurrenceWeek {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface OccurrenceDay {
+    id: number;
+    name: string;
 }

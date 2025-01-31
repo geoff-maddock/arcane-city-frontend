@@ -9,9 +9,12 @@ interface SeriesFilterContextProps {
 export const SeriesFilterContext = createContext<SeriesFilterContextProps>({
     filters: {
         name: '',
-        series_type: '',
+        event_type: '',
         tag: '',
-        created_at: {
+        entity: '',
+        venue: '',
+        promoter: '',
+        founded_at: {
             start: '',
             end: undefined
         }
