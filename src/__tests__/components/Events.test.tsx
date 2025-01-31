@@ -75,7 +75,9 @@ describe('Events Component', () => {
                 name: 'Test Event 1',
                 primary_photo: 'photo1.jpg',
                 primary_photo_thumbnail: 'thumb1.jpg',
-                start_at: '2023-01-01T00:00:00Z'
+                start_at: '2023-01-01T00:00:00Z',
+                attending: 0,
+                like: 0
             },
             {
                 id: 2,
@@ -84,6 +86,8 @@ describe('Events Component', () => {
                 primary_photo: 'photo2.jpg',
                 primary_photo_thumbnail: 'thumb2.jpg',
                 start_at: '2023-01-02T00:00:00Z',
+                attending: 0,
+                like: 0
             }
         ],
         last_page: 2,

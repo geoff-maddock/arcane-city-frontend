@@ -49,9 +49,9 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                             className="flex items-center gap-2"
                             asChild
                         >
-                            <Link to="/seriess">
+                            <Link to="/series">
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Seriess
+                                Back to Series
                             </Link>
                         </Button>
                     </div>
