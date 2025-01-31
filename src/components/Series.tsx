@@ -18,8 +18,10 @@ import { X } from 'lucide-react';
 const sortOptions = [
     { value: 'name', label: 'Name' },
     { value: 'event_type_id', label: 'Type' },
-    { value: 'founded_at', label: 'Founded Date' }
+    { value: 'founded_at', label: 'Founded Date' },
+    { value: 'created_at', label: 'Recently Added' }
 ];
+
 
 export default function Series() {
 
