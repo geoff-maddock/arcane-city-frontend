@@ -67,7 +67,7 @@ const MenuBar: React.FC = () => {
       </div>
 
       {/* Desktop Menu */}
-      <div class="hidden xl:block fixed top-0 left-0 h-full w-20 xl:w-64">
+      <div className="hidden xl:block fixed top-0 left-0 h-full w-20 xl:w-64">
         <MenuContent />
       </div>
     </>
