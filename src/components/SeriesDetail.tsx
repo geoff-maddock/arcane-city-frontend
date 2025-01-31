@@ -4,14 +4,17 @@ import { api } from '../lib/api';
 import { Series } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MapPin, Users } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
+import { formatDate } from '../lib/utils';
 
-export default function SeriesDetail({ seriesSlug }: { seriesSlug: string }) {
+export default function SeriesDetail({ slug }: { slug: string }) {
+    const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
 
+    // Fetch the series data
     const { data: series, isLoading, error } = useQuery<Series>({
-        queryKey: ['series', seriesSlug],
+        queryKey: ['series', slug],
         queryFn: async () => {
-            const { data } = await api.get<Series>(`/series/${seriesSlug}`);
+            const { data } = await api.get<Series>(`/series/${slug}`);
             return data;
         },
     });
@@ -32,8 +35,8 @@ export default function SeriesDetail({ seriesSlug }: { seriesSlug: string }) {
         );
     }
 
+    // Replace newlines with <br /> tags in the description
     const formattedDescription = series.description ? series.description.replace(/\n/g, '<br />') : '';
-    const placeHolderImage = `${window.location.origin}/src/assets/series-placeholder.png`;
 
     return (
         <div className="min-h-screen">
@@ -46,14 +49,15 @@ export default function SeriesDetail({ seriesSlug }: { seriesSlug: string }) {
                             className="flex items-center gap-2"
                             asChild
                         >
-                            <Link to="/series">
+                            <Link to="/seriess">
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Series
+                                Back to Seriess
                             </Link>
                         </Button>
                     </div>
 
                     <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+                        {/* Main Content */}
                         <div className="space-y-6">
                             <div>
                                 <h1 className="text-4xl font-bold text-gray-900 mb-4">{series.name}</h1>
@@ -61,6 +65,7 @@ export default function SeriesDetail({ seriesSlug }: { seriesSlug: string }) {
                                     <p className="text-xl text-gray-600">{series.short}</p>
                                 )}
                             </div>
+
 
                             <div className="aspect-video relative overflow-hidden rounded-lg">
                                 <img
@@ -70,6 +75,7 @@ export default function SeriesDetail({ seriesSlug }: { seriesSlug: string }) {
                                 />
                             </div>
 
+
                             {series.description && (
                                 <Card>
                                     <CardContent className="prose max-w-none p-6">
@@ -78,60 +84,86 @@ export default function SeriesDetail({ seriesSlug }: { seriesSlug: string }) {
                                 </Card>
                             )}
                         </div>
+
+                        {/* Sidebar */}
                         <div className="space-y-6">
                             <Card>
                                 <CardContent className="p-6 space-y-4">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-gray-600">
-                                            <MapPin className="h-5 w-5" />
-                                            <span>{series.series_type.name}</span>
-                                            {series.primary_location && (
-                                                <div>
-                                                    {series.primary_location.address_line_one}
-                                                    {series.primary_location.city}, {series.primary_location.state}
-                                                </div>
-                                            )}
+                                            <CalendarDays className="h-5 w-5" />
+                                            <span>{formatDate(series.start_at)}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <Users className="h-5 w-5" />
-                                            <span>{series.series_status.name}</span>
-                                        </div>
-                                        {series.roles.length > 0 && (
+
+                                        {series.event_type && (
+                                            <h2>
+                                                <span>{series.event_type.name}</span>
+                                            </h2>
+                                        )}
+
+                                        {series.venue && (
                                             <div className="flex items-center gap-2 text-gray-600">
-                                                <Users className="h-5 w-5" />
-                                                <span>{series.roles.map((role) => role.name).join(', ')}</span>
+                                                <MapPin className="h-5 w-5" />
+                                                <span>{series.venue.name}</span>
                                             </div>
                                         )}
 
-                                        {series.links.length > 0 && (
-                                            <div className="space-y-2">
-                                                <h3 className="font-semibold">Links</h3>
-                                                <ul className="list-disc list-inside">
-                                                    {series.links.map((link) => (
-                                                        <li key={link.id}>
-                                                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">
-                                                                {link.url}
-                                                            </a>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                        {series.tags.length > 0 && (
-                                            <div className="space-y-2">
-                                                <h3 className="font-semibold">Tags</h3>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {series.tags.map((tag) => (
-                                                        <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded">
-                                                            {tag.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
+                                        {series.min_age !== null && series.min_age !== undefined && (
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <Users className="h-5 w-5" />
+                                                <span>
+                                                    {series.min_age === 0 ? 'All Ages' :
+                                                        series.min_age === 18 ? '18+' :
+                                                            series.min_age === 21 ? '21+' :
+                                                                `${series.min_age}+`}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
+
+                                    {(series.presale_price || series.door_price) && (
+                                        <div className="space-y-2">
+                                            <h3 className="font-semibold flex items-center gap-2">
+                                                <DollarSign className="h-5 w-5" />
+                                                Pricing
+                                            </h3>
+                                            {series.presale_price && (
+                                                <div className="text-green-600">
+                                                    Presale: ${series.presale_price}
+                                                </div>
+                                            )}
+                                            {series.door_price && (
+                                                <div className="text-gray-600">
+                                                    Door: ${series.door_price}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {series.ticket_link && (
+                                        <Button className="w-full" asChild>
+                                            <a
+                                                href={series.ticket_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center gap-2"
+                                            >
+                                                <Ticket className="h-5 w-5" />
+                                                Buy Tickets
+                                            </a>
+                                        </Button>
+                                    )}
                                 </CardContent>
                             </Card>
+
+                            {series.promoter && (
+                                <Card>
+                                    <CardContent className="p-6">
+                                        <h3 className="font-semibold mb-2">Presented by</h3>
+                                        <div className="text-gray-600">{series.promoter.name}</div>
+                                    </CardContent>
+                                </Card>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -53,7 +53,7 @@ export function Pagination({
                         </span>{' '}
                         of{' '}
                         <span className="font-medium">{totalItems}</span>{' '}
-                        events
+                        results
                     </p>
 
                     <Select

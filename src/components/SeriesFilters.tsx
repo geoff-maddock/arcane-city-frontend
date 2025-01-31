@@ -19,7 +19,10 @@ interface DateRange {
 interface SeriesFiltersProps {
     filters: {
         name: string;
-        series_type: string;
+        entity: string;
+        event_type: string;
+        venue: string;
+        promoter: string;
         tag: string;
         created_at?: DateRange;
     };
@@ -62,15 +65,30 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="series_type">Type</Label>
+                    <Label htmlFor="entity">Entity</Label>
                     <div className="relative">
                         <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                         <Input
-                            id="series_type"
+                            id="entity"
+                            placeholder="Filter by entity..."
+                            className="pl-9"
+                            value={filters.entity}
+                            onChange={(e) => onFilterChange({ ...filters, entity: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+
+                <div className="space-y-2">
+                    <Label htmlFor="event_type">Type</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="event_type"
                             placeholder="Filter by series type..."
                             className="pl-9"
-                            value={filters.series_type}
-                            onChange={(e) => onFilterChange({ ...filters, series_type: e.target.value })}
+                            value={filters.event_type}
+                            onChange={(e) => onFilterChange({ ...filters, event_type: e.target.value })}
                         />
                     </div>
                 </div>

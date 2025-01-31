@@ -15,23 +15,23 @@ export function ActiveSeriesFilters({ filters, onRemoveFilter }: ActiveSeriesFil
             activeFilters.push({ key: 'name', label: `Name: ${filters.name}` });
         }
 
-        if (filters.series_type) {
-            activeFilters.push({ key: 'series_type', label: `Type: ${filters.series_type}` });
+        if (filters.event_type) {
+            activeFilters.push({ key: 'event_type', label: `Type: ${filters.event_type}` });
         }
 
         if (filters.tag) {
             activeFilters.push({ key: 'tag', label: `Tag: ${filters.tag}` });
         }
 
-        if (filters.created_at) {
-            if (filters.created_at.start || filters.created_at.end) {
+        if (filters.founded_at) {
+            if (filters.founded_at.start || filters.founded_at.end) {
                 const dateRange = [];
-                if (filters.created_at.start) {
-                    const startDate = new Date(filters.created_at.start).toLocaleDateString();
+                if (filters.founded_at.start) {
+                    const startDate = new Date(filters.founded_at.start).toLocaleDateString();
                     dateRange.push(`from ${startDate}`);
                 }
-                if (filters.created_at.end) {
-                    const endDate = new Date(filters.created_at.end).toLocaleDateString();
+                if (filters.founded_at.end) {
+                    const endDate = new Date(filters.founded_at.end).toLocaleDateString();
                     dateRange.push(`to ${endDate}`);
                 }
                 activeFilters.push({ key: 'created_at', label: `Date: ${dateRange.join(' ')}` });

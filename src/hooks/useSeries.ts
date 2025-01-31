@@ -10,8 +10,9 @@ interface DateRange {
 
 interface SeriesFilters {
     name: string;
-    series_type: string;
+    event_type: string;
     tag: string;
+    entity: string;
     created_at?: DateRange;
 }
 
@@ -32,8 +33,9 @@ export const useSeries = ({ page = 1, itemsPerPage = 25, filters, sort = 'name',
             params.append('page', page.toString());
             params.append('limit', itemsPerPage.toString());
             if (filters?.name) params.append('filters[name]', filters.name);
-            if (filters?.series_type) params.append('filters[series_type]', filters.series_type);
+            if (filters?.event_type) params.append('filters[series_type]', filters.event_type);
             if (filters?.tag) params.append('filters[tag]', toKebabCase(filters.tag));
+            if (filters?.entity) params.append('filters[entity]', toKebabCase(filters.entity));
             if (filters?.created_at?.start) params.append('filters[created_at][start]', filters.created_at.start);
             if (filters?.created_at?.end) params.append('filters[created_at][end]', filters.created_at.end);
             if (sort) params.append('sort', sort);

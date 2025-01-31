@@ -17,8 +17,8 @@ import { X } from 'lucide-react';
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
-    { value: 'series_type_id', label: 'Type' },
-    { value: 'created_at', label: 'Recently Added' }
+    { value: 'event_type_id', label: 'Type' },
+    { value: 'founded_at', label: 'Founded Date' }
 ];
 
 export default function Series() {
@@ -38,9 +38,12 @@ export default function Series() {
 
     const [filters, setFilters] = useState<SeriesFilters>({
         name: '',
-        series_type: '',
+        venue: '',
+        promoter: '',
+        event_type: '',
+        entity: '',
         tag: '',
-        created_at: {
+        founded_at: {
             start: undefined,
             end: undefined
         }
@@ -61,7 +64,7 @@ export default function Series() {
 
     const handleRemoveFilter = (key: keyof SeriesFilters) => {
         setFilters(prev => {
-            if (key === 'created_at') {
+            if (key === 'founded_at') {
                 return {
                     ...prev,
                     [key]: { start: undefined, end: undefined }
@@ -77,9 +80,12 @@ export default function Series() {
     const handleClearAllFilters = () => {
         setFilters({
             name: '',
-            series_type: '',
+            venue: '',
+            promoter: '',
+            event_type: '',
+            entity: '',
             tag: '',
-            created_at: {
+            founded_at: {
                 start: undefined,
                 end: undefined
             }
