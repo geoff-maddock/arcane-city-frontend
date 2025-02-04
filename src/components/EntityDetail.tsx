@@ -34,7 +34,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
 
     // Replace newlines with <br /> tags in the description
     const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
-    const placeHolderImage = `${window.location.origin}/src/assets/entity-placeholder.png`;
+    const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
 
     return (
         <div className="min-h-screen">
