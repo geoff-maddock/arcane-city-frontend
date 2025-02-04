@@ -1,4 +1,3 @@
-// src/hooks/useEvents.ts
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Event, PaginatedResponse, UseEventsParams } from '../types/api';
