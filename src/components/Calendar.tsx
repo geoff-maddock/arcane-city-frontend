@@ -1,8 +1,8 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar as FullCalendar, dateFnsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useEvents } from '../hooks/useEvents';
+import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { Button } from './ui/button';
 import { Switch } from './ui/switch';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
@@ -33,27 +33,29 @@ const Calendar: React.FC = () => {
   const [view, setView] = useState<View>('month');
   const [showImages, setShowImages] = useState(false);
   const [date, setDate] = useState(new Date());
-  const { data: events } = useEvents();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Transform and validate events
+  const { data: events, isLoading, isError } = useCalendarEvents({
+    currentDate: date
+  });
+
   const formattedEvents = React.useMemo(() => {
-    // the actual events are in events.data
-
-    if (!events) return [];
-
-    // output the contents of events to the console
-    // console.log(events.data);
-
-    // Convert to array if needed and ensure type safety
-    // const eventArray = Array.isArray(events.data) ? events.data : Object.values(events.data || {});
+    if (!events?.data) {
+      return [];
+    }
 
     return events.data.map((event: Event) => ({
-      id: event.id || String(Math.random()),
-      title: event.name || 'Untitled Event',
+      id: event.id,
+      title: event.name,
       start: new Date(event.start_at),
       end: new Date(event.end_at || event.start_at),
+      resource: event
     }));
   }, [events]);
+
+  if (isLoading) return <div>Loading events...</div>;
+  if (isError) return <div>Error loading events</div>;
 
   const handleViewChange = (newView: View): void => {
     setView(newView);
@@ -85,6 +87,7 @@ const Calendar: React.FC = () => {
     };
   };
 
+
   return (
     <div className="calendar-container">
       <div className="calendar-controls">
@@ -101,9 +104,11 @@ const Calendar: React.FC = () => {
         startAccessor="start"
         endAccessor="end"
         view={view}
-        onView={handleViewChange}
         date={date}
+        onView={handleViewChange}
         onNavigate={handleDateChange}
+        eventPropGetter={eventStyleGetter}
+        style={{ height: 800 }}
       />
     </div>
   );
