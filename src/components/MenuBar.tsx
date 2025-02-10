@@ -23,6 +23,10 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <HiCalendar />
           <span className=" xl:inline">Event Listings</span>
         </Link>
+        <Link to="/calendar" className="flex items-center gap-2 hover:underline">
+          <HiCalendar />
+          <span className=" xl:inline">Calendar</span>
+        </Link>
         <Link to="/entities" className="flex items-center gap-2 hover:underline">
           <HiOfficeBuilding />
           <span className=" xl:inline">Entity Listings</span>
