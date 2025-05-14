@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Calendar as FullCalendar, dateFnsLocalizer, View } from 'react-big-calendar';
+import { dateFnsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { Button } from './ui/button';
@@ -8,6 +8,8 @@ import { Switch } from './ui/switch';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { Event } from '../types/api';
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
 
 
 const locales = {
@@ -99,6 +101,9 @@ const Calendar: React.FC = () => {
         <Button onClick={() => handleNavigate(new Date(date.setMonth(date.getMonth() + 1)))}>Next</Button>
       </div>
       <FullCalendar
+        plugins={[dayGridPlugin]}
+        initialView="dayGridMonth"
+        weekends={false}
         localizer={localizer}
         events={formattedEvents}
         startAccessor="start"
