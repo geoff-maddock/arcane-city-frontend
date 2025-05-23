@@ -4,11 +4,16 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket, Music } from 'lucide-react';
 import { formatDate } from '../lib/utils';
+import { useState, useEffect } from 'react';
+import { Embed } from '../types/embeds';
 
 export default function EventDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
+    const [embeds, setEmbeds] = useState<Embed[]>([]);
+    const [embedsLoading, setEmbedsLoading] = useState(false);
+    const [embedsError, setEmbedsError] = useState<Error | null>(null);
 
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
@@ -18,6 +23,26 @@ export default function EventDetail({ slug }: { slug: string }) {
             return data;
         },
     });
+
+    // Fetch event embeds after the event detail is loaded
+    useEffect(() => {
+        if (event?.id) {
+            const fetchEmbeds = async () => {
+                setEmbedsLoading(true);
+                try {
+                    const { data } = await api.get<string[]>(`/events/${event.id}/embeds`);
+                    console.log('Fetched embeds:', data);
+                    setEmbeds(data);
+                } catch (err) {
+                    console.error('Error fetching embeds:', err);
+                    setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
+                } finally {
+                    setEmbedsLoading(false);
+                }
+            };
+            fetchEmbeds();
+        }
+    }, [event?.id]);
 
     if (isLoading) {
         return (
@@ -83,6 +108,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                                     </CardContent>
                                 </Card>
                             )}
+
                         </div>
 
                         {/* Sidebar */}
@@ -155,6 +181,11 @@ export default function EventDetail({ slug }: { slug: string }) {
                                     )}
                                 </CardContent>
                             </Card>
+                            <Card>
+                                <CardContent className="p-6">
+                                    <h3 className="font-semibold mb-2">Location</h3>
+                                </CardContent>
+                            </Card>
 
                             {event.promoter && (
                                 <Card>
@@ -163,6 +194,43 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         <div className="text-gray-600">{event.promoter.name}</div>
                                     </CardContent>
                                 </Card>
+                            )}
+
+                            {/* Audio Embeds Section */}
+                            {embeds.length > 0 && (
+                                <Card>
+                                    <CardContent className="p-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Music className="h-5 w-5" />
+                                            <h2 className="text-xl font-semibold">Audio</h2>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {embeds.map((embed, index) => (
+                                                <div key={index} className="rounded-md overflow-hidden">
+                                                    <div
+                                                        dangerouslySetInnerHTML={{ __html: embed }}
+                                                        className="w-full"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Loading state for embeds */}
+                            {embedsLoading && (
+                                <div className="flex items-center justify-center py-6">
+                                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                                    <span className="ml-2 text-gray-600">Loading audio...</span>
+                                </div>
+                            )}
+
+                            {/* Error state for embeds */}
+                            {embedsError && !embedsLoading && (
+                                <div className="text-red-500 text-sm">
+                                    Error loading audio content. Please try again later.
+                                </div>
                             )}
                         </div>
                     </div>
