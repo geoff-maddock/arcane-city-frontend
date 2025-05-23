@@ -90,14 +90,6 @@ const Calendar: React.FC = () => {
 
   return (
     <div className="calendar-container">
-      <div className="calendar-controls">
-        <Button onClick={() => handleViewChange('month')}>Month</Button>
-        <Button onClick={() => handleViewChange('week')}>Week</Button>
-        <Button onClick={() => handleViewChange('day')}>Day</Button>
-        <Switch checked={showImages} onCheckedChange={handleToggleImages} />
-        <Button onClick={() => handleNavigate(new Date(date.setMonth(date.getMonth() - 1)))}>Previous</Button>
-        <Button onClick={() => handleNavigate(new Date(date.setMonth(date.getMonth() + 1)))}>Next</Button>
-      </div>
       <FullCalendar
         localizer={localizer}
         events={formattedEvents}
