@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket, Music } from 'lucide-react';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
-import { Embed } from '../types/embeds';
+
 
 export default function EventDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
-    const [embeds, setEmbeds] = useState<Embed[]>([]);
+    const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
 
@@ -30,9 +30,9 @@ export default function EventDetail({ slug }: { slug: string }) {
             const fetchEmbeds = async () => {
                 setEmbedsLoading(true);
                 try {
-                    const { data } = await api.get<string[]>(`/events/${event.id}/embeds`);
-                    console.log('Fetched embeds:', data);
-                    setEmbeds(data);
+                    const response = await api.get<{ data: string[] }>(`/events/${event.id}/embeds`);
+                    console.log('Fetched embeds:', response.data.data, 'Length:', response.data.data.length);
+                    setEmbeds(response.data.data);
                 } catch (err) {
                     console.error('Error fetching embeds:', err);
                     setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
@@ -181,11 +181,6 @@ export default function EventDetail({ slug }: { slug: string }) {
                                     )}
                                 </CardContent>
                             </Card>
-                            <Card>
-                                <CardContent className="p-6">
-                                    <h3 className="font-semibold mb-2">Location</h3>
-                                </CardContent>
-                            </Card>
 
                             {event.promoter && (
                                 <Card>
@@ -197,7 +192,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                             )}
 
                             {/* Audio Embeds Section */}
-                            {embeds.length > 0 && (
+                            {embeds.length > 0 && !embedsLoading && (
                                 <Card>
                                     <CardContent className="p-6 space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
