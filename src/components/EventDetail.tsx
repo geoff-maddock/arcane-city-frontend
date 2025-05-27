@@ -26,11 +26,11 @@ export default function EventDetail({ slug }: { slug: string }) {
 
     // Fetch event embeds after the event detail is loaded
     useEffect(() => {
-        if (event?.id) {
+        if (event?.slug) {
             const fetchEmbeds = async () => {
                 setEmbedsLoading(true);
                 try {
-                    const response = await api.get<{ data: string[] }>(`/events/${event.id}/embeds`);
+                    const response = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
                     console.log('Fetched embeds:', response.data.data, 'Length:', response.data.data.length);
                     setEmbeds(response.data.data);
                 } catch (err) {
@@ -42,7 +42,7 @@ export default function EventDetail({ slug }: { slug: string }) {
             };
             fetchEmbeds();
         }
-    }, [event?.id]);
+    }, [event?.slug]);
 
     if (isLoading) {
         return (
