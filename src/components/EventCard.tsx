@@ -1,12 +1,14 @@
 import { useNavigate } from '@tanstack/react-router';
+import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
+import { Loader2, Music, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext } from 'react';
 import { EventFilterContext } from '../context/EventFilterContext';
+import { useState, useEffect } from 'react';
 
 const getAgeRestriction = (minAge: number | null | undefined): string => {
   if (minAge === null || minAge === undefined) return 'Age requirement unknown';
@@ -31,6 +33,9 @@ interface EventCardProps {
 const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   const navigate = useNavigate();
   const { setFilters } = useContext(EventFilterContext);
+  const [embeds, setEmbeds] = useState<string[]>([]);
+  const [embedsLoading, setEmbedsLoading] = useState(false);
+  const [embedsError, setEmbedsError] = useState<Error | null>(null);
 
   const handleTagClick = (tagName: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
@@ -50,6 +55,28 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
 
   const ageRestriction = getAgeRestriction(event.min_age);
   const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
+  const embedsEnabled = false; // This should be set based on your feature flag or config
+
+  // Fetch event embeds after the event detail is loaded
+  useEffect(() => {
+    // Only fetch embeds if the event has an ID and the feature is enabled
+    if (event?.id && embedsEnabled) {
+      const fetchEmbeds = async () => {
+        setEmbedsLoading(true);
+        try {
+          const response = await api.get<{ data: string[] }>(`/events/${event.id}/minimal-embeds`);
+          console.log('Fetched embeds:', response.data.data, 'Length:', response.data.data.length);
+          setEmbeds(response.data.data);
+        } catch (err) {
+          console.error('Error fetching embeds:', err);
+          setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
+        } finally {
+          setEmbedsLoading(false);
+        }
+      };
+      fetchEmbeds();
+    }
+  }, [event?.id]);
 
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md event-card">
@@ -186,6 +213,42 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
           </div>
         </CardContent>
       </div>
+      {/* Audio Embeds Section */}
+      {embeds.length > 0 && !embedsLoading && (
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Music className="h-5 w-5" />
+              <h2 className="text-xl font-semibold">Audio</h2>
+            </div>
+            <div className="space-y-4">
+              {embeds.map((embed, index) => (
+                <div key={index} className="rounded-md overflow-hidden">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: embed }}
+                    className="w-full"
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Loading state for embeds */}
+      {embedsLoading && (
+        <div className="flex items-center justify-center py-6">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <span className="ml-2 text-gray-600">Loading audio...</span>
+        </div>
+      )}
+
+      {/* Error state for embeds */}
+      {embedsError && !embedsLoading && (
+        <div className="text-red-500 text-sm">
+          Error loading audio content. Please try again later.
+        </div>
+      )}
     </Card>
   );
 };
