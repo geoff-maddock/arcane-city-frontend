@@ -4,9 +4,10 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket, Music } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket, Music, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
+import { PhotoResponse } from '../types/api';
 
 
 export default function EventDetail({ slug }: { slug: string }) {
@@ -14,6 +15,9 @@ export default function EventDetail({ slug }: { slug: string }) {
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
+    // Slideshow modal state
+    const [showSlideshow, setShowSlideshow] = useState(false);
+    const [slideshowIndex, setSlideshowIndex] = useState(0);
 
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
@@ -191,6 +195,72 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 </Card>
                             )}
 
+                            {/* Photo Gallery Section */}
+                            {event.photos && event.photos.length > 0 && (
+                                <Card>
+                                    <CardContent className="p-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <ImageIcon className="h-5 w-5" />
+                                            <h2 className="text-xl font-semibold">Photos</h2>
+                                        </div>
+                                        <div className="flex flex-wrap gap-4">
+                                            {event.photos.map((photo: PhotoResponse, idx: number) => (
+                                                <button
+                                                    key={idx}
+                                                    className="focus:outline-none"
+                                                    onClick={() => {
+                                                        setSlideshowIndex(idx);
+                                                        setShowSlideshow(true);
+                                                    }}
+                                                    type="button"
+                                                >
+                                                    <img
+                                                        src={photo.path}
+                                                        alt={`Event photo ${idx + 1}`}
+                                                        className="w-32 h-32 object-cover rounded shadow hover:scale-105 transition-transform"
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Slideshow Modal */}
+                            {showSlideshow && event.photos && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
+                                    <button
+                                        className="absolute top-4 right-4 text-white hover:text-gray-300"
+                                        onClick={() => setShowSlideshow(false)}
+                                        aria-label="Close"
+                                    >
+                                        <X className="h-8 w-8" />
+                                    </button>
+                                    <button
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+                                        onClick={() =>
+                                            setSlideshowIndex((slideshowIndex - 1 + event.photos.length) % event.photos.length)
+                                        }
+                                        aria-label="Previous"
+                                    >
+                                        <ChevronLeft className="h-10 w-10" />
+                                    </button>
+                                    <img
+                                        src={event.photos[slideshowIndex].path}
+                                        alt={`Event photo ${slideshowIndex + 1}`}
+                                        className="max-h-[80vh] max-w-[90vw] rounded shadow-lg"
+                                    />
+                                    <button
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+                                        onClick={() =>
+                                            setSlideshowIndex((slideshowIndex + 1) % event.photos.length)
+                                        }
+                                        aria-label="Next"
+                                    >
+                                        <ChevronRight className="h-10 w-10" />
+                                    </button>
+                                </div>
+                            )}
                             {/* Audio Embeds Section */}
                             {embeds.length > 0 && !embedsLoading && (
                                 <Card>
@@ -231,6 +301,6 @@ export default function EventDetail({ slug }: { slug: string }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
