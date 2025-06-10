@@ -1,3 +1,5 @@
+import { P } from "vitest/dist/chunks/environment.d8YfPkTm.js";
+
 export interface Event {
     id: number;
     name: string;
@@ -20,6 +22,7 @@ export interface Event {
     is_benefit?: boolean;
     attending: number;
     like: number;
+    photos?: PhotoResponse[];
 }
 
 export interface UseEventsParams {
@@ -80,6 +83,12 @@ export interface Location {
     postal_code?: string;
     country?: string;
     map_url?: string;
+}
+
+export interface PhotoResponse {
+    id: number;
+    path: string;
+    thumbnail_path: string;
 }
 
 
