@@ -3,26 +3,15 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Music, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
+import { Loader2, Music, CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
+import { AgeRestriction } from './AgeRestriction';
+import { EntityBadges } from './EntityBadges';
+import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext } from 'react';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { useState, useEffect } from 'react';
 
-const getAgeRestriction = (minAge: number | null | undefined): string => {
-  if (minAge === null || minAge === undefined) return 'Age requirement unknown';
-  switch (minAge) {
-    case 0:
-      return 'All Ages';
-    case 18:
-      return '18+';
-    case 21:
-      return '21+';
-    default:
-      return `${minAge}+`;  // Just in case there's a different age restriction
-  }
-};
 
 interface EventCardProps {
   event: Event;
@@ -53,7 +42,6 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
     });
   };
 
-  const ageRestriction = getAgeRestriction(event.min_age);
   const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
   const embedsEnabled = false; // This should be set based on your feature flag or config
 
@@ -147,10 +135,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
               )}
 
               {event.min_age !== null && event.min_age !== undefined && (
-                <div className="flex items-center text-sm text-gray-500">
-                  <Users className="mr-2 h-4 w-4" />
-                  {ageRestriction}
-                </div>
+                <AgeRestriction minAge={event.min_age} />
               )}
 
               {(event.presale_price || event.door_price) && (
@@ -181,35 +166,12 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
               )}
             </div>
 
-            {event.entities && event.entities.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {event.entities.map((entity) => (
-                  <Badge
-                    key={entity.id}
-                    variant="default"
-                    className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1"
-                    onClick={() => handleEntityClick(entity.name)}
-                  >
-                    {entity.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            <EntityBadges
+              entities={event.entities}
+              onClick={handleEntityClick}
+            />
 
-            {event.tags && event.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {event.tags.map((tag) => (
-                  <Badge
-                    key={tag.id}
-                    variant="secondary"
-                    className="bg-gray-100 text-gray-800 hover:bg-gray-200 cursor-pointer"
-                    onClick={() => handleTagClick(tag.name)}
-                  >
-                    {tag.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            <TagBadges tags={event.tags} onClick={handleTagClick} />
           </div>
         </CardContent>
       </div>

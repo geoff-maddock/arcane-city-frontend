@@ -4,7 +4,8 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket, Music, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { PhotoResponse } from '../types/api';
@@ -139,15 +140,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         )}
 
                                         {event.min_age !== null && event.min_age !== undefined && (
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <Users className="h-5 w-5" />
-                                                <span>
-                                                    {event.min_age === 0 ? 'All Ages' :
-                                                        event.min_age === 18 ? '18+' :
-                                                            event.min_age === 21 ? '21+' :
-                                                                `${event.min_age}+`}
-                                                </span>
-                                            </div>
+                                            <AgeRestriction minAge={event.min_age} />
                                         )}
                                     </div>
 
