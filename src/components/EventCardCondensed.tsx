@@ -2,25 +2,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
+import { CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
+import { AgeRestriction } from './AgeRestriction';
+import { EntityBadges } from './EntityBadges';
+import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext } from 'react';
 import { EventFilterContext } from '../context/EventFilterContext';
 
-const getAgeRestriction = (minAge: number | null | undefined): string => {
-    if (minAge === null || minAge === undefined) return 'Age requirement unknown';
-    switch (minAge) {
-        case 0:
-            return 'All Ages';
-        case 18:
-            return '18+';
-        case 21:
-            return '21+';
-        default:
-            return `${minAge}+`;  // Just in case there's a different age restriction
-    }
-};
 
 interface EventCardProps {
     event: Event;
@@ -44,7 +33,6 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
         });
     };
 
-    const ageRestriction = getAgeRestriction(event.min_age);
 
     return (
         <Card className="group overflow-hidden transition-all hover:shadow-md">
@@ -117,10 +105,7 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
                                 )}
 
                                 {event.min_age !== null && event.min_age !== undefined && (
-                                    <div className="flex items-center text-sm text-gray-500">
-                                        <Users className="mr-2 h-4 w-4" />
-                                        {ageRestriction}
-                                    </div>
+                                    <AgeRestriction minAge={event.min_age} />
                                 )}
 
                                 {(event.presale_price || event.door_price) && (
@@ -151,34 +136,9 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
                                 )}
                             </div>
 
-                            {event.entities && event.entities.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {event.entities.map((entity) => (
-                                        <Badge
-                                            key={entity.id}
-                                            variant="default"
-                                            className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1"
-                                        >
-                                            {entity.name}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            )}
+                            <EntityBadges entities={event.entities} />
 
-                            {event.tags && event.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-2">
-                                    {event.tags.map((tag) => (
-                                        <Badge
-                                            key={tag.id}
-                                            variant="secondary"
-                                            className="bg-gray-100 text-gray-800 hover:bg-gray-200 cursor-pointer"
-                                            onClick={() => handleTagClick(tag.name)}
-                                        >
-                                            {tag.name}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            )}
+                            <TagBadges tags={event.tags} onClick={handleTagClick} />
                         </div>
                     </CardContent>
                 </div>

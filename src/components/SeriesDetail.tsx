@@ -4,7 +4,8 @@ import { api } from '../lib/api';
 import { Series } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, Users, DollarSign, Ticket } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
+import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 
 export default function SeriesDetail({ slug }: { slug: string }) {
@@ -109,15 +110,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                         )}
 
                                         {series.min_age !== null && series.min_age !== undefined && (
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <Users className="h-5 w-5" />
-                                                <span>
-                                                    {series.min_age === 0 ? 'All Ages' :
-                                                        series.min_age === 18 ? '18+' :
-                                                            series.min_age === 21 ? '21+' :
-                                                                `${series.min_age}+`}
-                                                </span>
-                                            </div>
+                                            <AgeRestriction minAge={series.min_age} />
                                         )}
                                     </div>
 

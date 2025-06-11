@@ -3,6 +3,7 @@ import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
 import EventFilter from './EventFilters';
 import { Pagination } from './Pagination';
+import SortControls from './SortControls';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -206,6 +207,13 @@ export default function Events() {
                                         </Button>
                                     )}
                                 </div>
+                                <SortControls
+                                    sort={sort}
+                                    setSort={setSort}
+                                    direction={direction}
+                                    setDirection={setDirection}
+                                    sortOptions={sortOptions}
+                                />
                             </div>
 
                             {filtersVisible && (
