@@ -1,5 +1,3 @@
-import { P } from "vitest/dist/chunks/environment.d8YfPkTm.js";
-
 export interface Event {
     id: number;
     name: string;
