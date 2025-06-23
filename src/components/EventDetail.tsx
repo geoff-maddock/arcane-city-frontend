@@ -19,6 +19,10 @@ export default function EventDetail({ slug }: { slug: string }) {
     // Slideshow modal state
     const [showSlideshow, setShowSlideshow] = useState(false);
     const [slideshowIndex, setSlideshowIndex] = useState(0);
+    // Photos state
+    const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+    const [photosLoading, setPhotosLoading] = useState(false);
+    const [photosError, setPhotosError] = useState<Error | null>(null);
 
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
@@ -46,6 +50,26 @@ export default function EventDetail({ slug }: { slug: string }) {
                 }
             };
             fetchEmbeds();
+        }
+    }, [event?.slug]);
+
+    // Fetch event photos after the event detail is loaded
+    useEffect(() => {
+        if (event?.slug) {
+            const fetchPhotos = async () => {
+                setPhotosLoading(true);
+                try {
+                    const response = await api.get<{ data: PhotoResponse[] }>(`/events/${event.slug}/all-photos`);
+                    const photoData = (response.data as any).data ?? response.data;
+                    setPhotos(photoData as PhotoResponse[]);
+                } catch (err) {
+                    console.error('Error fetching photos:', err);
+                    setPhotosError(err instanceof Error ? err : new Error('Failed to load photos'));
+                } finally {
+                    setPhotosLoading(false);
+                }
+            };
+            fetchPhotos();
         }
     }, [event?.slug]);
 
@@ -113,6 +137,9 @@ export default function EventDetail({ slug }: { slug: string }) {
                                     </CardContent>
                                 </Card>
                             )}
+
+
+
 
                         </div>
 
@@ -189,7 +216,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                             )}
 
                             {/* Photo Gallery Section */}
-                            {event.photos && event.photos.length > 0 && (
+                            {photos.length > 0 && !photosLoading && (
                                 <Card>
                                     <CardContent className="p-6 space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
@@ -197,7 +224,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                                             <h2 className="text-xl font-semibold">Photos</h2>
                                         </div>
                                         <div className="flex flex-wrap gap-4">
-                                            {event.photos.map((photo: PhotoResponse, idx: number) => (
+                                            {photos.map((photo: PhotoResponse, idx: number) => (
                                                 <button
                                                     key={idx}
                                                     className="focus:outline-none"
@@ -219,10 +246,25 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 </Card>
                             )}
 
+                            {/* Loading state for photos */}
+                            {photosLoading && (
+                                <div className="flex items-center justify-center py-6">
+                                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                                    <span className="ml-2 text-gray-600">Loading photos...</span>
+                                </div>
+                            )}
+
+                            {/* Error state for photos */}
+                            {photosError && !photosLoading && (
+                                <div className="text-red-500 text-sm">
+                                    Error loading photos. Please try again later.
+                                </div>
+                            )}
+
                             {/* Slideshow Modal */}
-                            {showSlideshow && event.photos && event.photos.length > 0 && (() => {
+                            {showSlideshow && photos.length > 0 && (() => {
                                 // Store photos array in a variable to ensure it's defined throughout the component
-                                const photos = event.photos;
+                                const photosArray = photos;
                                 return (
                                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
                                         <button
@@ -235,21 +277,21 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         <button
                                             className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
                                             onClick={() =>
-                                                setSlideshowIndex((slideshowIndex - 1 + photos.length) % photos.length)
+                                                setSlideshowIndex((slideshowIndex - 1 + photosArray.length) % photosArray.length)
                                             }
                                             aria-label="Previous"
                                         >
                                             <ChevronLeft className="h-10 w-10" />
                                         </button>
                                         <img
-                                            src={photos[slideshowIndex].path}
+                                            src={photosArray[slideshowIndex].path}
                                             alt={`Event photo ${slideshowIndex + 1}`}
                                             className="max-h-[80vh] max-w-[90vw] rounded shadow-lg"
                                         />
                                         <button
                                             className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
                                             onClick={() =>
-                                                setSlideshowIndex((slideshowIndex + 1) % photos.length)
+                                                setSlideshowIndex((slideshowIndex + 1) % photosArray.length)
                                             }
                                             aria-label="Next"
                                         >
