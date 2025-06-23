@@ -5,6 +5,7 @@ import { Series } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
+import PhotoGallery from './PhotoGallery';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 
@@ -157,6 +158,8 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                     </CardContent>
                                 </Card>
                             )}
+
+                            <PhotoGallery fetchUrl={`/series/${slug}/all-photos`} />
                         </div>
                     </div>
                 </div>
