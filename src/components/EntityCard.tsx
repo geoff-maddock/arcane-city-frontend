@@ -61,6 +61,15 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
         <Card className="group overflow-hidden transition-all hover:shadow-md">
             <CardContent className="p-6 space-y-4">
                 <div className="space-y-3">
+                    <div className="thumbnail">
+                        <ImageLightbox
+                            thumbnailUrl={entity.primary_photo || placeHolderImage}
+                            alt={entity.name}
+                            allImages={allImages}
+                            initialIndex={imageIndex}
+                        />
+                    </div>
+
                     <h2 className="text-xl font-bold">
                         <a
                             href={`/entities/${entity.slug}`}
@@ -71,14 +80,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                         </a>
                     </h2>
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
-                    <div className="thumbnail">
-                        <ImageLightbox
-                            thumbnailUrl={entity.primary_photo || placeHolderImage}
-                            alt={entity.name}
-                            allImages={allImages}
-                            initialIndex={imageIndex}
-                        />
-                    </div>
+
                     <div className="flex items-center gap-2 text-gray-600">
                         <MapPin className="h-5 w-5" />
                         <span>{entity.entity_type.name}</span>
@@ -111,7 +113,6 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     )}
                     {entity.tags.length > 0 && (
                         <div className="space-y-2">
-                            <h3 className="font-semibold">Tags</h3>
                             <div className="flex flex-wrap gap-2">
                                 {entity.tags.map((tag) => (
                                     <Badge
