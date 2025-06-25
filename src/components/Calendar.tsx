@@ -8,6 +8,7 @@ import { Switch } from './ui/switch';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { Event } from '../types/api';
+import { useNavigate } from '@tanstack/react-router';
 
 
 const locales = {
@@ -35,6 +36,7 @@ const Calendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const { data: events, isLoading, isError } = useCalendarEvents({
     currentDate: date
@@ -73,6 +75,15 @@ const Calendar: React.FC = () => {
     setDate(newDate);
   };
 
+  const handleSelectEvent = (calendarEvent: CalendarEvent & { resource: Event }) => {
+    if (calendarEvent.resource?.slug) {
+      navigate({
+        to: '/events/$slug',
+        params: { slug: calendarEvent.resource.slug },
+      });
+    }
+  };
+
   const eventStyleGetter = (event) => {
     const style = {
       backgroundColor: '#3174ad',
@@ -100,6 +111,7 @@ const Calendar: React.FC = () => {
         date={date}
         onView={handleViewChange}
         onNavigate={handleDateChange}
+        onSelectEvent={handleSelectEvent}
         eventPropGetter={eventStyleGetter}
         style={{ height: 800 }}
       />
