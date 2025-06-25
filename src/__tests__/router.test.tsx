@@ -16,6 +16,10 @@ vi.mock('../routes/account', () => ({
     default: () => <div data-testid="account-component">Account Page</div>
 }))
 
+vi.mock('../components/Calendar', () => ({
+    default: () => <div data-testid="calendar-component">Calendar Page</div>
+}))
+
 describe('Router Configuration', () => {
     it('renders Events component at root path', async () => {
         render(
@@ -54,6 +58,16 @@ describe('Router Configuration', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('account-component')).toBeInTheDocument()
+        })
+    })
+
+    it('renders Calendar component at /calendar path', async () => {
+        await router.navigate({ to: '/calendar' })
+
+        render(<RouterProvider router={router} />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('calendar-component')).toBeInTheDocument()
         })
     })
 })

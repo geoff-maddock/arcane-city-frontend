@@ -7,6 +7,7 @@ import { EventDetailRoute } from './routes/event-detail.tsx';
 import { EntityDetailRoute } from './routes/entity-detail.tsx';
 import { SeriesDetailRoute } from './routes/series-detail.tsx';
 import Account from './routes/account';
+import Calendar from './components/Calendar';
 
 // Create routes
 const indexRoute = createRoute({
@@ -39,6 +40,12 @@ const accountRoute = createRoute({
     component: Account,
 });
 
+const calendarRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/calendar',
+    component: Calendar,
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
     indexRoute,
@@ -49,6 +56,7 @@ const routeTree = rootRoute.addChildren([
     EntityDetailRoute,
     SeriesDetailRoute,
     accountRoute,
+    calendarRoute,
 ]);
 
 // Create and export router

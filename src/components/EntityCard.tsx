@@ -55,7 +55,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
         });
     };
 
-    const placeHolderImage = `${window.location.origin}/src/assets/entity-placeholder.png`;
+    const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
 
     return (
         <Card className="group overflow-hidden transition-all hover:shadow-md">
