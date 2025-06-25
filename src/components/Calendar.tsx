@@ -1,13 +1,12 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Calendar as FullCalendar, dateFnsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
-import { Button } from './ui/button';
-import { Switch } from './ui/switch';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { Event } from '../types/api';
+import { useNavigate } from '@tanstack/react-router';
 
 
 const locales = {
@@ -31,10 +30,9 @@ interface CalendarEvent {
 
 const Calendar: React.FC = () => {
   const [view, setView] = useState<View>('month');
-  const [showImages, setShowImages] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const { data: events, isLoading, isError } = useCalendarEvents({
     currentDate: date
@@ -46,7 +44,7 @@ const Calendar: React.FC = () => {
     }
 
     return events.data.map((event: Event) => ({
-      id: event.id,
+      id: String(event.id),
       title: event.name,
       start: new Date(event.start_at),
       end: new Date(event.end_at || event.start_at),
@@ -65,15 +63,17 @@ const Calendar: React.FC = () => {
     setDate(newDate);
   };
 
-  const handleToggleImages = (): void => {
-    setShowImages(!showImages);
+
+  const handleSelectEvent = (calendarEvent: CalendarEvent & { resource: Event }) => {
+    if (calendarEvent.resource?.slug) {
+      navigate({
+        to: '/events/$slug',
+        params: { slug: calendarEvent.resource.slug },
+      });
+    }
   };
 
-  const handleNavigate = (newDate) => {
-    setDate(newDate);
-  };
-
-  const eventStyleGetter = (event) => {
+  const eventStyleGetter = () => {
     const style = {
       backgroundColor: '#3174ad',
       borderRadius: '5px',
@@ -100,6 +100,7 @@ const Calendar: React.FC = () => {
         date={date}
         onView={handleViewChange}
         onNavigate={handleDateChange}
+        onSelectEvent={handleSelectEvent}
         eventPropGetter={eventStyleGetter}
         style={{ height: 800 }}
       />
