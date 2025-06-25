@@ -21,7 +21,7 @@ export default function PhotoGallery({ fetchUrl }: PhotoGalleryProps) {
             setLoading(true);
             try {
                 const response = await api.get<{ data: PhotoResponse[] }>(fetchUrl);
-                const photoData = (response.data as any).data ?? response.data;
+                const photoData = (response.data as { data: PhotoResponse[] }).data ?? response.data;
                 setPhotos(photoData as PhotoResponse[]);
             } catch (err) {
                 console.error('Error fetching photos:', err);

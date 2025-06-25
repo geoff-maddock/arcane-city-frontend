@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { RouterProvider } from '@tanstack/react-router'
 import { router } from '../router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // Mock the components
 vi.mock('../components/Events', () => ({
@@ -20,10 +21,14 @@ vi.mock('../components/Calendar', () => ({
     default: () => <div data-testid="calendar-component">Calendar Page</div>
 }))
 
+const client = new QueryClient()
+
 describe('Router Configuration', () => {
     it('renders Events component at root path', async () => {
         render(
-            <RouterProvider router={router} />
+            <QueryClientProvider client={client}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
         )
 
         await waitFor(() => {
@@ -34,7 +39,11 @@ describe('Router Configuration', () => {
     it('renders Events component at /events path', async () => {
         await router.navigate({ to: '/events' })
 
-        render(<RouterProvider router={router} />)
+        render(
+            <QueryClientProvider client={client}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
+        )
 
         await waitFor(() => {
             expect(screen.getByTestId('events-component')).toBeInTheDocument()
@@ -44,7 +53,11 @@ describe('Router Configuration', () => {
     it('renders Entities component at /entities path', async () => {
         await router.navigate({ to: '/entities' })
 
-        render(<RouterProvider router={router} />)
+        render(
+            <QueryClientProvider client={client}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
+        )
 
         await waitFor(() => {
             expect(screen.getByTestId('entities-component')).toBeInTheDocument()
@@ -54,7 +67,11 @@ describe('Router Configuration', () => {
     it('renders Account component at /account path', async () => {
         await router.navigate({ to: '/account' })
 
-        render(<RouterProvider router={router} />)
+        render(
+            <QueryClientProvider client={client}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
+        )
 
         await waitFor(() => {
             expect(screen.getByTestId('account-component')).toBeInTheDocument()
@@ -64,7 +81,11 @@ describe('Router Configuration', () => {
     it('renders Calendar component at /calendar path', async () => {
         await router.navigate({ to: '/calendar' })
 
-        render(<RouterProvider router={router} />)
+        render(
+            <QueryClientProvider client={client}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
+        )
 
         await waitFor(() => {
             expect(screen.getByTestId('calendar-component')).toBeInTheDocument()
