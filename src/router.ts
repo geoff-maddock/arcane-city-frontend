@@ -3,9 +3,11 @@ import { rootRoute } from './routes/root';
 import Events from './components/Events';
 import Entities from './components/Entities';
 import Series from './components/Series';
+import Tags from './components/Tags';
 import { EventDetailRoute } from './routes/event-detail.tsx';
 import { EntityDetailRoute } from './routes/entity-detail.tsx';
 import { SeriesDetailRoute } from './routes/series-detail.tsx';
+import { TagDetailRoute } from './routes/tag-detail.tsx';
 import Account from './routes/account';
 import Calendar from './components/Calendar';
 
@@ -34,6 +36,12 @@ const seriesRoute = createRoute({
     component: Series,
 });
 
+const tagRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/tags',
+    component: Tags,
+});
+
 const accountRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/account',
@@ -52,9 +60,11 @@ const routeTree = rootRoute.addChildren([
     eventRoute,
     entityRoute,
     seriesRoute,
+    tagRoute,
     EventDetailRoute,
     EntityDetailRoute,
     SeriesDetailRoute,
+    TagDetailRoute,
     accountRoute,
     calendarRoute,
 ]);

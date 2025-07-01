@@ -57,3 +57,7 @@ export interface SeriesFiltersProps {
     };
     onFilterChange: (filters: SeriesFiltersProps['filters']) => void;
 }
+
+export interface TagFilters {
+    name: string;
+}
