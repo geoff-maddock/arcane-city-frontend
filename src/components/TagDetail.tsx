@@ -110,9 +110,14 @@ export default function TagDetail({ slug }: { slug: string }) {
                             {eventsLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                             ) : eventsData && eventsData.data.length > 0 ? (
-                                <div className="space-y-4">
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
                                     {eventsData.data.map((event, idx) => (
-                                        <EventCardCondensed key={event.id} event={event} allImages={eventImages} imageIndex={idx} />
+                                        <EventCardCondensed
+                                            key={event.id}
+                                            event={event}
+                                            allImages={eventImages}
+                                            imageIndex={idx}
+                                        />
                                     ))}
                                 </div>
                             ) : (
