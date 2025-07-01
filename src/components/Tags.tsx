@@ -11,8 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { TagFilterContext } from '../context/TagFilterContext';
 import { TagFilters as TagFiltersType } from '../types/filters';
-import { Badge } from '@/components/ui/badge';
-import { Link } from '@tanstack/react-router';
+import TagCard from './TagCard';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
@@ -160,16 +159,9 @@ export default function Tags() {
                             <>
                                 {renderPagination()}
 
-                                <div className="flex flex-wrap gap-2">
+                                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                                     {data.data.map((tag) => (
-                                        <Link key={tag.id} to="/tags/$slug" params={{ slug: tag.slug }}>
-                                            <Badge
-                                                variant="secondary"
-                                                className="bg-gray-100 text-gray-800 hover:bg-gray-200 cursor-pointer"
-                                            >
-                                                {tag.name}
-                                            </Badge>
-                                        </Link>
+                                        <TagCard key={tag.id} tag={tag} />
                                     ))}
                                 </div>
 

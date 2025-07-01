@@ -23,7 +23,7 @@ const itemsPerPageOptions = [
     { value: "25", label: "25 per page" },
     { value: "50", label: "50 per page" },
     { value: "100", label: "100 per page" },
-    { value: "1000", label: "All" },
+    { value: "all", label: "All" },
 ];
 
 export function Pagination({
@@ -58,8 +58,14 @@ export function Pagination({
                     </p>
 
                     <Select
-                        value={itemsPerPage.toString()}
-                        onValueChange={(value) => onItemsPerPageChange(Number(value))}
+                        value={itemsPerPage >= totalItems ? 'all' : itemsPerPage.toString()}
+                        onValueChange={(value) => {
+                            if (value === 'all') {
+                                onItemsPerPageChange(totalItems);
+                            } else {
+                                onItemsPerPageChange(Number(value));
+                            }
+                        }}
                     >
                         <SelectTrigger className="w-[140px]">
                             <SelectValue />
