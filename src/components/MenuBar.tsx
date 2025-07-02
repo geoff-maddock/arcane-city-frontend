@@ -49,19 +49,28 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
       </nav>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
       {user ? (
-        <Button asChild className="mt-2 w-full flex items-center justify-center gap-2">
-          <Link to="/account">
-            <HiUser />
-            <span className="lg:inline">My Account</span>
-          </Link>
-        </Button>
+        <>
+          <div className="mb-2">Logged in as {user.username}</div>
+          <Button asChild className="w-full flex items-center justify-center gap-2 mb-2">
+            <Link to="/account">
+              <HiUser />
+              <span className="lg:inline">My Account</span>
+            </Link>
+          </Button>
+          <Button onClick={() => { authService.logout(); window.location.reload(); }} className="w-full mb-2">
+            Log out
+          </Button>
+        </>
       ) : (
-        <Button asChild className="mt-2 w-full flex items-center justify-center gap-2">
-          <Link to="/login">
-            <HiUser />
-            <span className="lg:inline">Login / Register</span>
-          </Link>
-        </Button>
+        <>
+          <div className="mb-2">Not logged in</div>
+          <Button asChild className="w-full flex items-center justify-center gap-2 mb-2">
+            <Link to="/login">
+              <HiUser />
+              <span className="lg:inline">Login / Register</span>
+            </Link>
+          </Button>
+        </>
       )}
       <Button onClick={toggleTheme} className="mt-auto flex items-center gap-2">
         {theme === 'light' ? <HiMoon /> : <HiSun />}

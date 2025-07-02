@@ -24,7 +24,9 @@ const Account: React.FC = () => {
 
   return (
     <div className="p-4 space-y-2">
-      <h2 className="text-xl font-bold">Welcome, {user.username}</h2>
+      <h2 className="text-xl font-bold">Account</h2>
+      <div>User ID: {user.id}</div>
+      <div>Username: {user.username}</div>
       <div>Email: {user.email}</div>
       {/* Personalized content could go here */}
     </div>
