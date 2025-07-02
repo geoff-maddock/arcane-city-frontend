@@ -5,8 +5,8 @@ import { Tag, Event, Entity, Series, PaginatedResponse } from '../types/api';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import EventCardCondensed from './EventCardCondensed';
-import EntityCard from './EntityCard';
-import SeriesCard from './SeriesCard';
+import EntityCardCondensed from './EntityCardCondensed';
+import SeriesCardCondensed from './SeriesCardCondensed';
 
 export default function TagDetail({ slug }: { slug: string }) {
     const { data: tag, isLoading, error } = useQuery<Tag>({
@@ -132,7 +132,7 @@ export default function TagDetail({ slug }: { slug: string }) {
                             ) : entitiesData && entitiesData.data.length > 0 ? (
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                                     {entitiesData.data.map((entity, idx) => (
-                                        <EntityCard key={entity.id} entity={entity} allImages={entityImages} imageIndex={idx} />
+                                        <EntityCardCondensed key={entity.id} entity={entity} allImages={entityImages} imageIndex={idx} />
                                     ))}
                                 </div>
                             ) : (
@@ -147,7 +147,7 @@ export default function TagDetail({ slug }: { slug: string }) {
                             ) : seriesData && seriesData.data.length > 0 ? (
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                                     {seriesData.data.map((series, idx) => (
-                                        <SeriesCard key={series.id} series={series} allImages={seriesImages} imageIndex={idx} />
+                                        <SeriesCardCondensed key={series.id} series={series} allImages={seriesImages} imageIndex={idx} />
                                     ))}
                                 </div>
                             ) : (
