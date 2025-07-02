@@ -4,7 +4,12 @@ import { LoginCredentials, User } from '../types/auth';
 
 export const authService = {
     async login(credentials: LoginCredentials) {
-        const { data } = await api.post<{ token: string, user: User }>('/auth/login', credentials);
+        const { username, password } = credentials;
+        const { data } = await api.post<{ token: string }>(
+            '/tokens/create',
+            { token_name: 'arcane-city' },
+            { auth: { username, password } }
+        );
         localStorage.setItem('token', data.token);
         return data;
     },
