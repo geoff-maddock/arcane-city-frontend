@@ -50,7 +50,6 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
       {user ? (
         <>
-          <div className="mb-2">Logged in as {user.username}</div>
           <Button asChild className="w-full flex items-center justify-center gap-2 mb-2">
             <Link to="/account">
               <HiUser />
@@ -63,7 +62,6 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
         </>
       ) : (
         <>
-          <div className="mb-2">Not logged in</div>
           <Button asChild className="w-full flex items-center justify-center gap-2 mb-2">
             <Link to="/login">
               <HiUser />

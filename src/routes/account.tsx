@@ -25,10 +25,17 @@ const Account: React.FC = () => {
   return (
     <div className="p-4 space-y-2">
       <h2 className="text-xl font-bold">Account</h2>
-      <div>User ID: {user.id}</div>
-      <div>Username: {user.username}</div>
-      <div>Email: {user.email}</div>
-      {/* Personalized content could go here */}
+      <div className="grid grid-cols-[100px_1fr] gap-2">
+        <span className="font-semibold text-gray-600">Name:</span>
+        <span>{user.name}</span>
+
+        <span className="font-semibold text-gray-600">Email:</span>
+        <span>{user.email}</span>
+
+        <span className="font-semibold text-gray-600">Status:</span>
+        <span>{user.status.name}</span>
+      </div>
+
     </div>
   );
 };
