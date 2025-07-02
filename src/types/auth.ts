@@ -5,10 +5,16 @@ export interface AuthState {
     user: User | null;
 }
 
+export interface UserStatus {
+    id: number;
+    name: string;
+}
+
 export interface User {
     id: number;
-    username: string;
+    name: string;
     email: string;
+    status: UserStatus;
     // Add other user fields
 }
 

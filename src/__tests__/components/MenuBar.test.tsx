@@ -33,7 +33,7 @@ const renderMenuBar = async () => {
       <MenuBar />
     </QueryClientProvider>
   )
-  await waitFor(() => {})
+  await waitFor(() => { })
 }
 
 describe('MenuBar login indicator', () => {
@@ -55,8 +55,9 @@ describe('MenuBar login indicator', () => {
     vi.mocked(authService.isAuthenticated).mockReturnValue(true)
     vi.mocked(authService.getCurrentUser).mockResolvedValue({
       id: 1,
-      username: 'testuser',
-      email: 'test@example.com'
+      name: 'testuser',
+      email: 'test@example.com',
+      status: { id: 1, name: 'active' }
     })
 
     await renderMenuBar()
