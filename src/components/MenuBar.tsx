@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
@@ -8,6 +9,11 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: authService.getCurrentUser,
+    enabled: authService.isAuthenticated(),
+  });
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -16,7 +22,12 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
 
   return (
     <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`}>
-      <h1 className=" xl:block text-2xl font-bold mb-4 text-center">Arcane City</h1>
+      <h1 className=" xl:block text-2xl font-bold mb-2 text-center">Arcane City</h1>
+      {authService.isAuthenticated() && user ? (
+        <div className="text-sm mb-2">Logged in as {user.username}</div>
+      ) : (
+        <div className="text-sm mb-2 text-gray-400">Not logged in</div>
+      )}
 
       <nav className="flex flex-col gap-2 items-center">
         <Link to="/events" className="flex items-center gap-2 hover:underline">
@@ -39,13 +50,22 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <HiTag />
           <span className=" xl:inline">Tags</span>
         </Link>
-        {authService.isAuthenticated() && (
-          <Link to="/account" className="flex items-center gap-2 hover:underline">
+      </nav>
+      {authService.isAuthenticated() ? (
+        <Button asChild className="mt-2 w-full flex items-center justify-center gap-2">
+          <Link to="/account">
             <HiUser />
             <span className="lg:inline">My Account</span>
           </Link>
-        )}
-      </nav>
+        </Button>
+      ) : (
+        <Button asChild className="mt-2 w-full flex items-center justify-center gap-2">
+          <Link to="/login">
+            <HiUser />
+            <span className="lg:inline">Login / Register</span>
+          </Link>
+        </Button>
+      )}
       <Button onClick={toggleTheme} className="mt-auto flex items-center gap-2">
         {theme === 'light' ? <HiMoon /> : <HiSun />}
         <span className="hidden xl:inline">

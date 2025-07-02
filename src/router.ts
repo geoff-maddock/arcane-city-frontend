@@ -9,6 +9,8 @@ import { EntityDetailRoute } from './routes/entity-detail.tsx';
 import { SeriesDetailRoute } from './routes/series-detail.tsx';
 import { TagDetailRoute } from './routes/tag-detail.tsx';
 import Account from './routes/account';
+import { LoginRoute } from './routes/login';
+import { RegisterRoute } from './routes/register';
 import Calendar from './components/Calendar';
 
 // Create routes
@@ -67,6 +69,8 @@ const routeTree = rootRoute.addChildren([
     TagDetailRoute,
     accountRoute,
     calendarRoute,
+    LoginRoute,
+    RegisterRoute,
 ]);
 
 // Create and export router
