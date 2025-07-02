@@ -48,7 +48,7 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
         </Link>
       </nav>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
-      {authService.isAuthenticated() ? (
+      {user ? (
         <Button asChild className="mt-2 w-full flex items-center justify-center gap-2">
           <Link to="/account">
             <HiUser />
