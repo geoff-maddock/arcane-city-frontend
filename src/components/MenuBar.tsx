@@ -23,11 +23,7 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`}>
       <h1 className=" xl:block text-2xl font-bold mb-2 text-center">Arcane City</h1>
-      {authService.isAuthenticated() && user ? (
-        <div className="text-sm mb-2">Logged in as {user.username}</div>
-      ) : (
-        <div className="text-sm mb-2 text-gray-400">Not logged in</div>
-      )}
+      <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
 
       <nav className="flex flex-col gap-2 items-center">
         <Link to="/events" className="flex items-center gap-2 hover:underline">
@@ -36,7 +32,7 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
         </Link>
         <Link to="/calendar" className="flex items-center gap-2 hover:underline">
           <HiCalendar />
-          <span className=" xl:inline">Calendar</span>
+          <span className=" xl:inline">Event Calendar</span>
         </Link>
         <Link to="/entities" className="flex items-center gap-2 hover:underline">
           <HiOfficeBuilding />
@@ -51,6 +47,7 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <span className=" xl:inline">Tags</span>
         </Link>
       </nav>
+      <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
       {authService.isAuthenticated() ? (
         <Button asChild className="mt-2 w-full flex items-center justify-center gap-2">
           <Link to="/account">
