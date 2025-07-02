@@ -30,8 +30,15 @@ export const useTagImage = (slug: string) => {
         return data.data[0];
     };
 
-    const { data: event } = useQuery(['tagLatestEvent', slug], fetchLatestEvent);
-    const { data: entity } = useQuery(['tagLatestEntity', slug], fetchLatestEntity);
+    const { data: event } = useQuery<Event | undefined>({
+        queryKey: ['tagLatestEvent', slug],
+        queryFn: fetchLatestEvent,
+    });
+
+    const { data: entity } = useQuery<Entity | undefined>({
+        queryKey: ['tagLatestEntity', slug],
+        queryFn: fetchLatestEntity,
+    });
 
     let url: string | null = null;
     let alt = '';
