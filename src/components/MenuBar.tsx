@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection, HiTag } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
@@ -34,6 +34,10 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
         <Link to="/series" className="flex items-center gap-2 hover:underline">
           <HiCollection />
           <span className=" xl:inline">Series Listings</span>
+        </Link>
+        <Link to="/tags" className="flex items-center gap-2 hover:underline">
+          <HiTag />
+          <span className=" xl:inline">Tags</span>
         </Link>
         {authService.isAuthenticated() && (
           <Link to="/account" className="flex items-center gap-2 hover:underline">
