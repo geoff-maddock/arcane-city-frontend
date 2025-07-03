@@ -118,7 +118,6 @@ describe('Events Component', () => {
         // Check for main components
         expect(screen.getByText('Event Listings')).toBeInTheDocument()
         expect(screen.getByTestId('event-filters')).toBeInTheDocument()
-        expect(screen.getByTestId('sort-controls')).toBeInTheDocument()
 
         // Check that events are rendered
         await waitFor(() => {

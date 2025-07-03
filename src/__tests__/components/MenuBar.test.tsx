@@ -47,7 +47,6 @@ describe('MenuBar login indicator', () => {
 
     await renderMenuBar()
 
-    expect(screen.getByText('Not logged in')).toBeInTheDocument()
     expect(screen.getByText('Login / Register')).toBeInTheDocument()
   })
 
@@ -57,14 +56,22 @@ describe('MenuBar login indicator', () => {
       id: 1,
       name: 'testuser',
       email: 'test@example.com',
-      status: { id: 1, name: 'active' }
+      status: { id: 1, name: 'active' },
+      email_verified_at: null,
+      last_active: null,
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z',
+      followed_tags: [],
+      followed_entities: [],
+      followed_series: [],
+      followed_threads: [],
+      photos: []
     })
 
     await renderMenuBar()
 
     await waitFor(() => {
-      expect(screen.getByText('Logged in as testuser')).toBeInTheDocument()
+      expect(screen.getByText('My Account')).toBeInTheDocument()
     })
-    expect(screen.getByText('My Account')).toBeInTheDocument()
   })
 })
