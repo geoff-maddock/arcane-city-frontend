@@ -13,6 +13,7 @@ import { LoginRoute } from './routes/login';
 import { RegisterRoute } from './routes/register';
 import Calendar from './components/Calendar';
 import { AboutRoute } from './routes/about';
+import { ForYouRoute } from './routes/for-you';
 
 // Create routes
 const indexRoute = createRoute({
@@ -69,6 +70,7 @@ const routeTree = rootRoute.addChildren([
     SeriesDetailRoute,
     TagDetailRoute,
     accountRoute,
+    ForYouRoute,
     calendarRoute,
     AboutRoute,
     LoginRoute,

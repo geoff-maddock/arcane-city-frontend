@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle, HiStar } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
@@ -46,6 +46,12 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <HiTag />
           <span className=" xl:inline">Tags</span>
         </Link>
+        {user && (
+          <Link to="/for-you" className="flex items-center gap-2 hover:underline">
+            <HiStar />
+            <span className=" xl:inline">For You</span>
+          </Link>
+        )}
         <Link to="/about" className="flex items-center gap-2 hover:underline">
           <HiInformationCircle />
           <span className=" xl:inline">About</span>
