@@ -207,13 +207,6 @@ export default function Events() {
                                         </Button>
                                     )}
                                 </div>
-                                <SortControls
-                                    sort={sort}
-                                    setSort={setSort}
-                                    direction={direction}
-                                    setDirection={setDirection}
-                                    sortOptions={sortOptions}
-                                />
                             </div>
 
                             {filtersVisible && (

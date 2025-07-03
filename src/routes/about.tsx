@@ -4,6 +4,7 @@ import { rootRoute } from './root';
 
 const About: React.FC = () => (
   <div className="max-w-3xl mx-auto p-4 space-y-4">
+    <h1 className="text-4xl font-bold tracking-tight text-gray-900">About Arcane City</h1>
     <img src="/images/pittsburgh-skyline.jpg" alt="Pittsburgh skyline" />
     <p>
       <b>Arcane City</b> is calendar of events, concerts, club nights, weekly and
@@ -12,7 +13,7 @@ const About: React.FC = () => (
       artist, venue, genre or anything else to get weekly and daily updates on
       what's upcoming.  If you are a promoter, you can add your events and have
       them shared on the site, with anybody who signs up and also reposted in the
-      Arcane City page events and to our twitter account.
+      Arcane City page events and to our instagram account.
     </p>
     <iframe
       width="560"
