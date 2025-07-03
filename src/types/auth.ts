@@ -43,13 +43,30 @@ export interface Profile {
     updated_at: string;
 }
 
+export interface Activity {
+    id: number;
+    user_id: number;
+    object_table: string;
+    object_name: string;
+    object_id: number;
+    child_object_table: string | null;
+    child_object_name: string | null;
+    child_object_id: number | null;
+    message: string;
+    changes: string | null;
+    action_id: number;
+    created_at: string;
+    updated_at: string;
+    ip_address: string;
+}
+
 export interface User {
     id: number;
     name: string;
     email: string;
     status: UserStatus;
     email_verified_at: string | null;
-    last_active: string | null;
+    last_active: Activity | null;
     created_at: string;
     updated_at: string;
     profile?: Profile;
