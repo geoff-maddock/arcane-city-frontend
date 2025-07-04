@@ -189,6 +189,19 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 </Card>
                             )}
 
+                            {event.attendees && event.attendees.length > 0 && (
+                                <Card>
+                                    <CardContent className="p-6">
+                                        <h3 className="font-semibold mb-2">Attendees</h3>
+                                        <ul className="list-disc list-inside text-gray-600">
+                                            {event.attendees.map((user) => (
+                                                <li key={user.id}>{user.username}</li>
+                                            ))}
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            )}
+
                             <PhotoGallery fetchUrl={`/events/${event.slug}/all-photos`} />
                             {/* Audio Embeds Section */}
                             {embeds.length > 0 && !embedsLoading && (
