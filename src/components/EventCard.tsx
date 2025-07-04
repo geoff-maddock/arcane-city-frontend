@@ -42,7 +42,8 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
 
   const attendMutation = useMutation({
     mutationFn: async () => {
-      await api.post(`/events/${event.id}/attend`);
+      console.log('Attending event:', event.slug);
+      await api.post(`/events/${event.slug}/attend`);
     },
     onSuccess: () => {
       setAttending(true);
@@ -51,7 +52,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
 
   const unattendMutation = useMutation({
     mutationFn: async () => {
-      await api.delete(`/events/${event.id}/attend`);
+      await api.delete(`/events/${event.slug}/attend`);
     },
     onSuccess: () => {
       setAttending(false);
