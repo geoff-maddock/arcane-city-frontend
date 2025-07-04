@@ -82,7 +82,7 @@ const Account: React.FC = () => {
               <Link
                 key={tag.id}
                 to="/tags/$slug"
-                params={{ slug: (tag as any).slug ?? tag.name }}
+                params={{ slug: tag.slug }}
                 className="bg-gray-100 px-2 py-1 rounded hover:bg-gray-200"
               >
                 {tag.name}
@@ -100,7 +100,7 @@ const Account: React.FC = () => {
               <Link
                 key={entity.id}
                 to="/entities/$entitySlug"
-                params={{ entitySlug: (entity as any).slug ?? entity.name }}
+                params={{ entitySlug: entity.slug }}
                 className="bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200"
               >
                 {entity.name}
@@ -118,7 +118,7 @@ const Account: React.FC = () => {
               <Link
                 key={series.id}
                 to="/series/$slug"
-                params={{ slug: (series as any).slug ?? series.name }}
+                params={{ slug: series.slug }}
                 className="bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200"
               >
                 {series.name}

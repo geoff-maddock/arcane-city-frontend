@@ -15,6 +15,13 @@ export interface MinimalResource {
     name: string;
 }
 
+export interface MinimalSlugResource {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+
 export interface Photo {
     id: number;
     path: string;
@@ -70,10 +77,10 @@ export interface User {
     created_at: string;
     updated_at: string;
     profile?: Profile;
-    followed_tags: MinimalResource[];
-    followed_entities: MinimalResource[];
-    followed_series: MinimalResource[];
-    followed_threads: MinimalResource[];
+    followed_tags: MinimalSlugResource[];
+    followed_entities: MinimalSlugResource[];
+    followed_series: MinimalSlugResource[];
+    followed_threads: MinimalSlugResource[];
     photos: Photo[];
 }
 
