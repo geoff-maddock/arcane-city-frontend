@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
 
 const Account: React.FC = () => {
@@ -79,9 +79,14 @@ const Account: React.FC = () => {
           <h3 className="text-lg font-semibold">Followed Tags</h3>
           <div className="flex flex-wrap gap-2">
             {user.followed_tags.map(tag => (
-              <span key={tag.id} className="bg-gray-100 px-2 py-1 rounded">
+              <Link
+                key={tag.id}
+                to="/tags/$slug"
+                params={{ slug: (tag as any).slug ?? tag.name }}
+                className="bg-gray-100 px-2 py-1 rounded hover:bg-gray-200"
+              >
                 {tag.name}
-              </span>
+              </Link>
             ))}
           </div>
         </section>
@@ -92,9 +97,14 @@ const Account: React.FC = () => {
           <h3 className="text-lg font-semibold">Followed Entities</h3>
           <div className="flex flex-wrap gap-2">
             {user.followed_entities.map(entity => (
-              <span key={entity.id} className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+              <Link
+                key={entity.id}
+                to="/entities/$entitySlug"
+                params={{ entitySlug: (entity as any).slug ?? entity.name }}
+                className="bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200"
+              >
                 {entity.name}
-              </span>
+              </Link>
             ))}
           </div>
         </section>
@@ -105,9 +115,14 @@ const Account: React.FC = () => {
           <h3 className="text-lg font-semibold">Followed Series</h3>
           <div className="flex flex-wrap gap-2">
             {user.followed_series.map(series => (
-              <span key={series.id} className="bg-green-100 text-green-800 px-2 py-1 rounded">
+              <Link
+                key={series.id}
+                to="/series/$slug"
+                params={{ slug: (series as any).slug ?? series.name }}
+                className="bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200"
+              >
                 {series.name}
-              </span>
+              </Link>
             ))}
           </div>
         </section>
