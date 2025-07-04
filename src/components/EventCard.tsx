@@ -3,12 +3,14 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Loader2, Music, CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
+import { Loader2, Music, CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
 import { AgeRestriction } from './AgeRestriction';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext } from 'react';
+import { authService } from '../services/auth.service';
+import { eventsService } from '../services/events.service';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { useState, useEffect } from 'react';
 
@@ -25,6 +27,8 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   const [embeds, setEmbeds] = useState<string[]>([]);
   const [embedsLoading, setEmbedsLoading] = useState(false);
   const [embedsError, setEmbedsError] = useState<Error | null>(null);
+  const [attending, setAttending] = useState<boolean>(event.user_attending ?? false);
+  const [attendLoading, setAttendLoading] = useState(false);
 
   const handleTagClick = (tagName: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
@@ -32,6 +36,26 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
 
   const handleEntityClick = (entityName: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
+  };
+
+  const handleAttendToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (attendLoading) return;
+    setAttendLoading(true);
+    try {
+      if (attending) {
+        await eventsService.unattend(event.id);
+        setAttending(false);
+      } else {
+        await eventsService.attend(event.id);
+        setAttending(true);
+      }
+    } catch (err) {
+      console.error('Failed to toggle attendance', err);
+    } finally {
+      setAttendLoading(false);
+    }
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -92,6 +116,15 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                     {event.name}
                   </a>
                 </h3>
+                {authService.isAuthenticated() && (
+                  <button
+                    onClick={handleAttendToggle}
+                    className="ml-2 text-yellow-500 hover:text-yellow-600"
+                    aria-label={attending ? 'Unattend event' : 'Attend event'}
+                  >
+                    <Star className="h-5 w-5" fill={attending ? 'currentColor' : 'none'} />
+                  </button>
+                )}
               </div>
               {event.short && (
                 <p className="line-clamp-2 text-sm text-gray-500">{event.short}</p>
