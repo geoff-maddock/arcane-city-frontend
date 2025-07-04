@@ -100,7 +100,7 @@ const Account: React.FC = () => {
               <Link
                 key={entity.id}
                 to="/entities/$entitySlug"
-                params={{ entitySlug: (entity as any).slug ?? entity.name }}
+                params={{ entitySlug: entity.slug }}
                 className="bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200"
               >
                 {entity.name}
