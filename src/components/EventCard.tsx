@@ -42,7 +42,6 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
 
   const attendMutation = useMutation({
     mutationFn: async () => {
-      console.log('Attending event:', event.slug);
       await api.post(`/events/${event.slug}/attend`);
     },
     onSuccess: () => {
