@@ -18,6 +18,7 @@ export interface Event {
     primary_photo?: string;
     primary_photo_thumbnail?: string;
     is_benefit?: boolean;
+    user_attending?: boolean;
     attending: number;
     like: number;
     photos?: PhotoResponse[];

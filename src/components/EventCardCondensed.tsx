@@ -2,13 +2,15 @@ import { useNavigate } from '@tanstack/react-router';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
+import { CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
 import { AgeRestriction } from './AgeRestriction';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { EventFilterContext } from '../context/EventFilterContext';
+import { authService } from '../services/auth.service';
+import { eventsService } from '../services/events.service';
 
 
 interface EventCardProps {
@@ -20,9 +22,31 @@ interface EventCardProps {
 const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) => {
     const navigate = useNavigate();
     const { setFilters } = useContext(EventFilterContext);
+    const [attending, setAttending] = useState<boolean>(event.user_attending ?? false);
+    const [attendLoading, setAttendLoading] = useState(false);
 
     const handleTagClick = (tagName: string) => {
         setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
+    };
+
+    const handleAttendToggle = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (attendLoading) return;
+        setAttendLoading(true);
+        try {
+            if (attending) {
+                await eventsService.unattend(event.id);
+                setAttending(false);
+            } else {
+                await eventsService.attend(event.id);
+                setAttending(true);
+            }
+        } catch (err) {
+            console.error('Failed to toggle attendance', err);
+        } finally {
+            setAttendLoading(false);
+        }
     };
 
     const handleClick = (e: React.MouseEvent) => {
@@ -63,6 +87,15 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
                                             {event.name}
                                         </a>
                                     </h3>
+                                    {authService.isAuthenticated() && (
+                                        <button
+                                            onClick={handleAttendToggle}
+                                            className="ml-2 text-yellow-500 hover:text-yellow-600"
+                                            aria-label={attending ? 'Unattend event' : 'Attend event'}
+                                        >
+                                            <Star className="h-5 w-5" fill={attending ? 'currentColor' : 'none'} />
+                                        </button>
+                                    )}
                                 </div>
                                 {event.short && (
                                     <p className="line-clamp-2 text-sm text-gray-500 mb-2">{event.short}</p>
