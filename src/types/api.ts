@@ -21,6 +21,7 @@ export interface Event {
     attending: number;
     like: number;
     photos?: PhotoResponse[];
+    attendees?: UserMinimalResponse[];
 }
 
 export interface UseEventsParams {
@@ -41,6 +42,11 @@ export interface UseEventsParams {
     sort?: string;
     direction?: 'desc' | 'asc';
 
+}
+
+export interface UserMinimalResponse {
+    id: number;
+    username: string;
 }
 
 export interface EntityResponse {
