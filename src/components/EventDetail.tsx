@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star } from 'lucide-react';
+import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
@@ -17,6 +18,41 @@ export default function EventDetail({ slug }: { slug: string }) {
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
 
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
+    const [attending, setAttending] = useState(false);
+
+    const attendMutation = useMutation({
+        mutationFn: async () => {
+            if (!event) return;
+            await api.post(`/events/${event.slug}/attend`);
+        },
+        onSuccess: () => {
+            setAttending(true);
+        },
+    });
+
+    const unattendMutation = useMutation({
+        mutationFn: async () => {
+            if (!event) return;
+            await api.delete(`/events/${event.slug}/attend`);
+        },
+        onSuccess: () => {
+            setAttending(false);
+        },
+    });
+
+    const handleAttendToggle = () => {
+        if (attending) {
+            unattendMutation.mutate();
+        } else {
+            attendMutation.mutate();
+        }
+    };
+
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
         queryKey: ['event', slug],
@@ -25,6 +61,12 @@ export default function EventDetail({ slug }: { slug: string }) {
             return data;
         },
     });
+
+    useEffect(() => {
+        if (user && event?.attendees) {
+            setAttending(event.attendees.some((u) => u.id === user.id));
+        }
+    }, [user, event?.attendees]);
 
     // Fetch event embeds after the event detail is loaded
     useEffect(() => {
@@ -88,7 +130,17 @@ export default function EventDetail({ slug }: { slug: string }) {
                         {/* Main Content */}
                         <div className="space-y-6">
                             <div>
-                                <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
+                                <div className="flex items-start justify-between">
+                                    <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
+                                    {user && (
+                                        <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
+                                            <Star
+                                                className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                fill={attending ? 'currentColor' : 'none'}
+                                            />
+                                        </button>
+                                    )}
+                                </div>
                                 {event.short && (
                                     <p className="text-xl text-gray-600">{event.short}</p>
                                 )}
