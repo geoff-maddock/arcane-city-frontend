@@ -21,10 +21,6 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
   const navigate = useNavigate();
   const { setFilters } = useContext(SeriesFilterContext);
 
-  const handleTagClick = (tagName: string) => {
-    setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
-  };
-
   const handleEntityClick = (entityName: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
   };
@@ -119,7 +115,7 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
 
             <EntityBadges entities={series.entities} onClick={handleEntityClick} />
 
-            <TagBadges tags={series.tags} onClick={handleTagClick} />
+            <TagBadges tags={series.tags} />
           </div>
         </CardContent>
       </div>

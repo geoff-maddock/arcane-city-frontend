@@ -54,9 +54,6 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
         },
     });
 
-    const handleTagClick = (tagName: string) => {
-        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
-    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -188,7 +185,7 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
 
                             <EntityBadges entities={event.entities} />
 
-                            <TagBadges tags={event.tags} onClick={handleTagClick} />
+                            <TagBadges tags={event.tags} />
                         </div>
                     </CardContent>
                 </div>

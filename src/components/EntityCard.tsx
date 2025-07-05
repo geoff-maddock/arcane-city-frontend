@@ -3,8 +3,8 @@ import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
-import { Badge } from '@/components/ui/badge';
 import { ImageLightbox } from './ImageLightbox';
+import { TagBadges } from './TagBadges';
 import { useContext } from 'react';
 import { EntityFilterContext } from '../context/EntityFilterContext';
 
@@ -43,9 +43,6 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const navigate = useNavigate();
     const { setFilters } = useContext(EntityFilterContext);
 
-    const handleTagClick = (tagName: string) => {
-        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
-    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -112,20 +109,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                         </div>
                     )}
                     {entity.tags.length > 0 && (
-                        <div className="space-y-2">
-                            <div className="flex flex-wrap gap-2">
-                                {entity.tags.map((tag) => (
-                                    <Badge
-                                        key={tag.id}
-                                        variant="secondary"
-                                        className="bg-gray-100 text-gray-800 hover:bg-gray-200"
-                                        onClick={() => handleTagClick(tag.name)}
-                                    >
-                                        {tag.name}
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
+                        <TagBadges tags={entity.tags} />
                     )}
                 </div>
             </CardContent>

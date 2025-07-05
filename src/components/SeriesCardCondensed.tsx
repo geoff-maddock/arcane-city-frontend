@@ -20,10 +20,6 @@ export default function SeriesCardCondensed({ series, allImages, imageIndex }: S
     const navigate = useNavigate();
     const { setFilters } = useContext(SeriesFilterContext);
 
-    const handleTagClick = (tagName: string) => {
-        setFilters(prev => ({ ...prev, tag: tagName }));
-    };
-
     const handleEntityClick = (entityName: string) => {
         setFilters(prev => ({ ...prev, entity: entityName }));
     };
@@ -103,7 +99,7 @@ export default function SeriesCardCondensed({ series, allImages, imageIndex }: S
                                 )}
                             </div>
                             <EntityBadges entities={series.entities} onClick={handleEntityClick} />
-                            <TagBadges tags={series.tags} onClick={handleTagClick} />
+                            <TagBadges tags={series.tags} />
                         </div>
                     </CardContent>
                 </div>

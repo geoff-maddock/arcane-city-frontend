@@ -58,10 +58,6 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
     },
   });
 
-  const handleTagClick = (tagName: string) => {
-    setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
-  };
-
   const handleEntityClick = (entityName: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
   };
@@ -220,7 +216,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
               onClick={handleEntityClick}
             />
 
-            <TagBadges tags={event.tags} onClick={handleTagClick} />
+            <TagBadges tags={event.tags} />
           </div>
         </CardContent>
       </div>

@@ -47,18 +47,23 @@ export default function Events() {
         return today.toISOString();
     };
 
-    const [filters, setFilters] = useState<EventFilters>({  // Add the type annotation here
-        name: '',
-        venue: '',
-        promoter: '',
-        event_type: '',
-        entity: '',
-        tag: '',
-        start_at: {
-            start: getTodayStart(),
-            end: undefined
-        }
-    });
+    const getInitialFilters = (): EventFilters => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            name: '',
+            venue: '',
+            promoter: '',
+            event_type: '',
+            entity: params.get('entity') || '',
+            tag: params.get('tag') || '',
+            start_at: {
+                start: getTodayStart(),
+                end: undefined,
+            },
+        };
+    };
+
+    const [filters, setFilters] = useState<EventFilters>(getInitialFilters());
     const [page, setPage] = useState(1);
     // Replace useState with useLocalStorage
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('eventsPerPage', 25);

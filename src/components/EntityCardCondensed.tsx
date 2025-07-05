@@ -18,9 +18,6 @@ export default function EntityCardCondensed({ entity, allImages, imageIndex }: E
     const navigate = useNavigate();
     const { setFilters } = useContext(EntityFilterContext);
 
-    const handleTagClick = (tagName: string) => {
-        setFilters(prev => ({ ...prev, tag: tagName }));
-    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -77,7 +74,7 @@ export default function EntityCardCondensed({ entity, allImages, imageIndex }: E
                         </div>
                     </CardHeader>
                     <CardContent className="p-4 pt-2">
-                        <TagBadges tags={entity.tags} onClick={handleTagClick} />
+                        <TagBadges tags={entity.tags} />
                     </CardContent>
                 </div>
             </div>
