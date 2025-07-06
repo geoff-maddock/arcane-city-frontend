@@ -10,6 +10,8 @@ import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
+import { EntityBadges } from './EntityBadges';
+import { TagBadges } from './TagBadges';
 
 
 export default function EventDetail({ slug }: { slug: string }) {
@@ -162,6 +164,18 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         <div dangerouslySetInnerHTML={{ __html: formattedDescription }} />
                                     </CardContent>
                                 </Card>
+                            )}
+
+                            {event.entities && event.entities.length > 0 && (
+                                <div>
+                                    <EntityBadges entities={event.entities} />
+                                </div>
+                            )}
+
+                            {event.tags && event.tags.length > 0 && (
+                                <div>
+                                    <TagBadges tags={event.tags} />
+                                </div>
                             )}
 
 
