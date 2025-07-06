@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, MapPin, Users, Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import EntityEvents from './EntityEvents';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const [embeds, setEmbeds] = useState<string[]>([]);
@@ -200,6 +201,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                             )}
                         </div>
                     </div>
+                    <EntityEvents entitySlug={entity.slug} />
                 </div>
             </div>
         </div>
