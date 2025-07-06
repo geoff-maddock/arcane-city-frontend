@@ -168,14 +168,12 @@ export default function EventDetail({ slug }: { slug: string }) {
 
                             {event.entities && event.entities.length > 0 && (
                                 <div>
-                                    <h3 className="font-semibold mb-2">Entities</h3>
                                     <EntityBadges entities={event.entities} />
                                 </div>
                             )}
 
                             {event.tags && event.tags.length > 0 && (
                                 <div>
-                                    <h3 className="font-semibold mb-2">Tags</h3>
                                     <TagBadges tags={event.tags} />
                                 </div>
                             )}

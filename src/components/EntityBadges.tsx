@@ -22,7 +22,7 @@ export const EntityBadges: React.FC<EntityBadgesProps> = ({ entities, onClick })
             {entity.name}
           </Badge>
         ) : (
-          <Link key={entity.id} to="/entities/$slug" params={{ slug: entity.slug ?? entity.name }}>
+          <Link key={entity.id} to="/entities/$entitySlug" params={{ entitySlug: entity.slug ?? entity.name }}>
             <Badge
               variant="default"
               className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1"
