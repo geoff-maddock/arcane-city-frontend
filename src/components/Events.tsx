@@ -59,6 +59,18 @@ export default function Events() {
             end: undefined
         }
     });
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tag = params.get('tag');
+        const entity = params.get('entity');
+        if (tag) {
+            setFilters(prev => ({ ...prev, tag }));
+        }
+        if (entity) {
+            setFilters(prev => ({ ...prev, entity }));
+        }
+    }, []);
     const [page, setPage] = useState(1);
     // Replace useState with useLocalStorage
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('eventsPerPage', 25);

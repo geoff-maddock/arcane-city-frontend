@@ -12,8 +12,6 @@ import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
-import { useContext } from 'react';
-import { EventFilterContext } from '../context/EventFilterContext';
 
 
 export default function EventDetail({ slug }: { slug: string }) {
@@ -57,16 +55,6 @@ export default function EventDetail({ slug }: { slug: string }) {
         }
     };
 
-    const { setFilters } = useContext(EventFilterContext);
-
-
-    const handleTagClick = (tagName: string) => {
-        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
-    };
-
-    const handleEntityClick = (entityName: string) => {
-        setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
-    };
 
     // Fetch the event data
     const { data: event, isLoading, error } = useQuery<Event>({
@@ -250,15 +238,9 @@ export default function EventDetail({ slug }: { slug: string }) {
                                             )}
                                         </div>
 
-                                        <EntityBadges
-                                            entities={event.entities}
-                                            onClick={handleEntityClick}
-                                        />
+                                        <EntityBadges entities={event.entities} />
 
-                                        <TagBadges
-                                            tags={event.tags}
-                                            onClick={handleTagClick}
-                                        />
+                                        <TagBadges tags={event.tags} />
                                     </div>
                                 </CardContent>
                             </Card>
