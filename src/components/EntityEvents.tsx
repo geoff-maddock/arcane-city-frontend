@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface EntityEventsProps {
-    entitySlug: string;
+    entityName: string;
 }
 
 const sortOptions = [
@@ -19,14 +19,14 @@ const sortOptions = [
     { value: 'created_at', label: 'Recently Added' },
 ];
 
-export default function EntityEvents({ entitySlug }: EntityEventsProps) {
+export default function EntityEvents({ entityName }: EntityEventsProps) {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [sort, setSort] = useState('start_at');
     const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
 
     const { data, isLoading, error } = useEvents({
-        filters: { entity: entitySlug },
+        filters: { entity: entityName },
         page,
         itemsPerPage,
         sort,

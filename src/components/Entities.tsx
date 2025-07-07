@@ -12,6 +12,7 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { EntityFilterContext } from '../context/EntityFilterContext';
 import { EntityFilters } from '../types/filters';
 import { ActiveEntityFilters as ActiveFilters } from './ActiveEntityFilters';
+import { useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
@@ -24,6 +25,7 @@ const sortOptions = [
 ];
 
 export default function Entities() {
+    const search = useSearch({ from: '/entities' }) as EntityFilters;
 
     const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
         const savedState = localStorage.getItem('filtersVisible');
@@ -34,6 +36,12 @@ export default function Entities() {
     useEffect(() => {
         localStorage.setItem('filtersVisible', JSON.stringify(filtersVisible));
     }, [filtersVisible]);
+
+    useEffect(() => {
+        if (search.tag) {
+            setFilters(prev => ({ ...prev, tag: search.tag }));
+        }
+    }, [search.tag]);
 
     const toggleFilters = () => {
         setFiltersVisible(!filtersVisible);

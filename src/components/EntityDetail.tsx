@@ -199,7 +199,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                             )}
                         </div>
                     </div>
-                    <EntityEvents entitySlug={entity.slug} />
+                    <EntityEvents entityName={entity.name} />
                 </div>
             </div>
         </div>

@@ -42,6 +42,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
+        console.log('Navigating to entity from entity card handle click:', entity.slug);
         navigate({
             to: '/entities/$entitySlug',
             params: { entitySlug: entity.slug }
