@@ -12,6 +12,8 @@ import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
+import { useContext } from 'react';
+import { EventFilterContext } from '../context/EventFilterContext';
 
 
 export default function EventDetail({ slug }: { slug: string }) {
@@ -53,6 +55,17 @@ export default function EventDetail({ slug }: { slug: string }) {
         } else {
             attendMutation.mutate();
         }
+    };
+
+    const { setFilters } = useContext(EventFilterContext);
+
+
+    const handleTagClick = (tagName: string) => {
+        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
+    };
+
+    const handleEntityClick = (entityName: string) => {
+        setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
     };
 
     // Fetch the event data
@@ -166,94 +179,90 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 </Card>
                             )}
 
-                            {event.entities && event.entities.length > 0 && (
-                                <div>
-                                    <EntityBadges entities={event.entities} />
-                                </div>
-                            )}
-
-                            {event.tags && event.tags.length > 0 && (
-                                <div>
-                                    <TagBadges tags={event.tags} />
-                                </div>
-                            )}
-
-
-
 
                         </div>
 
                         {/* Sidebar */}
                         <div className="space-y-6">
                             <Card>
-                                <CardContent className="p-6 space-y-4">
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <CalendarDays className="h-5 w-5" />
-                                            <span>{formatDate(event.start_at)}</span>
-                                        </div>
-
-                                        {event.event_type && (
-                                            <h2>
-                                                <span>{event.event_type.name}</span>
-                                            </h2>
-                                        )}
-
-                                        {event.venue && (
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <MapPin className="h-5 w-5" />
-                                                <span>{event.venue.name}</span>
-                                            </div>
-                                        )}
-
-                                        {event.min_age !== null && event.min_age !== undefined && (
-                                            <AgeRestriction minAge={event.min_age} />
-                                        )}
-                                    </div>
-
-                                    {(event.presale_price || event.door_price) && (
+                                <CardContent className="p-4 pt-2">
+                                    <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <h3 className="font-semibold flex items-center gap-2">
-                                                <DollarSign className="h-5 w-5" />
-                                                Pricing
-                                            </h3>
-                                            {event.presale_price && (
-                                                <div className="text-green-600">
-                                                    Presale: ${event.presale_price}
+                                            {event.event_type && (
+                                                <div className="items-center">
+                                                    <span className="text-gray-500 font-bold">
+                                                        {event.event_type.name}
+                                                    </span>
+                                                    {event.promoter && (
+                                                        <span>
+                                                            <span className="m-1 text-gray-500 ">
+                                                                by
+                                                            </span>
+                                                            <span className=" text-gray-500 font-bold">
+                                                                {event.promoter.name}
+                                                            </span>
+                                                        </span>
+                                                    )}
                                                 </div>
                                             )}
-                                            {event.door_price && (
-                                                <div className="text-gray-600">
-                                                    Door: ${event.door_price}
+
+                                            <div className="flex items-center text-sm text-gray-500">
+                                                <CalendarDays className="mr-2 h-4 w-4" />
+                                                {formatDate(event.start_at)}
+                                            </div>
+
+                                            {event.venue && (
+                                                <div className="flex items-center text-sm text-gray-500">
+                                                    <MapPin className="mr-2 h-4 w-4" />
+                                                    {event.venue.name}
+                                                </div>
+                                            )}
+
+                                            {event.min_age !== null && event.min_age !== undefined && (
+                                                <AgeRestriction minAge={event.min_age} />
+                                            )}
+
+                                            {(event.presale_price || event.door_price) && (
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <DollarSign className="h-4 w-4 text-gray-500" />
+                                                    {event.presale_price && (
+                                                        <span className="text-green-600">
+                                                            Presale: ${event.presale_price}
+                                                        </span>
+                                                    )}
+                                                    {event.door_price && (
+                                                        <span className="text-gray-600">
+                                                            Door: ${event.door_price}
+                                                        </span>
+                                                    )}
+                                                    {event.ticket_link && (
+                                                        <a
+                                                            href={event.ticket_link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                                            title="Buy tickets"
+                                                        >
+                                                            <Ticket className="h-5 w-5 text-gray-600 hover:text-gray-900" />
+                                                        </a>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
-                                    )}
 
-                                    {event.ticket_link && (
-                                        <Button className="w-full" asChild>
-                                            <a
-                                                href={event.ticket_link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-2"
-                                            >
-                                                <Ticket className="h-5 w-5" />
-                                                Buy Tickets
-                                            </a>
-                                        </Button>
-                                    )}
+                                        <EntityBadges
+                                            entities={event.entities}
+                                            onClick={handleEntityClick}
+                                        />
+
+                                        <TagBadges
+                                            tags={event.tags}
+                                            onClick={handleTagClick}
+                                        />
+                                    </div>
                                 </CardContent>
                             </Card>
 
-                            {event.promoter && (
-                                <Card>
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold mb-2">Presented by</h3>
-                                        <div className="text-gray-600">{event.promoter.name}</div>
-                                    </CardContent>
-                                </Card>
-                            )}
 
                             <PhotoGallery fetchUrl={`/events/${event.slug}/all-photos`} />
                             {/* Audio Embeds Section */}

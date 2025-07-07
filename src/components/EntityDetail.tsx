@@ -6,7 +6,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, MapPin, Users, Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
+import { TagBadges } from './TagBadges';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const [embeds, setEmbeds] = useState<string[]>([]);
@@ -150,19 +152,15 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                         )}
                                         {entity.tags.length > 0 && (
                                             <div className="space-y-2">
-                                                <h3 className="font-semibold">Tags</h3>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {entity.tags.map((tag) => (
-                                                        <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded">
-                                                            {tag.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
+                                                <TagBadges tags={entity.tags} />
                                             </div>
                                         )}
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            <PhotoGallery fetchUrl={`/entities/${entity.slug}/photos`} />
+
                             {/* Audio Embeds Section */}
                             {embeds.length > 0 && !embedsLoading && (
                                 <Card>
