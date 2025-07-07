@@ -5,8 +5,8 @@ import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
-import { useContext } from 'react';
-import { EntityFilterContext } from '../context/EntityFilterContext';
+// import { useContext } from 'react';
+// import { EntityFilterContext } from '../context/EntityFilterContext';
 
 interface EntityCardProps {
     entity: Entity;
@@ -16,11 +16,6 @@ interface EntityCardProps {
 
 export default function EntityCardCondensed({ entity, allImages, imageIndex }: EntityCardProps) {
     const navigate = useNavigate();
-    const { setFilters } = useContext(EntityFilterContext);
-
-    const handleTagClick = (tagName: string) => {
-        setFilters(prev => ({ ...prev, tag: tagName }));
-    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
