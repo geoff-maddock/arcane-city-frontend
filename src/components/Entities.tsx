@@ -51,6 +51,15 @@ export default function Entities() {
         }
     });
 
+    // Initialize filters from query parameters
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tag = params.get('tag');
+        if (tag) {
+            setFilters(prev => ({ ...prev, tag }));
+        }
+    }, []);
+
     const [page, setPage] = useState(1);
     // Replace useState with useLocalStorage
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('entitiesPerPage', 25);

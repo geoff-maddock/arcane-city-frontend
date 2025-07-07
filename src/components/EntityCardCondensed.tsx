@@ -77,7 +77,7 @@ export default function EntityCardCondensed({ entity, allImages, imageIndex }: E
                         </div>
                     </CardHeader>
                     <CardContent className="p-4 pt-2">
-                        <TagBadges tags={entity.tags} onClick={handleTagClick} />
+                        <TagBadges tags={entity.tags} indexPath="/entities" />
                     </CardContent>
                 </div>
             </div>
