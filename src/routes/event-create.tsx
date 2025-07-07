@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { formatApiError, toKebabCase } from '@/lib/utils';
+import { useSearchOptions } from '../hooks/useSearchOptions';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -31,22 +32,48 @@ const EventCreate: React.FC = () => {
     door_at: '',
     start_at: '',
     end_at: '',
-    series_id: '',
+    series_id: '' as number | '',
     min_age: '',
     primary_link: '',
     ticket_link: '',
     cancelled_at: '',
-    tag_list: '',
-    entity_list: '',
+    tag_list: [] as number[],
+    entity_list: [] as number[],
   });
+  const [visibilityQuery, setVisibilityQuery] = useState('');
+  const [statusQuery, setStatusQuery] = useState('');
+  const [typeQuery, setTypeQuery] = useState('');
+  const [promoterQuery, setPromoterQuery] = useState('');
+  const [venueQuery, setVenueQuery] = useState('');
+  const [seriesQuery, setSeriesQuery] = useState('');
+  const [tagQuery, setTagQuery] = useState('');
+  const [entityQuery, setEntityQuery] = useState('');
+
+  const { data: visibilityOptions } = useSearchOptions('visibilities', visibilityQuery);
+  const { data: statusOptions } = useSearchOptions('event-statuses', statusQuery);
+  const { data: typeOptions } = useSearchOptions('event-types', typeQuery);
+  const { data: promoterOptions } = useSearchOptions('promoters', promoterQuery);
+  const { data: venueOptions } = useSearchOptions('venues', venueQuery);
+  const { data: seriesOptions } = useSearchOptions('series', seriesQuery);
+  const { data: tagOptions } = useSearchOptions('tags', tagQuery);
+  const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement;
+    const { name, value } = target;
+    const isCheckbox = (target as HTMLInputElement).type === 'checkbox';
+    const checked = (target as HTMLInputElement).checked;
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: isCheckbox ? checked : value };
+      if (name === 'name') {
+        updated.slug = toKebabCase(value);
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,8 +87,8 @@ const EventCreate: React.FC = () => {
         door_price: formData.door_price ? parseFloat(formData.door_price) : undefined,
         series_id: formData.series_id ? Number(formData.series_id) : undefined,
         min_age: formData.min_age ? Number(formData.min_age) : undefined,
-        tag_list: formData.tag_list ? formData.tag_list.split(',').map((v) => Number(v.trim())) : [],
-        entity_list: formData.entity_list ? formData.entity_list.split(',').map((v) => Number(v.trim())) : [],
+        tag_list: formData.tag_list,
+        entity_list: formData.entity_list,
       };
       const { data } = await api.post('/events', payload);
       navigate({ to: `/events/${data.slug}` });
@@ -123,59 +150,99 @@ const EventCreate: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="visibility_id">Visibility Id</Label>
-            <Input
-              id="visibility_id"
-              name="visibility_id"
-              type="number"
-              value={formData.visibility_id}
-              onChange={handleChange}
-            />
-            {renderError('visibility_id')}
+          <Label htmlFor="visibility_id">Visibility</Label>
+          <Input
+            id="visibility_id"
+            list="visibility-options"
+            value={visibilityQuery}
+            onChange={(e) => {
+              setVisibilityQuery(e.target.value);
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) setFormData((p) => ({ ...p, visibility_id: val }));
+            }}
+          />
+          <datalist id="visibility-options">
+            {visibilityOptions?.map((v) => (
+              <option key={v.id} value={v.id} label={v.name} />
+            ))}
+          </datalist>
+          {renderError('visibility_id')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="event_status_id">Event Status Id</Label>
-            <Input
-              id="event_status_id"
-              name="event_status_id"
-              type="number"
-              value={formData.event_status_id}
-              onChange={handleChange}
-            />
-            {renderError('event_status_id')}
+          <Label htmlFor="event_status_id">Event Status</Label>
+          <Input
+            id="event_status_id"
+            list="status-options"
+            value={statusQuery}
+            onChange={(e) => {
+              setStatusQuery(e.target.value);
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) setFormData((p) => ({ ...p, event_status_id: val }));
+            }}
+          />
+          <datalist id="status-options">
+            {statusOptions?.map((o) => (
+              <option key={o.id} value={o.id} label={o.name} />
+            ))}
+          </datalist>
+          {renderError('event_status_id')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="event_type_id">Event Type Id</Label>
-            <Input
-              id="event_type_id"
-              name="event_type_id"
-              type="number"
-              value={formData.event_type_id}
-              onChange={handleChange}
-            />
-            {renderError('event_type_id')}
+          <Label htmlFor="event_type_id">Event Type</Label>
+          <Input
+            id="event_type_id"
+            list="type-options"
+            value={typeQuery}
+            onChange={(e) => {
+              setTypeQuery(e.target.value);
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) setFormData((p) => ({ ...p, event_type_id: val }));
+            }}
+          />
+          <datalist id="type-options">
+            {typeOptions?.map((o) => (
+              <option key={o.id} value={o.id} label={o.name} />
+            ))}
+          </datalist>
+          {renderError('event_type_id')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="promoter_id">Promoter Id</Label>
-            <Input
-              id="promoter_id"
-              name="promoter_id"
-              type="number"
-              value={formData.promoter_id}
-              onChange={handleChange}
-            />
-            {renderError('promoter_id')}
+          <Label htmlFor="promoter_id">Promoter</Label>
+          <Input
+            id="promoter_id"
+            list="promoter-options"
+            value={promoterQuery}
+            onChange={(e) => {
+              setPromoterQuery(e.target.value);
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) setFormData((p) => ({ ...p, promoter_id: val }));
+            }}
+          />
+          <datalist id="promoter-options">
+            {promoterOptions?.map((o) => (
+              <option key={o.id} value={o.id} label={o.name} />
+            ))}
+          </datalist>
+          {renderError('promoter_id')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="venue_id">Venue Id</Label>
-            <Input
-              id="venue_id"
-              name="venue_id"
-              type="number"
-              value={formData.venue_id}
-              onChange={handleChange}
-            />
-            {renderError('venue_id')}
+          <Label htmlFor="venue_id">Venue</Label>
+          <Input
+            id="venue_id"
+            list="venue-options"
+            value={venueQuery}
+            onChange={(e) => {
+              setVenueQuery(e.target.value);
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) setFormData((p) => ({ ...p, venue_id: val }));
+            }}
+          />
+          <datalist id="venue-options">
+            {venueOptions?.map((o) => (
+              <option key={o.id} value={o.id} label={o.name} />
+            ))}
+          </datalist>
+          {renderError('venue_id')}
           </div>
           <div className="space-y-2 flex items-center gap-2 mt-6">
             <input
@@ -257,15 +324,23 @@ const EventCreate: React.FC = () => {
             {renderError('end_at')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="series_id">Series Id</Label>
-            <Input
-              id="series_id"
-              name="series_id"
-              type="number"
-              value={formData.series_id}
-              onChange={handleChange}
-            />
-            {renderError('series_id')}
+          <Label htmlFor="series_id">Series</Label>
+          <Input
+            id="series_id"
+            list="series-options"
+            value={seriesQuery}
+            onChange={(e) => {
+              setSeriesQuery(e.target.value);
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) setFormData((p) => ({ ...p, series_id: val }));
+            }}
+          />
+          <datalist id="series-options">
+            {seriesOptions?.map((o) => (
+              <option key={o.id} value={o.id} label={o.name} />
+            ))}
+          </datalist>
+          {renderError('series_id')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="min_age">Minimum Age</Label>
@@ -310,23 +385,87 @@ const EventCreate: React.FC = () => {
             {renderError('cancelled_at')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tag_list">Tag Ids (comma separated)</Label>
+            <Label htmlFor="tag_input">Tags</Label>
             <Input
-              id="tag_list"
-              name="tag_list"
-              value={formData.tag_list}
-              onChange={handleChange}
+              id="tag_input"
+              list="tag-options"
+              value={tagQuery}
+              onChange={(e) => {
+                setTagQuery(e.target.value);
+              }}
+              onBlur={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && !formData.tag_list.includes(val)) {
+                  setFormData((p) => ({ ...p, tag_list: [...p.tag_list, val] }));
+                }
+                setTagQuery('');
+              }}
             />
+            <datalist id="tag-options">
+              {tagOptions?.map((o) => (
+                <option key={o.id} value={o.id} label={o.name} />
+              ))}
+            </datalist>
+            <div className="flex flex-wrap gap-2">
+              {formData.tag_list.map((id) => (
+                <span key={id} className="px-2 py-1 bg-gray-200 rounded text-sm">
+                  {id}
+                  <button
+                    type="button"
+                    className="ml-1 text-red-500"
+                    onClick={() =>
+                      setFormData((p) => ({
+                        ...p,
+                        tag_list: p.tag_list.filter((t) => t !== id),
+                      }))
+                    }
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
             {renderError('tag_list')}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="entity_list">Entity Ids (comma separated)</Label>
+            <Label htmlFor="entity_input">Entities</Label>
             <Input
-              id="entity_list"
-              name="entity_list"
-              value={formData.entity_list}
-              onChange={handleChange}
+              id="entity_input"
+              list="entity-options"
+              value={entityQuery}
+              onChange={(e) => setEntityQuery(e.target.value)}
+              onBlur={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && !formData.entity_list.includes(val)) {
+                  setFormData((p) => ({ ...p, entity_list: [...p.entity_list, val] }));
+                }
+                setEntityQuery('');
+              }}
             />
+            <datalist id="entity-options">
+              {entityOptions?.map((o) => (
+                <option key={o.id} value={o.id} label={o.name} />
+              ))}
+            </datalist>
+            <div className="flex flex-wrap gap-2">
+              {formData.entity_list.map((id) => (
+                <span key={id} className="px-2 py-1 bg-gray-200 rounded text-sm">
+                  {id}
+                  <button
+                    type="button"
+                    className="ml-1 text-red-500"
+                    onClick={() =>
+                      setFormData((p) => ({
+                        ...p,
+                        entity_list: p.entity_list.filter((t) => t !== id),
+                      }))
+                    }
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
             {renderError('entity_list')}
           </div>
         </div>
