@@ -6,9 +6,14 @@ import { Link as LinkIcon } from 'lucide-react';
 interface TagBadgesProps {
   tags: Array<{ id: number; name: string; slug?: string }> | undefined;
   onClick?: (name: string) => void;
+  /**
+   * Path to the index page used when filtering by tag
+   * e.g. `/events` or `/entities`
+   */
+  indexPath?: string;
 }
 
-export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick }) => {
+export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath = '/events' }) => {
   const navigate = useNavigate();
   if (!tags || tags.length === 0) return null;
 
@@ -16,7 +21,7 @@ export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick }) => {
     if (onClick) {
       onClick(name);
     } else {
-      navigate({ to: '/events', search: { tag: name } });
+      navigate({ to: indexPath, search: { tag: name } });
     }
   };
 

@@ -3,10 +3,8 @@ import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
-import { Badge } from '@/components/ui/badge';
+import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
-import { useContext } from 'react';
-import { EntityFilterContext } from '../context/EntityFilterContext';
 
 // interface EntityType {
 //     id: number;
@@ -41,14 +39,10 @@ interface EntityCardProps {
 
 const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const navigate = useNavigate();
-    const { setFilters } = useContext(EntityFilterContext);
-
-    const handleTagClick = (tagName: string) => {
-        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
-    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
+        console.log('Navigating to entity from entity card handle click:', entity.slug);
         navigate({
             to: '/entities/$entitySlug',
             params: { entitySlug: entity.slug }
@@ -113,18 +107,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     )}
                     {entity.tags.length > 0 && (
                         <div className="space-y-2">
-                            <div className="flex flex-wrap gap-2">
-                                {entity.tags.map((tag) => (
-                                    <Badge
-                                        key={tag.id}
-                                        variant="secondary"
-                                        className="bg-gray-100 text-gray-800 hover:bg-gray-200"
-                                        onClick={() => handleTagClick(tag.name)}
-                                    >
-                                        {tag.name}
-                                    </Badge>
-                                ))}
-                            </div>
+                            <TagBadges tags={entity.tags} indexPath="/entities" />
                         </div>
                     )}
                 </div>

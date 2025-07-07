@@ -152,7 +152,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                         )}
                                         {entity.tags.length > 0 && (
                                             <div className="space-y-2">
-                                                <TagBadges tags={entity.tags} />
+                                                <TagBadges tags={entity.tags} indexPath="/entities" />
                                             </div>
                                         )}
                                     </div>
@@ -199,7 +199,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                             )}
                         </div>
                     </div>
-                    <EntityEvents entitySlug={entity.slug} />
+                    <EntityEvents entityName={entity.name} />
                 </div>
             </div>
         </div>
