@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoute, useNavigate } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError, toKebabCase } from '@/lib/utils';
@@ -22,9 +23,9 @@ const EventCreate: React.FC = () => {
     visibility_id: 1,
     description: '',
     event_status_id: 1,
-    event_type_id: 1,
-    promoter_id: 1,
-    venue_id: 1,
+    event_type_id: '' as number | '',
+    promoter_id: '' as number | '',
+    venue_id: '' as number | '',
     is_benefit: false,
     presale_price: '',
     door_price: '',
@@ -40,17 +41,20 @@ const EventCreate: React.FC = () => {
     tag_list: [] as number[],
     entity_list: [] as number[],
   });
-  const [visibilityQuery, setVisibilityQuery] = useState('');
-  const [typeQuery, setTypeQuery] = useState('');
   const [promoterQuery, setPromoterQuery] = useState('');
+  const [selectedPromoterName, setSelectedPromoterName] = useState('');
+  const [typeQuery, setTypeQuery] = useState('');
+  const [selectedTypeName, setSelectedTypeName] = useState('');
   const [venueQuery, setVenueQuery] = useState('');
+  const [selectedVenueName, setSelectedVenueName] = useState('');
   const [seriesQuery, setSeriesQuery] = useState('');
+  const [selectedSeriesName, setSelectedSeriesName] = useState('');
   const [tagQuery, setTagQuery] = useState('');
   const [entityQuery, setEntityQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
   const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
-  const { data: visibilityOptions } = useSearchOptions('visibilities', visibilityQuery);
+  const { data: visibilityOptions } = useSearchOptions('visibilities', '');
   const { data: typeOptions } = useSearchOptions('event-types', typeQuery);
   const { data: promoterOptions } = useSearchOptions('entities', promoterQuery, { 'filters[role]': 'Promoter' });
   const { data: venueOptions } = useSearchOptions('entities', venueQuery, { 'filters[role]': 'Venue' });
@@ -59,6 +63,16 @@ const EventCreate: React.FC = () => {
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
+
+  // Set default visibility to "Public" when options are loaded
+  useEffect(() => {
+    if (visibilityOptions && visibilityOptions.length > 0) {
+      const publicOption = visibilityOptions.find(option => option.name.toLowerCase() === 'public');
+      if (publicOption && formData.visibility_id === 1) {
+        setFormData(prev => ({ ...prev, visibility_id: publicOption.id }));
+      }
+    }
+  }, [visibilityOptions, formData.visibility_id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -86,6 +100,9 @@ const EventCreate: React.FC = () => {
         presale_price: formData.presale_price ? parseFloat(formData.presale_price) : undefined,
         door_price: formData.door_price ? parseFloat(formData.door_price) : undefined,
         series_id: formData.series_id ? Number(formData.series_id) : undefined,
+        event_type_id: formData.event_type_id ? Number(formData.event_type_id) : undefined,
+        promoter_id: formData.promoter_id ? Number(formData.promoter_id) : undefined,
+        venue_id: formData.venue_id ? Number(formData.venue_id) : undefined,
         min_age: formData.min_age ? Number(formData.min_age) : undefined,
         tag_list: formData.tag_list,
         entity_list: formData.entity_list,
@@ -151,26 +168,21 @@ const EventCreate: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="visibility_id">Visibility</Label>
-            <Input
-              id="visibility_id"
-              list="visibility-options"
-              value={visibilityQuery}
-              onChange={(e) => {
-                const val = e.target.value;
-                setVisibilityQuery(val);
-                const opt = visibilityOptions?.find((o) => o.name === val);
-                if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
-              }}
-              onBlur={(e) => {
-                const opt = visibilityOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
-              }}
-            />
-            <datalist id="visibility-options">
-              {visibilityOptions?.map((v) => (
-                <option key={v.id} value={v.name} />
-              ))}
-            </datalist>
+            <Select
+              value={formData.visibility_id.toString()}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, visibility_id: Number(value) }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select visibility" />
+              </SelectTrigger>
+              <SelectContent>
+                {visibilityOptions?.map((option) => (
+                  <SelectItem key={option.id} value={option.id.toString()}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {renderError('visibility_id')}
           </div>
           <div className="space-y-2">
@@ -178,17 +190,29 @@ const EventCreate: React.FC = () => {
             <Input
               id="event_type_id"
               list="type-options"
-              value={typeQuery}
+              value={selectedTypeName}
               onChange={(e) => {
                 const val = e.target.value;
+                setSelectedTypeName(val);
                 setTypeQuery(val);
                 const opt = typeOptions?.find((o) => o.name === val);
-                if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, event_type_id: opt.id }));
+                } else {
+                  setFormData((p) => ({ ...p, event_type_id: '' }));
+                }
               }}
               onBlur={(e) => {
                 const opt = typeOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, event_type_id: opt.id }));
+                  setSelectedTypeName(opt.name);
+                } else {
+                  setFormData((p) => ({ ...p, event_type_id: '' }));
+                  setSelectedTypeName('');
+                }
               }}
+              placeholder="Type to search event types..."
             />
             <datalist id="type-options">
               {typeOptions?.map((o) => (
@@ -202,17 +226,29 @@ const EventCreate: React.FC = () => {
             <Input
               id="promoter_id"
               list="promoter-options"
-              value={promoterQuery}
+              value={selectedPromoterName}
               onChange={(e) => {
                 const val = e.target.value;
+                setSelectedPromoterName(val);
                 setPromoterQuery(val);
                 const opt = promoterOptions?.find((o) => o.name === val);
-                if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, promoter_id: opt.id }));
+                } else {
+                  setFormData((p) => ({ ...p, promoter_id: '' }));
+                }
               }}
               onBlur={(e) => {
                 const opt = promoterOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, promoter_id: opt.id }));
+                  setSelectedPromoterName(opt.name);
+                } else {
+                  setFormData((p) => ({ ...p, promoter_id: '' }));
+                  setSelectedPromoterName('');
+                }
               }}
+              placeholder="Type to search promoters..."
             />
             <datalist id="promoter-options">
               {promoterOptions?.map((o) => (
@@ -226,17 +262,29 @@ const EventCreate: React.FC = () => {
             <Input
               id="venue_id"
               list="venue-options"
-              value={venueQuery}
+              value={selectedVenueName}
               onChange={(e) => {
                 const val = e.target.value;
+                setSelectedVenueName(val);
                 setVenueQuery(val);
                 const opt = venueOptions?.find((o) => o.name === val);
-                if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, venue_id: opt.id }));
+                } else {
+                  setFormData((p) => ({ ...p, venue_id: '' }));
+                }
               }}
               onBlur={(e) => {
                 const opt = venueOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, venue_id: opt.id }));
+                  setSelectedVenueName(opt.name);
+                } else {
+                  setFormData((p) => ({ ...p, venue_id: '' }));
+                  setSelectedVenueName('');
+                }
               }}
+              placeholder="Type to search venues..."
             />
             <datalist id="venue-options">
               {venueOptions?.map((o) => (
@@ -329,17 +377,29 @@ const EventCreate: React.FC = () => {
             <Input
               id="series_id"
               list="series-options"
-              value={seriesQuery}
+              value={selectedSeriesName}
               onChange={(e) => {
                 const val = e.target.value;
+                setSelectedSeriesName(val);
                 setSeriesQuery(val);
                 const opt = seriesOptions?.find((o) => o.name === val);
-                if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, series_id: opt.id }));
+                } else {
+                  setFormData((p) => ({ ...p, series_id: '' }));
+                }
               }}
               onBlur={(e) => {
                 const opt = seriesOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, series_id: opt.id }));
+                  setSelectedSeriesName(opt.name);
+                } else {
+                  setFormData((p) => ({ ...p, series_id: '' }));
+                  setSelectedSeriesName('');
+                }
               }}
+              placeholder="Type to search series..."
             />
             <datalist id="series-options">
               {seriesOptions?.map((o) => (
@@ -350,13 +410,19 @@ const EventCreate: React.FC = () => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="min_age">Minimum Age</Label>
-            <Input
-              id="min_age"
-              name="min_age"
-              type="number"
-              value={formData.min_age}
-              onChange={handleChange}
-            />
+            <Select
+              value={formData.min_age.toString()}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select minimum age" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">All Ages</SelectItem>
+                <SelectItem value="18">18+</SelectItem>
+                <SelectItem value="21">21+</SelectItem>
+              </SelectContent>
+            </Select>
             {renderError('min_age')}
           </div>
           <div className="space-y-2">
