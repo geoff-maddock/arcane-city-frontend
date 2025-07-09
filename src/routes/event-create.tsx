@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoute, useNavigate } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
@@ -33,14 +33,14 @@ const EventCreate: React.FC = () => {
     start_at: '',
     end_at: '',
     series_id: '' as number | '',
-    min_age: '',
+    min_age: '0',
     primary_link: '',
     ticket_link: '',
     cancelled_at: '',
     tag_list: [] as number[],
     entity_list: [] as number[],
   });
-  const [visibilityQuery, setVisibilityQuery] = useState('');
+  const [visibilityQuery, setVisibilityQuery] = useState('Public');
   const [typeQuery, setTypeQuery] = useState('');
   const [promoterQuery, setPromoterQuery] = useState('');
   const [venueQuery, setVenueQuery] = useState('');
@@ -57,6 +57,23 @@ const EventCreate: React.FC = () => {
   const { data: seriesOptions } = useSearchOptions('series', seriesQuery);
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
+  useEffect(() => {
+    if (visibilityOptions) {
+      const opt = visibilityOptions.find((o) => o.id === formData.visibility_id);
+      if (opt && visibilityQuery !== opt.name) {
+        setVisibilityQuery(opt.name);
+      }
+    }
+  }, [visibilityOptions, formData.visibility_id]);
+
+  useEffect(() => {
+    if (typeOptions) {
+      const opt = typeOptions.find((o) => o.id === formData.event_type_id);
+      if (opt && typeQuery !== opt.name) {
+        setTypeQuery(opt.name);
+      }
+    }
+  }, [typeOptions, formData.event_type_id]);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
 
@@ -154,6 +171,7 @@ const EventCreate: React.FC = () => {
             <Input
               id="visibility_id"
               list="visibility-options"
+              required
               value={visibilityQuery}
               onChange={(e) => {
                 const val = e.target.value;
@@ -163,7 +181,10 @@ const EventCreate: React.FC = () => {
               }}
               onBlur={(e) => {
                 const opt = visibilityOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, visibility_id: opt.id }));
+                  setVisibilityQuery(opt.name);
+                }
               }}
             />
             <datalist id="visibility-options">
@@ -178,6 +199,7 @@ const EventCreate: React.FC = () => {
             <Input
               id="event_type_id"
               list="type-options"
+              required
               value={typeQuery}
               onChange={(e) => {
                 const val = e.target.value;
@@ -187,7 +209,10 @@ const EventCreate: React.FC = () => {
               }}
               onBlur={(e) => {
                 const opt = typeOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, event_type_id: opt.id }));
+                  setTypeQuery(opt.name);
+                }
               }}
             />
             <datalist id="type-options">
@@ -211,7 +236,10 @@ const EventCreate: React.FC = () => {
               }}
               onBlur={(e) => {
                 const opt = promoterOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, promoter_id: opt.id }));
+                  setPromoterQuery(opt.name);
+                }
               }}
             />
             <datalist id="promoter-options">
@@ -235,7 +263,10 @@ const EventCreate: React.FC = () => {
               }}
               onBlur={(e) => {
                 const opt = venueOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, venue_id: opt.id }));
+                  setVenueQuery(opt.name);
+                }
               }}
             />
             <datalist id="venue-options">
@@ -338,7 +369,10 @@ const EventCreate: React.FC = () => {
               }}
               onBlur={(e) => {
                 const opt = seriesOptions?.find((o) => o.name === e.target.value);
-                if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
+                if (opt) {
+                  setFormData((p) => ({ ...p, series_id: opt.id }));
+                  setSeriesQuery(opt.name);
+                }
               }}
             />
             <datalist id="series-options">
@@ -354,6 +388,7 @@ const EventCreate: React.FC = () => {
               id="min_age"
               name="min_age"
               type="number"
+              required
               value={formData.min_age}
               onChange={handleChange}
             />
