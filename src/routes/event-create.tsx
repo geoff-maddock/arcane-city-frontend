@@ -41,7 +41,6 @@ const EventCreate: React.FC = () => {
     entity_list: [] as number[],
   });
   const [visibilityQuery, setVisibilityQuery] = useState('');
-  const [statusQuery, setStatusQuery] = useState('');
   const [typeQuery, setTypeQuery] = useState('');
   const [promoterQuery, setPromoterQuery] = useState('');
   const [venueQuery, setVenueQuery] = useState('');
@@ -52,10 +51,9 @@ const EventCreate: React.FC = () => {
   const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', visibilityQuery);
-  const { data: statusOptions } = useSearchOptions('event-statuses', statusQuery);
   const { data: typeOptions } = useSearchOptions('event-types', typeQuery);
-  const { data: promoterOptions } = useSearchOptions('entities', promoterQuery, { 'filters[role]': 5 });
-  const { data: venueOptions } = useSearchOptions('entities', venueQuery, { 'filters[role]': 1 });
+  const { data: promoterOptions } = useSearchOptions('entities', promoterQuery, { 'filters[role]': 'Promoter' });
+  const { data: venueOptions } = useSearchOptions('entities', venueQuery, { 'filters[role]': 'Venue' });
   const { data: seriesOptions } = useSearchOptions('series', seriesQuery);
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
@@ -152,124 +150,100 @@ const EventCreate: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-          <Label htmlFor="visibility_id">Visibility</Label>
-          <Input
-            id="visibility_id"
-            list="visibility-options"
-            value={visibilityQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              setVisibilityQuery(val);
-              const opt = visibilityOptions?.find((o) => o.name === val);
-              if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
-            }}
-            onBlur={(e) => {
-              const opt = visibilityOptions?.find((o) => o.name === e.target.value);
-              if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
-            }}
-          />
-          <datalist id="visibility-options">
-            {visibilityOptions?.map((v) => (
-              <option key={v.id} value={v.name} />
-            ))}
-          </datalist>
-          {renderError('visibility_id')}
+            <Label htmlFor="visibility_id">Visibility</Label>
+            <Input
+              id="visibility_id"
+              list="visibility-options"
+              value={visibilityQuery}
+              onChange={(e) => {
+                const val = e.target.value;
+                setVisibilityQuery(val);
+                const opt = visibilityOptions?.find((o) => o.name === val);
+                if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
+              }}
+              onBlur={(e) => {
+                const opt = visibilityOptions?.find((o) => o.name === e.target.value);
+                if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
+              }}
+            />
+            <datalist id="visibility-options">
+              {visibilityOptions?.map((v) => (
+                <option key={v.id} value={v.name} />
+              ))}
+            </datalist>
+            {renderError('visibility_id')}
           </div>
           <div className="space-y-2">
-          <Label htmlFor="event_status_id">Event Status</Label>
-          <Input
-            id="event_status_id"
-            list="status-options"
-            value={statusQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              setStatusQuery(val);
-              const opt = statusOptions?.find((o) => o.name === val);
-              if (opt) setFormData((p) => ({ ...p, event_status_id: opt.id }));
-            }}
-            onBlur={(e) => {
-              const opt = statusOptions?.find((o) => o.name === e.target.value);
-              if (opt) setFormData((p) => ({ ...p, event_status_id: opt.id }));
-            }}
-          />
-          <datalist id="status-options">
-            {statusOptions?.map((o) => (
-              <option key={o.id} value={o.name} />
-            ))}
-          </datalist>
-          {renderError('event_status_id')}
+            <Label htmlFor="event_type_id">Event Type</Label>
+            <Input
+              id="event_type_id"
+              list="type-options"
+              value={typeQuery}
+              onChange={(e) => {
+                const val = e.target.value;
+                setTypeQuery(val);
+                const opt = typeOptions?.find((o) => o.name === val);
+                if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
+              }}
+              onBlur={(e) => {
+                const opt = typeOptions?.find((o) => o.name === e.target.value);
+                if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
+              }}
+            />
+            <datalist id="type-options">
+              {typeOptions?.map((o) => (
+                <option key={o.id} value={o.name} />
+              ))}
+            </datalist>
+            {renderError('event_type_id')}
           </div>
           <div className="space-y-2">
-          <Label htmlFor="event_type_id">Event Type</Label>
-          <Input
-            id="event_type_id"
-            list="type-options"
-            value={typeQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              setTypeQuery(val);
-              const opt = typeOptions?.find((o) => o.name === val);
-              if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
-            }}
-            onBlur={(e) => {
-              const opt = typeOptions?.find((o) => o.name === e.target.value);
-              if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
-            }}
-          />
-          <datalist id="type-options">
-            {typeOptions?.map((o) => (
-              <option key={o.id} value={o.name} />
-            ))}
-          </datalist>
-          {renderError('event_type_id')}
+            <Label htmlFor="promoter_id">Promoter</Label>
+            <Input
+              id="promoter_id"
+              list="promoter-options"
+              value={promoterQuery}
+              onChange={(e) => {
+                const val = e.target.value;
+                setPromoterQuery(val);
+                const opt = promoterOptions?.find((o) => o.name === val);
+                if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
+              }}
+              onBlur={(e) => {
+                const opt = promoterOptions?.find((o) => o.name === e.target.value);
+                if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
+              }}
+            />
+            <datalist id="promoter-options">
+              {promoterOptions?.map((o) => (
+                <option key={o.id} value={o.name} />
+              ))}
+            </datalist>
+            {renderError('promoter_id')}
           </div>
           <div className="space-y-2">
-          <Label htmlFor="promoter_id">Promoter</Label>
-          <Input
-            id="promoter_id"
-            list="promoter-options"
-            value={promoterQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              setPromoterQuery(val);
-              const opt = promoterOptions?.find((o) => o.name === val);
-              if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
-            }}
-            onBlur={(e) => {
-              const opt = promoterOptions?.find((o) => o.name === e.target.value);
-              if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
-            }}
-          />
-          <datalist id="promoter-options">
-            {promoterOptions?.map((o) => (
-              <option key={o.id} value={o.name} />
-            ))}
-          </datalist>
-          {renderError('promoter_id')}
-          </div>
-          <div className="space-y-2">
-          <Label htmlFor="venue_id">Venue</Label>
-          <Input
-            id="venue_id"
-            list="venue-options"
-            value={venueQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              setVenueQuery(val);
-              const opt = venueOptions?.find((o) => o.name === val);
-              if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
-            }}
-            onBlur={(e) => {
-              const opt = venueOptions?.find((o) => o.name === e.target.value);
-              if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
-            }}
-          />
-          <datalist id="venue-options">
-            {venueOptions?.map((o) => (
-              <option key={o.id} value={o.name} />
-            ))}
-          </datalist>
-          {renderError('venue_id')}
+            <Label htmlFor="venue_id">Venue</Label>
+            <Input
+              id="venue_id"
+              list="venue-options"
+              value={venueQuery}
+              onChange={(e) => {
+                const val = e.target.value;
+                setVenueQuery(val);
+                const opt = venueOptions?.find((o) => o.name === val);
+                if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
+              }}
+              onBlur={(e) => {
+                const opt = venueOptions?.find((o) => o.name === e.target.value);
+                if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
+              }}
+            />
+            <datalist id="venue-options">
+              {venueOptions?.map((o) => (
+                <option key={o.id} value={o.name} />
+              ))}
+            </datalist>
+            {renderError('venue_id')}
           </div>
           <div className="space-y-2 flex items-center gap-2 mt-6">
             <input
@@ -351,28 +325,28 @@ const EventCreate: React.FC = () => {
             {renderError('end_at')}
           </div>
           <div className="space-y-2">
-          <Label htmlFor="series_id">Series</Label>
-          <Input
-            id="series_id"
-            list="series-options"
-            value={seriesQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              setSeriesQuery(val);
-              const opt = seriesOptions?.find((o) => o.name === val);
-              if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
-            }}
-            onBlur={(e) => {
-              const opt = seriesOptions?.find((o) => o.name === e.target.value);
-              if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
-            }}
-          />
-          <datalist id="series-options">
-            {seriesOptions?.map((o) => (
-              <option key={o.id} value={o.name} />
-            ))}
-          </datalist>
-          {renderError('series_id')}
+            <Label htmlFor="series_id">Series</Label>
+            <Input
+              id="series_id"
+              list="series-options"
+              value={seriesQuery}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSeriesQuery(val);
+                const opt = seriesOptions?.find((o) => o.name === val);
+                if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
+              }}
+              onBlur={(e) => {
+                const opt = seriesOptions?.find((o) => o.name === e.target.value);
+                if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
+              }}
+            />
+            <datalist id="series-options">
+              {seriesOptions?.map((o) => (
+                <option key={o.id} value={o.name} />
+              ))}
+            </datalist>
+            {renderError('series_id')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="min_age">Minimum Age</Label>

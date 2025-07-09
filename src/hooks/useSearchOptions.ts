@@ -14,15 +14,23 @@ export const useSearchOptions = (
     return useQuery<Option[]>({
         queryKey: ['search', endpoint, search, extraParams],
         queryFn: async () => {
-            const params = new URLSearchParams();
-            params.set('limit', '20');
-            params.set('sort', 'name');
-            if (search) params.set('filters[name]', search);
-            for (const [k, v] of Object.entries(extraParams)) {
-                params.set(k, String(v));
+            const queryParts = [
+                'limit=20',
+                'sort=name',
+                'direction=asc'
+            ];
+
+            if (search) {
+                queryParts.push(`filters[name]=${encodeURIComponent(search)}`);
             }
+
+            for (const [k, v] of Object.entries(extraParams)) {
+                queryParts.push(`${k}=${encodeURIComponent(String(v))}`);
+            }
+
+            const queryString = queryParts.join('&');
             const { data } = await api.get<{ data: Option[] }>(
-                `/${endpoint}?${params.toString()}`
+                `/${endpoint}?${queryString}`
             );
             return data.data.sort((a, b) => a.name.localeCompare(b.name));
         },
