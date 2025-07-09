@@ -48,12 +48,14 @@ const EventCreate: React.FC = () => {
   const [seriesQuery, setSeriesQuery] = useState('');
   const [tagQuery, setTagQuery] = useState('');
   const [entityQuery, setEntityQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
+  const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', visibilityQuery);
   const { data: statusOptions } = useSearchOptions('event-statuses', statusQuery);
   const { data: typeOptions } = useSearchOptions('event-types', typeQuery);
-  const { data: promoterOptions } = useSearchOptions('promoters', promoterQuery);
-  const { data: venueOptions } = useSearchOptions('venues', venueQuery);
+  const { data: promoterOptions } = useSearchOptions('entities', promoterQuery, { 'filters[role]': 5 });
+  const { data: venueOptions } = useSearchOptions('entities', venueQuery, { 'filters[role]': 1 });
   const { data: seriesOptions } = useSearchOptions('series', seriesQuery);
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
@@ -156,14 +158,19 @@ const EventCreate: React.FC = () => {
             list="visibility-options"
             value={visibilityQuery}
             onChange={(e) => {
-              setVisibilityQuery(e.target.value);
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) setFormData((p) => ({ ...p, visibility_id: val }));
+              const val = e.target.value;
+              setVisibilityQuery(val);
+              const opt = visibilityOptions?.find((o) => o.name === val);
+              if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
+            }}
+            onBlur={(e) => {
+              const opt = visibilityOptions?.find((o) => o.name === e.target.value);
+              if (opt) setFormData((p) => ({ ...p, visibility_id: opt.id }));
             }}
           />
           <datalist id="visibility-options">
             {visibilityOptions?.map((v) => (
-              <option key={v.id} value={v.id} label={v.name} />
+              <option key={v.id} value={v.name} />
             ))}
           </datalist>
           {renderError('visibility_id')}
@@ -175,14 +182,19 @@ const EventCreate: React.FC = () => {
             list="status-options"
             value={statusQuery}
             onChange={(e) => {
-              setStatusQuery(e.target.value);
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) setFormData((p) => ({ ...p, event_status_id: val }));
+              const val = e.target.value;
+              setStatusQuery(val);
+              const opt = statusOptions?.find((o) => o.name === val);
+              if (opt) setFormData((p) => ({ ...p, event_status_id: opt.id }));
+            }}
+            onBlur={(e) => {
+              const opt = statusOptions?.find((o) => o.name === e.target.value);
+              if (opt) setFormData((p) => ({ ...p, event_status_id: opt.id }));
             }}
           />
           <datalist id="status-options">
             {statusOptions?.map((o) => (
-              <option key={o.id} value={o.id} label={o.name} />
+              <option key={o.id} value={o.name} />
             ))}
           </datalist>
           {renderError('event_status_id')}
@@ -194,14 +206,19 @@ const EventCreate: React.FC = () => {
             list="type-options"
             value={typeQuery}
             onChange={(e) => {
-              setTypeQuery(e.target.value);
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) setFormData((p) => ({ ...p, event_type_id: val }));
+              const val = e.target.value;
+              setTypeQuery(val);
+              const opt = typeOptions?.find((o) => o.name === val);
+              if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
+            }}
+            onBlur={(e) => {
+              const opt = typeOptions?.find((o) => o.name === e.target.value);
+              if (opt) setFormData((p) => ({ ...p, event_type_id: opt.id }));
             }}
           />
           <datalist id="type-options">
             {typeOptions?.map((o) => (
-              <option key={o.id} value={o.id} label={o.name} />
+              <option key={o.id} value={o.name} />
             ))}
           </datalist>
           {renderError('event_type_id')}
@@ -213,14 +230,19 @@ const EventCreate: React.FC = () => {
             list="promoter-options"
             value={promoterQuery}
             onChange={(e) => {
-              setPromoterQuery(e.target.value);
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) setFormData((p) => ({ ...p, promoter_id: val }));
+              const val = e.target.value;
+              setPromoterQuery(val);
+              const opt = promoterOptions?.find((o) => o.name === val);
+              if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
+            }}
+            onBlur={(e) => {
+              const opt = promoterOptions?.find((o) => o.name === e.target.value);
+              if (opt) setFormData((p) => ({ ...p, promoter_id: opt.id }));
             }}
           />
           <datalist id="promoter-options">
             {promoterOptions?.map((o) => (
-              <option key={o.id} value={o.id} label={o.name} />
+              <option key={o.id} value={o.name} />
             ))}
           </datalist>
           {renderError('promoter_id')}
@@ -232,14 +254,19 @@ const EventCreate: React.FC = () => {
             list="venue-options"
             value={venueQuery}
             onChange={(e) => {
-              setVenueQuery(e.target.value);
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) setFormData((p) => ({ ...p, venue_id: val }));
+              const val = e.target.value;
+              setVenueQuery(val);
+              const opt = venueOptions?.find((o) => o.name === val);
+              if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
+            }}
+            onBlur={(e) => {
+              const opt = venueOptions?.find((o) => o.name === e.target.value);
+              if (opt) setFormData((p) => ({ ...p, venue_id: opt.id }));
             }}
           />
           <datalist id="venue-options">
             {venueOptions?.map((o) => (
-              <option key={o.id} value={o.id} label={o.name} />
+              <option key={o.id} value={o.name} />
             ))}
           </datalist>
           {renderError('venue_id')}
@@ -330,14 +357,19 @@ const EventCreate: React.FC = () => {
             list="series-options"
             value={seriesQuery}
             onChange={(e) => {
-              setSeriesQuery(e.target.value);
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) setFormData((p) => ({ ...p, series_id: val }));
+              const val = e.target.value;
+              setSeriesQuery(val);
+              const opt = seriesOptions?.find((o) => o.name === val);
+              if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
+            }}
+            onBlur={(e) => {
+              const opt = seriesOptions?.find((o) => o.name === e.target.value);
+              if (opt) setFormData((p) => ({ ...p, series_id: opt.id }));
             }}
           />
           <datalist id="series-options">
             {seriesOptions?.map((o) => (
-              <option key={o.id} value={o.id} label={o.name} />
+              <option key={o.id} value={o.name} />
             ))}
           </datalist>
           {renderError('series_id')}
@@ -390,35 +422,35 @@ const EventCreate: React.FC = () => {
               id="tag_input"
               list="tag-options"
               value={tagQuery}
-              onChange={(e) => {
-                setTagQuery(e.target.value);
-              }}
+              onChange={(e) => setTagQuery(e.target.value)}
               onBlur={(e) => {
-                const val = parseInt(e.target.value, 10);
-                if (!isNaN(val) && !formData.tag_list.includes(val)) {
-                  setFormData((p) => ({ ...p, tag_list: [...p.tag_list, val] }));
+                const opt = tagOptions?.find((o) => o.name === e.target.value);
+                if (opt && !formData.tag_list.includes(opt.id)) {
+                  setFormData((p) => ({ ...p, tag_list: [...p.tag_list, opt.id] }));
+                  setSelectedTags((p) => [...p, opt]);
                 }
                 setTagQuery('');
               }}
             />
             <datalist id="tag-options">
               {tagOptions?.map((o) => (
-                <option key={o.id} value={o.id} label={o.name} />
+                <option key={o.id} value={o.name} />
               ))}
             </datalist>
             <div className="flex flex-wrap gap-2">
-              {formData.tag_list.map((id) => (
-                <span key={id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                  {id}
+              {selectedTags.map((tag) => (
+                <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
+                  {tag.name}
                   <button
                     type="button"
                     className="ml-1 text-red-500"
-                    onClick={() =>
+                    onClick={() => {
+                      setSelectedTags((p) => p.filter((t) => t.id !== tag.id));
                       setFormData((p) => ({
                         ...p,
-                        tag_list: p.tag_list.filter((t) => t !== id),
-                      }))
-                    }
+                        tag_list: p.tag_list.filter((t) => t !== tag.id),
+                      }));
+                    }}
                   >
                     ×
                   </button>
@@ -435,31 +467,33 @@ const EventCreate: React.FC = () => {
               value={entityQuery}
               onChange={(e) => setEntityQuery(e.target.value)}
               onBlur={(e) => {
-                const val = parseInt(e.target.value, 10);
-                if (!isNaN(val) && !formData.entity_list.includes(val)) {
-                  setFormData((p) => ({ ...p, entity_list: [...p.entity_list, val] }));
+                const opt = entityOptions?.find((o) => o.name === e.target.value);
+                if (opt && !formData.entity_list.includes(opt.id)) {
+                  setFormData((p) => ({ ...p, entity_list: [...p.entity_list, opt.id] }));
+                  setSelectedEntities((p) => [...p, opt]);
                 }
                 setEntityQuery('');
               }}
             />
             <datalist id="entity-options">
               {entityOptions?.map((o) => (
-                <option key={o.id} value={o.id} label={o.name} />
+                <option key={o.id} value={o.name} />
               ))}
             </datalist>
             <div className="flex flex-wrap gap-2">
-              {formData.entity_list.map((id) => (
-                <span key={id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                  {id}
+              {selectedEntities.map((ent) => (
+                <span key={ent.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
+                  {ent.name}
                   <button
                     type="button"
                     className="ml-1 text-red-500"
-                    onClick={() =>
+                    onClick={() => {
+                      setSelectedEntities((p) => p.filter((t) => t.id !== ent.id));
                       setFormData((p) => ({
                         ...p,
-                        entity_list: p.entity_list.filter((t) => t !== id),
-                      }))
-                    }
+                        entity_list: p.entity_list.filter((t) => t !== ent.id),
+                      }));
+                    }}
                   >
                     ×
                   </button>
