@@ -13,6 +13,7 @@ import { EventFilterContext } from '../context/EventFilterContext';
 import { EventFilters } from '../types/filters';
 import { ActiveEventFilters as ActiveFilters } from './ActiveEventFilters';
 import { Button } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
 import { X } from 'lucide-react';
 
 const sortOptions = [
@@ -177,6 +178,9 @@ export default function Events() {
                             <p className="text-lg text-gray-500">
                                 Discover and explore upcoming events in your area
                             </p>
+                            <Button asChild className="self-start">
+                                <Link to="/event/create">Create Event</Link>
+                            </Button>
                         </div>
 
                         <div className="relative">
