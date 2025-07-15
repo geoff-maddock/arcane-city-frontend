@@ -22,6 +22,8 @@ export interface Event {
     like: number;
     photos?: PhotoResponse[];
     attendees?: UserMinimalResponse[];
+    created_by?: number;
+    updated_by?: number;
 }
 
 export interface UseEventsParams {
@@ -208,6 +210,8 @@ export interface Series {
     like: number;
     founded_at: string;
     canceled_at?: string;
+    created_by?: number;
+    updated_by?: number;
 }
 
 export interface OccurrenceType {
