@@ -246,8 +246,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 </CardContent>
                             </Card>
 
-
-                            {user && event.created_by && user.id === event.created_by.id && (
+                            {user && event.created_by && user.id === event.created_by && (
                                 <PhotoDropzone eventId={event.id} />
                             )}
                             <PhotoGallery fetchUrl={`/events/${event.slug}/all-photos`} />
