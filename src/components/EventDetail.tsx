@@ -10,6 +10,7 @@ import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
+import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 
@@ -246,6 +247,9 @@ export default function EventDetail({ slug }: { slug: string }) {
                             </Card>
 
 
+                            {user && event.created_by && user.id === event.created_by.id && (
+                                <PhotoDropzone eventId={event.id} />
+                            )}
                             <PhotoGallery fetchUrl={`/events/${event.slug}/all-photos`} />
                             {/* Audio Embeds Section */}
                             {embeds.length > 0 && !embedsLoading && (

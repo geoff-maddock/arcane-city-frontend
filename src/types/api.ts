@@ -22,6 +22,7 @@ export interface Event {
     like: number;
     photos?: PhotoResponse[];
     attendees?: UserMinimalResponse[];
+    created_by?: User;
 }
 
 export interface UseEventsParams {
