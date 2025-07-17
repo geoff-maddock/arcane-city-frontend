@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import SearchableInput from '../components/SearchableInput';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError, toKebabCase } from '@/lib/utils';
@@ -41,24 +42,12 @@ const EventCreate: React.FC = () => {
     tag_list: [] as number[],
     entity_list: [] as number[],
   });
-  const [promoterQuery, setPromoterQuery] = useState('');
-  const [selectedPromoterName, setSelectedPromoterName] = useState('');
-  const [typeQuery, setTypeQuery] = useState('');
-  const [selectedTypeName, setSelectedTypeName] = useState('');
-  const [venueQuery, setVenueQuery] = useState('');
-  const [selectedVenueName, setSelectedVenueName] = useState('');
-  const [seriesQuery, setSeriesQuery] = useState('');
-  const [selectedSeriesName, setSelectedSeriesName] = useState('');
   const [tagQuery, setTagQuery] = useState('');
   const [entityQuery, setEntityQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
   const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
-  const { data: typeOptions } = useSearchOptions('event-types', typeQuery);
-  const { data: promoterOptions } = useSearchOptions('entities', promoterQuery, { 'filters[role]': 'Promoter' });
-  const { data: venueOptions } = useSearchOptions('entities', venueQuery, { 'filters[role]': 'Venue' });
-  const { data: seriesOptions } = useSearchOptions('series', seriesQuery);
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -187,110 +176,43 @@ const EventCreate: React.FC = () => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="event_type_id">Event Type</Label>
-            <Input
+            <SearchableInput
               id="event_type_id"
-              list="type-options"
-              value={selectedTypeName}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedTypeName(val);
-                setTypeQuery(val);
-                const opt = typeOptions?.find((o) => o.name === val);
-                if (opt) {
-                  setFormData((p) => ({ ...p, event_type_id: opt.id }));
-                } else {
-                  setFormData((p) => ({ ...p, event_type_id: '' }));
-                }
-              }}
-              onBlur={(e) => {
-                const opt = typeOptions?.find((o) => o.name === e.target.value);
-                if (opt) {
-                  setFormData((p) => ({ ...p, event_type_id: opt.id }));
-                  setSelectedTypeName(opt.name);
-                } else {
-                  setFormData((p) => ({ ...p, event_type_id: '' }));
-                  setSelectedTypeName('');
-                }
-              }}
+              endpoint="event-types"
+              value={formData.event_type_id}
+              onValueChange={(val) =>
+                setFormData((p) => ({ ...p, event_type_id: val }))
+              }
               placeholder="Type to search event types..."
             />
-            <datalist id="type-options">
-              {typeOptions?.map((o) => (
-                <option key={o.id} value={o.name} />
-              ))}
-            </datalist>
             {renderError('event_type_id')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="promoter_id">Promoter</Label>
-            <Input
+            <SearchableInput
               id="promoter_id"
-              list="promoter-options"
-              value={selectedPromoterName}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedPromoterName(val);
-                setPromoterQuery(val);
-                const opt = promoterOptions?.find((o) => o.name === val);
-                if (opt) {
-                  setFormData((p) => ({ ...p, promoter_id: opt.id }));
-                } else {
-                  setFormData((p) => ({ ...p, promoter_id: '' }));
-                }
-              }}
-              onBlur={(e) => {
-                const opt = promoterOptions?.find((o) => o.name === e.target.value);
-                if (opt) {
-                  setFormData((p) => ({ ...p, promoter_id: opt.id }));
-                  setSelectedPromoterName(opt.name);
-                } else {
-                  setFormData((p) => ({ ...p, promoter_id: '' }));
-                  setSelectedPromoterName('');
-                }
-              }}
+              endpoint="entities"
+              extraParams={{ 'filters[role]': 'Promoter' }}
+              value={formData.promoter_id}
+              onValueChange={(val) =>
+                setFormData((p) => ({ ...p, promoter_id: val }))
+              }
               placeholder="Type to search promoters..."
             />
-            <datalist id="promoter-options">
-              {promoterOptions?.map((o) => (
-                <option key={o.id} value={o.name} />
-              ))}
-            </datalist>
             {renderError('promoter_id')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="venue_id">Venue</Label>
-            <Input
+            <SearchableInput
               id="venue_id"
-              list="venue-options"
-              value={selectedVenueName}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedVenueName(val);
-                setVenueQuery(val);
-                const opt = venueOptions?.find((o) => o.name === val);
-                if (opt) {
-                  setFormData((p) => ({ ...p, venue_id: opt.id }));
-                } else {
-                  setFormData((p) => ({ ...p, venue_id: '' }));
-                }
-              }}
-              onBlur={(e) => {
-                const opt = venueOptions?.find((o) => o.name === e.target.value);
-                if (opt) {
-                  setFormData((p) => ({ ...p, venue_id: opt.id }));
-                  setSelectedVenueName(opt.name);
-                } else {
-                  setFormData((p) => ({ ...p, venue_id: '' }));
-                  setSelectedVenueName('');
-                }
-              }}
+              endpoint="entities"
+              extraParams={{ 'filters[role]': 'Venue' }}
+              value={formData.venue_id}
+              onValueChange={(val) =>
+                setFormData((p) => ({ ...p, venue_id: val }))
+              }
               placeholder="Type to search venues..."
             />
-            <datalist id="venue-options">
-              {venueOptions?.map((o) => (
-                <option key={o.id} value={o.name} />
-              ))}
-            </datalist>
             {renderError('venue_id')}
           </div>
           <div className="space-y-2 flex items-center gap-2 mt-6">
@@ -374,38 +296,15 @@ const EventCreate: React.FC = () => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="series_id">Series</Label>
-            <Input
+            <SearchableInput
               id="series_id"
-              list="series-options"
-              value={selectedSeriesName}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedSeriesName(val);
-                setSeriesQuery(val);
-                const opt = seriesOptions?.find((o) => o.name === val);
-                if (opt) {
-                  setFormData((p) => ({ ...p, series_id: opt.id }));
-                } else {
-                  setFormData((p) => ({ ...p, series_id: '' }));
-                }
-              }}
-              onBlur={(e) => {
-                const opt = seriesOptions?.find((o) => o.name === e.target.value);
-                if (opt) {
-                  setFormData((p) => ({ ...p, series_id: opt.id }));
-                  setSelectedSeriesName(opt.name);
-                } else {
-                  setFormData((p) => ({ ...p, series_id: '' }));
-                  setSelectedSeriesName('');
-                }
-              }}
+              endpoint="series"
+              value={formData.series_id}
+              onValueChange={(val) =>
+                setFormData((p) => ({ ...p, series_id: val }))
+              }
               placeholder="Type to search series..."
             />
-            <datalist id="series-options">
-              {seriesOptions?.map((o) => (
-                <option key={o.id} value={o.name} />
-              ))}
-            </datalist>
             {renderError('series_id')}
           </div>
           <div className="space-y-2">
