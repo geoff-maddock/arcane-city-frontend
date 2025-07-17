@@ -118,7 +118,7 @@ const EventCreate: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4">
+    <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Create Event</h1>
       {generalError && <div className="text-red-500">{generalError}</div>}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -148,6 +148,7 @@ const EventCreate: React.FC = () => {
           <textarea
             id="description"
             name="description"
+            rows={6}
             className="w-full border rounded p-2"
             value={formData.description}
             onChange={handleChange}
@@ -215,17 +216,8 @@ const EventCreate: React.FC = () => {
             />
             {renderError('venue_id')}
           </div>
-          <div className="space-y-2 flex items-center gap-2 mt-6">
-            <input
-              id="is_benefit"
-              name="is_benefit"
-              type="checkbox"
-              checked={formData.is_benefit}
-              onChange={handleChange}
-            />
-            <Label htmlFor="is_benefit">Benefit Event</Label>
-            {renderError('is_benefit')}
-          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="presale_price">Presale Price</Label>
             <Input
@@ -250,16 +242,33 @@ const EventCreate: React.FC = () => {
             />
             {renderError('door_price')}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="soundcheck_at">Soundcheck At</Label>
-            <Input
-              id="soundcheck_at"
-              name="soundcheck_at"
-              type="datetime-local"
-              value={formData.soundcheck_at}
+          <div className="space-y-2 flex items-center gap-2 mt-6">
+            <input
+              id="is_benefit"
+              name="is_benefit"
+              type="checkbox"
+              checked={formData.is_benefit}
               onChange={handleChange}
             />
-            {renderError('soundcheck_at')}
+            <Label htmlFor="is_benefit">Benefit Event</Label>
+            {renderError('is_benefit')}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="min_age">Minimum Age</Label>
+            <Select
+              value={formData.min_age.toString()}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select minimum age" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">All Ages</SelectItem>
+                <SelectItem value="18">18+</SelectItem>
+                <SelectItem value="21">21+</SelectItem>
+              </SelectContent>
+            </Select>
+            {renderError('min_age')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="door_at">Door At</Label>
@@ -272,6 +281,7 @@ const EventCreate: React.FC = () => {
             />
             {renderError('door_at')}
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="start_at">Start At</Label>
             <Input
@@ -307,23 +317,9 @@ const EventCreate: React.FC = () => {
             />
             {renderError('series_id')}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="min_age">Minimum Age</Label>
-            <Select
-              value={formData.min_age.toString()}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select minimum age" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">All Ages</SelectItem>
-                <SelectItem value="18">18+</SelectItem>
-                <SelectItem value="21">21+</SelectItem>
-              </SelectContent>
-            </Select>
-            {renderError('min_age')}
-          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
           <div className="space-y-2">
             <Label htmlFor="primary_link">Primary Link</Label>
             <Input
@@ -343,17 +339,6 @@ const EventCreate: React.FC = () => {
               onChange={handleChange}
             />
             {renderError('ticket_link')}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cancelled_at">Cancelled At</Label>
-            <Input
-              id="cancelled_at"
-              name="cancelled_at"
-              type="datetime-local"
-              value={formData.cancelled_at}
-              onChange={handleChange}
-            />
-            {renderError('cancelled_at')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="tag_input">Tags</Label>
