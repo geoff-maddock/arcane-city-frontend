@@ -95,6 +95,8 @@ export interface PhotoResponse {
     id: number;
     path: string;
     thumbnail_path: string;
+    created_by?: number;
+    is_primary?: boolean;
 }
 
 
