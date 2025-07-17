@@ -9,6 +9,7 @@ import { EntityDetailRoute } from './routes/entity-detail.tsx';
 import { SeriesDetailRoute } from './routes/series-detail.tsx';
 import { TagDetailRoute } from './routes/tag-detail.tsx';
 import { EventCreateRoute } from './routes/event-create.tsx';
+import { EntityCreateRoute } from './routes/entity-create.tsx';
 import Account from './routes/account';
 import { LoginRoute } from './routes/login';
 import { RegisterRoute } from './routes/register';
@@ -66,6 +67,7 @@ const routeTree = rootRoute.addChildren([
     seriesRoute,
     tagRoute,
     EventCreateRoute,
+    EntityCreateRoute,
     EventDetailRoute,
     EntityDetailRoute,
     SeriesDetailRoute,

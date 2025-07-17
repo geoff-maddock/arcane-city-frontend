@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
 import { TagBadges } from './TagBadges';
+import PhotoDropzone from './PhotoDropzone';
+import { authService } from '../services/auth.service';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const [embeds, setEmbeds] = useState<string[]>([]);
@@ -21,6 +23,12 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
             const { data } = await api.get<Entity>(`/entities/${entitySlug}`);
             return data;
         },
+    });
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
     });
 
     // Fetch event embeds after the entity detail is loaded
@@ -160,6 +168,11 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                             </Card>
 
                             <PhotoGallery fetchUrl={`/entities/${entity.slug}/photos`} />
+
+                            {/* Photo Upload for logged in users */}
+                            {user && (
+                                <PhotoDropzone entityId={entity.id} />
+                            )}
 
                             {/* Audio Embeds Section */}
                             {embeds.length > 0 && !embedsLoading && (

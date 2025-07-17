@@ -12,7 +12,7 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { EntityFilterContext } from '../context/EntityFilterContext';
 import { EntityFilters } from '../types/filters';
 import { ActiveEntityFilters as ActiveFilters } from './ActiveEntityFilters';
-import { useSearch } from '@tanstack/react-router';
+import { useSearch, Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
@@ -171,6 +171,9 @@ export default function Entities() {
                             <p className="text-lg text-gray-500">
                                 Discover and explore entities in our database.
                             </p>
+                            <Button asChild className="self-start">
+                                <Link to="/entity/create">Create Entity</Link>
+                            </Button>
                         </div>
 
                         <div className="relative">

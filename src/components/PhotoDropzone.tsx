@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { api } from '../lib/api';
 
 interface PhotoDropzoneProps {
-    eventId: number;
+    eventId?: number;
+    entityId?: number;
 }
 
-export default function PhotoDropzone({ eventId }: PhotoDropzoneProps) {
+export default function PhotoDropzone({ eventId, entityId }: PhotoDropzoneProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -19,9 +20,16 @@ export default function PhotoDropzone({ eventId }: PhotoDropzoneProps) {
             for (const file of acceptedFiles) {
                 const formData = new FormData();
                 formData.append('file', file);
-                await api.post(`/events/${eventId}/photos`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
+
+                if (eventId) {
+                    await api.post(`/events/${eventId}/photos`, formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                } else if (entityId) {
+                    await api.post(`/entities/${entityId}/photos`, formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                }
             }
             window.location.reload();
         } catch (err) {
