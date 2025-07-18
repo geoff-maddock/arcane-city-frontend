@@ -16,9 +16,10 @@ import { authService } from '../services/auth.service';
 
 interface PhotoGalleryProps {
     fetchUrl: string;
+    onPrimaryUpdate?: () => void;
 }
 
-export default function PhotoGallery({ fetchUrl }: PhotoGalleryProps) {
+export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGalleryProps) {
     const [photos, setPhotos] = useState<PhotoResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -48,12 +49,18 @@ export default function PhotoGallery({ fetchUrl }: PhotoGalleryProps) {
 
     const setPrimaryMutation = useMutation({
         mutationFn: (photoId: number) => api.post(`/photos/${photoId}/set-primary`),
-        onSuccess: fetchPhotos,
+        onSuccess: () => {
+            fetchPhotos();
+            onPrimaryUpdate?.();
+        },
     });
 
     const unsetPrimaryMutation = useMutation({
         mutationFn: (photoId: number) => api.post(`/photos/${photoId}/unset-primary`),
-        onSuccess: fetchPhotos,
+        onSuccess: () => {
+            fetchPhotos();
+            onPrimaryUpdate?.();
+        },
     });
 
     const deletePhotoMutation = useMutation({
@@ -106,7 +113,7 @@ export default function PhotoGallery({ fetchUrl }: PhotoGalleryProps) {
                     </div>
                     <div className="flex flex-wrap gap-4">
                         {photos.map((photo: PhotoResponse, idx: number) => (
-                            <div key={idx} className="relative group">
+                            <div key={photo.id} className="relative group">
                                 <button
                                     className="focus:outline-none"
                                     onClick={() => {

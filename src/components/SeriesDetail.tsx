@@ -13,7 +13,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
 
     // Fetch the series data
-    const { data: series, isLoading, error } = useQuery<Series>({
+    const { data: series, isLoading, error, refetch } = useQuery<Series>({
         queryKey: ['series', slug],
         queryFn: async () => {
             const { data } = await api.get<Series>(`/series/${slug}`);
@@ -159,7 +159,10 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                 </Card>
                             )}
 
-                            <PhotoGallery fetchUrl={`/series/${slug}/all-photos`} />
+                            <PhotoGallery
+                                fetchUrl={`/series/${slug}/all-photos`}
+                                onPrimaryUpdate={refetch}
+                            />
                         </div>
                     </div>
                 </div>

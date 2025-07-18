@@ -17,7 +17,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
 
-    const { data: entity, isLoading, error } = useQuery<Entity>({
+    const { data: entity, isLoading, error, refetch } = useQuery<Entity>({
         queryKey: ['entity', entitySlug],
         queryFn: async () => {
             const { data } = await api.get<Entity>(`/entities/${entitySlug}`);
@@ -167,7 +167,10 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                 </CardContent>
                             </Card>
 
-                            <PhotoGallery fetchUrl={`/entities/${entity.slug}/photos`} />
+                            <PhotoGallery
+                                fetchUrl={`/entities/${entity.slug}/photos`}
+                                onPrimaryUpdate={refetch}
+                            />
 
                             {/* Photo Upload for logged in users */}
                             {user && (
