@@ -2,13 +2,16 @@ import { useNavigate } from '@tanstack/react-router';
 import { Series } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CalendarDays, MapPin } from 'lucide-react';
+import { CalendarDays, MapPin, Star } from 'lucide-react';
 import { AgeRestriction } from './AgeRestriction';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { SeriesFilterContext } from '../context/SeriesFilterContext';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { authService } from '../services/auth.service';
+import { api } from '../lib/api';
 
 
 interface SeriesCardProps {
@@ -20,6 +23,46 @@ interface SeriesCardProps {
 const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
   const navigate = useNavigate();
   const { setFilters } = useContext(SeriesFilterContext);
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: authService.getCurrentUser,
+    enabled: authService.isAuthenticated(),
+  });
+
+  const [following, setFollowing] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFollowing(user.followed_series.some(s => s.slug === series.slug));
+    }
+  }, [user, series.slug]);
+
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      await api.post(`/series/${series.slug}/follow`);
+    },
+    onSuccess: () => {
+      setFollowing(true);
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: async () => {
+      await api.post(`/series/${series.slug}/unfollow`);
+    },
+    onSuccess: () => {
+      setFollowing(false);
+    },
+  });
+
+  const handleFollowToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (following) {
+      unfollowMutation.mutate();
+    } else {
+      followMutation.mutate();
+    }
+  };
 
   const handleTagClick = (tagName: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
@@ -65,6 +108,11 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
                     {series.name}
                   </a>
                 </h3>
+                {user && (
+                  <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
+                    <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                  </button>
+                )}
               </div>
               {series.short && (
                 <p className="line-clamp-2 text-sm text-gray-500">{series.short}</p>
@@ -128,3 +176,4 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
 };
 
 export default SeriesCard;
+

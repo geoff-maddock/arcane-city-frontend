@@ -1,10 +1,15 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
+import { api } from '../lib/api';
 import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { authService } from '../services/auth.service';
+import { Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 // interface EntityType {
 //     id: number;
@@ -39,6 +44,46 @@ interface EntityCardProps {
 
 const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const navigate = useNavigate();
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
+
+    const [following, setFollowing] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setFollowing(user.followed_entities.some(e => e.slug === entity.slug));
+        }
+    }, [user, entity.slug]);
+
+    const followMutation = useMutation({
+        mutationFn: async () => {
+            await api.post(`/entities/${entity.slug}/follow`);
+        },
+        onSuccess: () => {
+            setFollowing(true);
+        },
+    });
+
+    const unfollowMutation = useMutation({
+        mutationFn: async () => {
+            await api.post(`/entities/${entity.slug}/unfollow`);
+        },
+        onSuccess: () => {
+            setFollowing(false);
+        },
+    });
+
+    const handleFollowToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (following) {
+            unfollowMutation.mutate();
+        } else {
+            followMutation.mutate();
+        }
+    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -64,15 +109,22 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                         />
                     </div>
 
-                    <h2 className="text-xl font-bold">
-                        <a
-                            href={`/entities/${entity.slug}`}
-                            onClick={handleClick}
-                            className="hover:text-primary transition-colors"
-                        >
-                            {entity.name}
-                        </a>
-                    </h2>
+                    <div className="flex justify-between items-start">
+                        <h2 className="text-xl font-bold">
+                            <a
+                                href={`/entities/${entity.slug}`}
+                                onClick={handleClick}
+                                className="hover:text-primary transition-colors"
+                            >
+                                {entity.name}
+                            </a>
+                        </h2>
+                        {user && (
+                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
+                                <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                            </button>
+                        )}
+                    </div>
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
 
                     <div className="flex items-center gap-2 text-gray-600">
@@ -117,3 +169,4 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
 };
 
 export default EntityCard;
+
