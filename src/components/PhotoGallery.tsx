@@ -128,8 +128,10 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
                                         className="w-32 h-32 object-cover rounded shadow hover:scale-105 transition-transform"
                                     />
                                 </button>
-                                {user && photo.created_by === user.id && (
+                                {user && photo.created_by === user.id && photo.direct === true && (
+
                                     <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+
                                         <button
                                             onClick={() => handleTogglePrimary(photo)}
                                             aria-label={photo.is_primary ? 'Unset Primary Photo' : 'Set Primary Photo'}
@@ -141,6 +143,7 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
                                                 fill={photo.is_primary ? 'currentColor' : 'none'}
                                             />
                                         </button>
+
                                         <button
                                             onClick={() => handleDelete(photo)}
                                             aria-label="Delete Photo"
@@ -149,6 +152,7 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
                                         >
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </button>
+
                                     </div>
                                 )}
                             </div>

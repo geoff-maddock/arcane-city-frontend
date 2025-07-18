@@ -6,11 +6,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
+import PhotoDropzone from './PhotoDropzone';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
+import { authService } from '../services/auth.service';
 
 export default function SeriesDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
 
     // Fetch the series data
     const { data: series, isLoading, error, refetch } = useQuery<Series>({
@@ -157,6 +165,10 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                         <div className="text-gray-600">{series.promoter.name}</div>
                                     </CardContent>
                                 </Card>
+                            )}
+
+                            {user && series.created_by && user.id === series.created_by && (
+                                <PhotoDropzone seriesId={series.id} />
                             )}
 
                             <PhotoGallery

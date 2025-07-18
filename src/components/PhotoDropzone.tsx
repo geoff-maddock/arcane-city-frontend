@@ -6,9 +6,10 @@ import { api } from '../lib/api';
 interface PhotoDropzoneProps {
     eventId?: number;
     entityId?: number;
+    seriesId?: number;
 }
 
-export default function PhotoDropzone({ eventId, entityId }: PhotoDropzoneProps) {
+export default function PhotoDropzone({ eventId, entityId, seriesId }: PhotoDropzoneProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -27,6 +28,10 @@ export default function PhotoDropzone({ eventId, entityId }: PhotoDropzoneProps)
                     });
                 } else if (entityId) {
                     await api.post(`/entities/${entityId}/photos`, formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                } else if (seriesId) {
+                    await api.post(`/series/${seriesId}/photos`, formData, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                     });
                 }
