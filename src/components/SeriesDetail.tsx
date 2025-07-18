@@ -5,6 +5,7 @@ import { Series } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { AgeRestriction } from './AgeRestriction';
