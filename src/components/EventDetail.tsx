@@ -58,7 +58,7 @@ export default function EventDetail({ slug }: { slug: string }) {
 
 
     // Fetch the event data
-    const { data: event, isLoading, error } = useQuery<Event>({
+    const { data: event, isLoading, error, refetch } = useQuery<Event>({
         queryKey: ['event', slug],
         queryFn: async () => {
             const { data } = await api.get<Event>(`/events/${slug}`);
@@ -250,7 +250,10 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 <PhotoDropzone eventId={event.id} />
                             )}
 
-                            <PhotoGallery fetchUrl={`/events/${event.slug}/all-photos`} />
+                            <PhotoGallery
+                                fetchUrl={`/events/${event.slug}/all-photos`}
+                                onPrimaryUpdate={refetch}
+                            />
                             {/* Audio Embeds Section */}
                             {embeds.length > 0 && !embedsLoading && (
                                 <Card>

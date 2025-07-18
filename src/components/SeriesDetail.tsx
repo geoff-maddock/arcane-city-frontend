@@ -6,14 +6,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
+import PhotoDropzone from './PhotoDropzone';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
+import { authService } from '../services/auth.service';
 
 export default function SeriesDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
 
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
+
     // Fetch the series data
-    const { data: series, isLoading, error } = useQuery<Series>({
+    const { data: series, isLoading, error, refetch } = useQuery<Series>({
         queryKey: ['series', slug],
         queryFn: async () => {
             const { data } = await api.get<Series>(`/series/${slug}`);
@@ -159,7 +167,14 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                 </Card>
                             )}
 
-                            <PhotoGallery fetchUrl={`/series/${slug}/all-photos`} />
+                            {user && series.created_by && user.id === series.created_by && (
+                                <PhotoDropzone seriesId={series.id} />
+                            )}
+
+                            <PhotoGallery
+                                fetchUrl={`/series/${slug}/all-photos`}
+                                onPrimaryUpdate={refetch}
+                            />
                         </div>
                     </div>
                 </div>

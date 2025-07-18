@@ -15,6 +15,8 @@ import { ActiveEventFilters as ActiveFilters } from './ActiveEventFilters';
 import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 import { X } from 'lucide-react';
+import { authService } from '@/services/auth.service';
+import { useQuery } from '@tanstack/react-query';
 
 const sortOptions = [
     { value: 'start_at', label: 'Date' },
@@ -30,6 +32,12 @@ export default function Events() {
     const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
         const savedState = localStorage.getItem('filtersVisible');
         return savedState ? JSON.parse(savedState) : true;
+    });
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
     });
 
     useEffect(() => {
@@ -178,9 +186,11 @@ export default function Events() {
                             <p className="text-lg text-gray-500">
                                 Discover and explore upcoming events in your area
                             </p>
-                            <Button asChild className="self-start">
-                                <Link to="/event/create">Create Event</Link>
-                            </Button>
+                            {user && (
+                                <Button asChild className="self-start">
+                                    <Link to="/event/create">Create Event</Link>
+                                </Button>
+                            )}
                         </div>
 
                         <div className="relative">

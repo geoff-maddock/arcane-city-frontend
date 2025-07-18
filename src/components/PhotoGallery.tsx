@@ -1,37 +1,90 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { PhotoResponse } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Image as ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+    Loader2,
+    Image as ImageIcon,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    Star,
+    Trash2,
+} from 'lucide-react';
+import { authService } from '../services/auth.service';
 
 interface PhotoGalleryProps {
     fetchUrl: string;
+    onPrimaryUpdate?: () => void;
 }
 
-export default function PhotoGallery({ fetchUrl }: PhotoGalleryProps) {
+export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGalleryProps) {
     const [photos, setPhotos] = useState<PhotoResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [showSlideshow, setShowSlideshow] = useState(false);
     const [slideshowIndex, setSlideshowIndex] = useState(0);
 
-    useEffect(() => {
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
+
+    const fetchPhotos = useCallback(async () => {
         if (!fetchUrl) return;
-        const fetchPhotos = async () => {
-            setLoading(true);
-            try {
-                const response = await api.get<{ data: PhotoResponse[] }>(fetchUrl);
-                const photoData = (response.data as { data: PhotoResponse[] }).data ?? response.data;
-                setPhotos(photoData as PhotoResponse[]);
-            } catch (err) {
-                console.error('Error fetching photos:', err);
-                setError(err instanceof Error ? err : new Error('Failed to load photos'));
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPhotos();
+        setLoading(true);
+        try {
+            const response = await api.get<{ data: PhotoResponse[] }>(fetchUrl);
+            const photoData = (response.data as { data: PhotoResponse[] }).data ?? response.data;
+            setPhotos(photoData as PhotoResponse[]);
+        } catch (err) {
+            console.error('Error fetching photos:', err);
+            setError(err instanceof Error ? err : new Error('Failed to load photos'));
+        } finally {
+            setLoading(false);
+        }
     }, [fetchUrl]);
+
+    const setPrimaryMutation = useMutation({
+        mutationFn: (photoId: number) => api.post(`/photos/${photoId}/set-primary`),
+        onSuccess: () => {
+            fetchPhotos();
+            onPrimaryUpdate?.();
+        },
+    });
+
+    const unsetPrimaryMutation = useMutation({
+        mutationFn: (photoId: number) => api.post(`/photos/${photoId}/unset-primary`),
+        onSuccess: () => {
+            fetchPhotos();
+            onPrimaryUpdate?.();
+        },
+    });
+
+    const deletePhotoMutation = useMutation({
+        mutationFn: (photoId: number) => api.delete(`/photos/${photoId}`),
+        onSuccess: fetchPhotos,
+    });
+
+    const handleTogglePrimary = (photo: PhotoResponse) => {
+        if (photo.is_primary) {
+            unsetPrimaryMutation.mutate(photo.id);
+        } else {
+            setPrimaryMutation.mutate(photo.id);
+        }
+    };
+
+    const handleDelete = (photo: PhotoResponse) => {
+        if (window.confirm('Are you sure you want to delete this photo?')) {
+            deletePhotoMutation.mutate(photo.id);
+        }
+    };
+
+    useEffect(() => {
+        fetchPhotos();
+    }, [fetchPhotos]);
 
     if (loading) {
         return (
@@ -60,21 +113,49 @@ export default function PhotoGallery({ fetchUrl }: PhotoGalleryProps) {
                     </div>
                     <div className="flex flex-wrap gap-4">
                         {photos.map((photo: PhotoResponse, idx: number) => (
-                            <button
-                                key={idx}
-                                className="focus:outline-none"
-                                onClick={() => {
-                                    setSlideshowIndex(idx);
-                                    setShowSlideshow(true);
-                                }}
-                                type="button"
-                            >
-                                <img
-                                    src={photo.path}
-                                    alt={`Photo ${idx + 1}`}
-                                    className="w-32 h-32 object-cover rounded shadow hover:scale-105 transition-transform"
-                                />
-                            </button>
+                            <div key={photo.id} className="relative group">
+                                <button
+                                    className="focus:outline-none"
+                                    onClick={() => {
+                                        setSlideshowIndex(idx);
+                                        setShowSlideshow(true);
+                                    }}
+                                    type="button"
+                                >
+                                    <img
+                                        src={photo.path}
+                                        alt={`Photo ${idx + 1}`}
+                                        className="w-32 h-32 object-cover rounded shadow hover:scale-105 transition-transform"
+                                    />
+                                </button>
+                                {user && photo.created_by === user.id && photo.direct === true && (
+
+                                    <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+
+                                        <button
+                                            onClick={() => handleTogglePrimary(photo)}
+                                            aria-label={photo.is_primary ? 'Unset Primary Photo' : 'Set Primary Photo'}
+                                            className="bg-white/70 p-1 rounded hover:bg-white"
+                                            type="button"
+                                        >
+                                            <Star
+                                                className={`h-4 w-4 ${photo.is_primary ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                fill={photo.is_primary ? 'currentColor' : 'none'}
+                                            />
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleDelete(photo)}
+                                            aria-label="Delete Photo"
+                                            className="bg-white/70 p-1 rounded hover:bg-white"
+                                            type="button"
+                                        >
+                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                        </button>
+
+                                    </div>
+                                )}
+                            </div>
                         ))}
                     </div>
                 </CardContent>

@@ -15,6 +15,8 @@ import { ActiveEntityFilters as ActiveFilters } from './ActiveEntityFilters';
 import { useSearch, Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { authService } from '@/services/auth.service';
+import { useQuery } from '@tanstack/react-query';
 
 
 const sortOptions = [
@@ -30,6 +32,12 @@ export default function Entities() {
     const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
         const savedState = localStorage.getItem('filtersVisible');
         return savedState ? JSON.parse(savedState) : true;
+    });
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
     });
 
 
@@ -171,9 +179,11 @@ export default function Entities() {
                             <p className="text-lg text-gray-500">
                                 Discover and explore entities in our database.
                             </p>
-                            <Button asChild className="self-start">
-                                <Link to="/entity/create">Create Entity</Link>
-                            </Button>
+                            {user && (
+                                <Button asChild className="self-start">
+                                    <Link to="/entity/create">Create Entity</Link>
+                                </Button>
+                            )}
                         </div>
 
                         <div className="relative">
