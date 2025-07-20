@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createRoute, useNavigate } from '@tanstack/react-router';
+import { createRoute, useNavigate, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { authService } from '../services/auth.service';
 import { Button } from '../components/ui/button';
@@ -46,6 +46,9 @@ const Login: React.FC = () => {
         {error && <div className="text-red-500 text-sm">{error}</div>}
         <Button type="submit" className="w-full">Login</Button>
       </form>
+      <Button asChild variant="link" className="w-full">
+        <Link to="/register">Need an account? Register</Link>
+      </Button>
     </div>
   );
 };
