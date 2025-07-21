@@ -38,7 +38,7 @@ const Register: React.FC = () => {
       validationErrors.email = 'Enter a valid email address';
     }
     if (password.length < 8 || password.length > 60) {
-      validationErrors.password = 'Password must be between 12 and 60 characters';
+      validationErrors.password = 'Password must be between 8 and 60 characters';
     }
     if (password !== confirmPassword) {
       validationErrors.confirmPassword = 'Passwords do not match';
@@ -56,7 +56,7 @@ const Register: React.FC = () => {
     setErrors({});
     try {
       await userService.createUser({ name, email, password });
-      navigate({ to: '/login' });
+      navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
       if (axiosErr.response && axiosErr.response.status >= 400 && axiosErr.response.status < 500) {
