@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { createRoute, useNavigate } from '@tanstack/react-router';
+import { AxiosError } from 'axios';
 import { rootRoute } from './root';
 import { userService } from '../services/user.service';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { formatApiError } from '../lib/utils';
 
 interface FieldErrors {
   name?: string;
@@ -35,8 +37,8 @@ const Register: React.FC = () => {
     ) {
       validationErrors.email = 'Enter a valid email address';
     }
-    if (password.length < 8 || password.length > 60) {
-      validationErrors.password = 'Password must be between 8 and 60 characters';
+    if (password.length < 12 || password.length > 60) {
+      validationErrors.password = 'Password must be between 12 and 60 characters';
     }
     if (password !== confirmPassword) {
       validationErrors.confirmPassword = 'Passwords do not match';
@@ -55,8 +57,18 @@ const Register: React.FC = () => {
     try {
       await userService.createUser({ name, email, password });
       navigate({ to: '/login' });
-    } catch {
-      setErrors({ general: 'Registration failed' });
+    } catch (err) {
+      const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
+      if (axiosErr.response && axiosErr.response.status >= 400 && axiosErr.response.status < 500) {
+        const serverErrors = axiosErr.response.data?.errors;
+        if (serverErrors) {
+          setErrors(serverErrors);
+        } else {
+          setErrors({ general: axiosErr.response.data?.message || formatApiError(err) });
+        }
+        return;
+      }
+      setErrors({ general: formatApiError(err) });
     }
   };
 
