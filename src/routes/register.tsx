@@ -6,26 +6,57 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 
+interface FieldErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  general?: string;
+}
+
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+
+  const validate = (): FieldErrors => {
+    const validationErrors: FieldErrors = {};
+    if (name.length < 6 || name.length > 60) {
+      validationErrors.name = 'Name must be between 6 and 60 characters';
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (
+      email.length < 6 ||
+      email.length > 60 ||
+      !emailRegex.test(email)
+    ) {
+      validationErrors.email = 'Enter a valid email address';
+    }
+    if (password.length < 12 || password.length > 60) {
+      validationErrors.password = 'Password must be between 12 and 60 characters';
+    }
+    if (password !== confirmPassword) {
+      validationErrors.confirmPassword = 'Passwords do not match';
+    }
+    return validationErrors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
-    setError('');
+    setErrors({});
     try {
       await userService.createUser({ name, email, password });
       navigate({ to: '/login' });
     } catch {
-      setError('Registration failed');
+      setErrors({ general: 'Registration failed' });
     }
   };
 
@@ -36,20 +67,24 @@ const Register: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
           <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+          {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          {errors.password && <div className="text-red-500 text-sm">{errors.password}</div>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirm">Confirm Password</Label>
           <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword}</div>}
         </div>
-        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
         <Button type="submit" className="w-full">Register</Button>
       </form>
     </div>
