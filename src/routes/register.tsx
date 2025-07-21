@@ -35,8 +35,8 @@ const Register: React.FC = () => {
     ) {
       validationErrors.email = 'Enter a valid email address';
     }
-    if (password.length < 12 || password.length > 60) {
-      validationErrors.password = 'Password must be between 12 and 60 characters';
+    if (password.length < 8 || password.length > 60) {
+      validationErrors.password = 'Password must be between 8 and 60 characters';
     }
     if (password !== confirmPassword) {
       validationErrors.confirmPassword = 'Passwords do not match';
