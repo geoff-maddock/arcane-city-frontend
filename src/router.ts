@@ -13,6 +13,7 @@ import { EntityCreateRoute } from './routes/entity-create.tsx';
 import Account from './routes/account';
 import { LoginRoute } from './routes/login';
 import { RegisterRoute } from './routes/register';
+import { RegisterSuccessRoute } from './routes/register-success';
 import Calendar from './components/Calendar';
 import { AboutRoute } from './routes/about';
 
@@ -77,6 +78,7 @@ const routeTree = rootRoute.addChildren([
     AboutRoute,
     LoginRoute,
     RegisterRoute,
+    RegisterSuccessRoute,
 ]);
 
 // Create and export router

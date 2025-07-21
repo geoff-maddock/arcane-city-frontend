@@ -56,7 +56,7 @@ const Register: React.FC = () => {
     setErrors({});
     try {
       await userService.createUser({ name, email, password });
-      navigate({ to: '/login' });
+      navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
       if (axiosErr.response && axiosErr.response.status >= 400 && axiosErr.response.status < 500) {
