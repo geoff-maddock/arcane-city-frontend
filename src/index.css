@@ -104,4 +104,69 @@
   .menu-bar .toggle-theme-button {
     @apply mt-auto;
   }
+
+  /* React Big Calendar custom styles */
+  .rbc-toolbar {
+    @apply mb-4 p-2 rounded-lg bg-background border border-border;
+  }
+
+  .rbc-toolbar-label {
+    @apply text-foreground font-semibold text-lg;
+  }
+
+  .rbc-btn-group button {
+    @apply px-3 py-2 mx-1 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors;
+  }
+
+  .rbc-btn-group button:hover {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .rbc-btn-group button:active,
+  .rbc-btn-group button.rbc-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  /* Dark mode specific overrides for better contrast */
+  .dark .rbc-toolbar {
+    @apply bg-gray-800 border-gray-600;
+  }
+
+  .dark .rbc-toolbar-label {
+    @apply text-gray-100;
+  }
+
+  .dark .rbc-btn-group button {
+    @apply bg-gray-700 text-gray-100 border-gray-600;
+  }
+
+  .dark .rbc-btn-group button:hover {
+    @apply bg-blue-600 text-white border-blue-500;
+  }
+
+  .dark .rbc-btn-group button:active,
+  .dark .rbc-btn-group button.rbc-active {
+    @apply bg-blue-500 text-white border-blue-400;
+  }
+
+  /* Calendar grid styling for better dark mode visibility */
+  .dark .rbc-calendar {
+    @apply bg-gray-900;
+  }
+
+  .dark .rbc-header {
+    @apply text-gray-200 bg-gray-800 border-gray-600;
+  }
+
+  .dark .rbc-date-cell {
+    @apply text-gray-300;
+  }
+
+  .dark .rbc-off-range-bg {
+    @apply bg-gray-800;
+  }
+
+  .dark .rbc-today {
+    @apply bg-blue-900;
+  }
 }

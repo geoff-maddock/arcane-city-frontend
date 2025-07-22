@@ -16,6 +16,8 @@ import { RegisterRoute } from './routes/register';
 import { RegisterSuccessRoute } from './routes/register-success';
 import Calendar from './components/Calendar';
 import { AboutRoute } from './routes/about';
+import { PrivacyRoute } from './routes/privacy';
+import { HelpRoute } from './routes/help';
 
 // Create routes
 const indexRoute = createRoute({
@@ -76,7 +78,9 @@ const routeTree = rootRoute.addChildren([
     accountRoute,
     calendarRoute,
     AboutRoute,
+    HelpRoute,
     LoginRoute,
+    PrivacyRoute,
     RegisterRoute,
     RegisterSuccessRoute,
 ]);

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle, HiQuestionMarkCircle } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
@@ -46,9 +46,18 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <HiTag />
           <span className=" xl:inline">Tags</span>
         </Link>
+        <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
         <Link to="/about" className="flex items-center gap-2 hover:underline">
           <HiInformationCircle />
           <span className=" xl:inline">About</span>
+        </Link>
+        <Link to="/help" className="flex items-center gap-2 hover:underline">
+          <HiQuestionMarkCircle />
+          <span className=" xl:inline">Help</span>
+        </Link>
+        <Link to="/privacy" className="flex items-center gap-2 hover:underline">
+          <HiInformationCircle />
+          <span className=" xl:inline">Privacy</span>
         </Link>
       </nav>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>

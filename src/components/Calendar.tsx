@@ -89,8 +89,7 @@ const Calendar: React.FC = () => {
 
 
   return (
-    <div className="calendar-container">
-
+    <div className="calendar-container p-4">
       <FullCalendar
         localizer={localizer}
         events={formattedEvents}
