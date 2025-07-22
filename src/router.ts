@@ -18,6 +18,7 @@ import Calendar from './components/Calendar';
 import { AboutRoute } from './routes/about';
 import { PrivacyRoute } from './routes/privacy';
 import { HelpRoute } from './routes/help';
+import { RadarRoute } from './routes/radar';
 
 // Create routes
 const indexRoute = createRoute({
@@ -77,6 +78,7 @@ const routeTree = rootRoute.addChildren([
     TagDetailRoute,
     accountRoute,
     calendarRoute,
+    RadarRoute,
     AboutRoute,
     HelpRoute,
     LoginRoute,
