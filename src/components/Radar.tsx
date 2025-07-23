@@ -4,60 +4,8 @@ import { Link } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
 import { useUserAttendingEvents, useUserRecommendedEvents, useRecentEvents } from '../hooks/useRadar';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { formatDate } from '../lib/utils';
-import { HiCalendar, HiOfficeBuilding, HiTag, HiExclamationCircle, HiLocationMarker } from 'react-icons/hi';
-import { Event } from '../types/api';
-
-// Simple event card component for radar page
-const SimpleEventCard: React.FC<{ event: Event }> = ({ event }) => {
-    return (
-        <Card className="hover:shadow-lg transition-shadow duration-200">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-lg">
-                    <Link
-                        to="/events/$slug"
-                        params={{ slug: event.slug }}
-                        className="hover:underline"
-                    >
-                        {event.name}
-                    </Link>
-                </CardTitle>
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 gap-4">
-                    <span className="flex items-center gap-1">
-                        <HiCalendar className="h-4 w-4" />
-                        {formatDate(event.start_at)}
-                    </span>
-                    {event.venue?.name && (
-                        <span className="flex items-center gap-1">
-                            <HiLocationMarker className="h-4 w-4" />
-                            {event.venue.name}
-                        </span>
-                    )}
-                </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-                {event.description && (
-                    <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mb-2">
-                        {event.description.replace(/<[^>]*>/g, '').substring(0, 100)}...
-                    </p>
-                )}
-                <div className="flex flex-wrap gap-1">
-                    {event.tags?.slice(0, 3).map((tag) => (
-                        <span key={tag.id} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded">
-                            {tag.name}
-                        </span>
-                    ))}
-                    {event.tags && event.tags.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded">
-                            +{event.tags.length - 3} more
-                        </span>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
-    );
-};
+import { HiCalendar, HiOfficeBuilding, HiTag, HiExclamationCircle } from 'react-icons/hi';
+import EventCardCondensed from './EventCardCondensed';
 
 const Radar: React.FC = () => {
     const { data: user } = useQuery({
@@ -116,8 +64,16 @@ const Radar: React.FC = () => {
                         <div className="text-center py-8">Loading your events...</div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {attendingEvents?.map((event) => (
-                                <SimpleEventCard key={event.id} event={event} />
+                            {attendingEvents?.map((event, index) => (
+                                <EventCardCondensed
+                                    key={event.id}
+                                    event={event}
+                                    allImages={attendingEvents.map(e => ({
+                                        src: e.primary_photo || '',
+                                        alt: e.name
+                                    }))}
+                                    imageIndex={index}
+                                />
                             ))}
                         </div>
                     )}
@@ -138,8 +94,16 @@ const Radar: React.FC = () => {
                         <div className="text-center py-8">Finding recommendations...</div>
                     ) : hasRecommendedEvents ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {recommendedEvents?.map((event) => (
-                                <SimpleEventCard key={event.id} event={event} />
+                            {recommendedEvents?.map((event, index) => (
+                                <EventCardCondensed
+                                    key={event.id}
+                                    event={event}
+                                    allImages={recommendedEvents.map(e => ({
+                                        src: e.primary_photo || '',
+                                        alt: e.name
+                                    }))}
+                                    imageIndex={index}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -196,8 +160,16 @@ const Radar: React.FC = () => {
                     <div className="text-center py-8">Loading recent events...</div>
                 ) : recentEvents.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {recentEvents.map((event) => (
-                            <SimpleEventCard key={event.id} event={event} />
+                        {recentEvents.map((event, index) => (
+                            <EventCardCondensed
+                                key={event.id}
+                                event={event}
+                                allImages={recentEvents.map(e => ({
+                                    src: e.primary_photo || '',
+                                    alt: e.name
+                                }))}
+                                imageIndex={index}
+                            />
                         ))}
                     </div>
                 ) : (

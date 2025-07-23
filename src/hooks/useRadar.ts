@@ -23,8 +23,8 @@ export const useUserAttendingEvents = () => {
             params.append('sort', 'start_at');
             params.append('direction', 'asc');
 
-            const { data } = await api.get<PaginatedResponse<Event>>(`/users/${user.id}/events-attending?${params.toString()}`);
-            console.log('Fetched user attending events:', data);
+            //const { data } = await api.get<PaginatedResponse<Event>>(`/users/${user.id}/events-attending?${params.toString()}`);
+            const { data } = await api.get<PaginatedResponse<Event>>(`/events/attending?${params.toString()}`);
             return data;
         },
         enabled: authService.isAuthenticated() && !!user?.id,
