@@ -26,6 +26,12 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
 
       <nav className="flex flex-col gap-2 items-center">
+        {user && (
+          <Link to="/radar" className="flex items-center gap-2 hover:underline">
+            <HiCalendar />
+            <span className=" xl:inline">Your Radar</span>
+          </Link>
+        )}
         <Link to="/events" className="flex items-center gap-2 hover:underline">
           <HiCalendar />
           <span className=" xl:inline">Event Listings</span>
@@ -46,6 +52,7 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <HiTag />
           <span className=" xl:inline">Tags</span>
         </Link>
+
         <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
         <Link to="/about" className="flex items-center gap-2 hover:underline">
           <HiInformationCircle />
