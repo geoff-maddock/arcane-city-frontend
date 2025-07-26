@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:coverage": "c8 vitest"
+    "test:coverage": "c8 vitest",
+    "deploy:do": "npm run build && doctl apps update $DIGITALOCEAN_APP_ID --spec .digitalocean.yml"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -62,6 +63,7 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.15.0",
     "vite": "^6.0.1",
-    "vitest": "^3.0.1"
+    "vitest": "^3.0.1",
+    "doctl": "^1.73.0"
   }
 }
