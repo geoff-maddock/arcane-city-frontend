@@ -44,7 +44,7 @@ export const useUserRecommendedEvents = () => {
             if (!user?.id) throw new Error('User ID not available');
             try {
                 // Try the recommended events endpoint first
-                const { data } = await api.get<PaginatedResponse<Event> | Event[]>(`/users/${user.id}/events-recommended`);
+                const { data } = await api.get<PaginatedResponse<Event> | Event[]>(`/events/recommended`);
 
                 // Handle both paginated and non-paginated responses
                 if (Array.isArray(data)) {
