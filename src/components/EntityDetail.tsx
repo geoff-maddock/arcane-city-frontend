@@ -4,13 +4,14 @@ import { api } from '../lib/api';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MapPin, Users, Music, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, MapPin, Music, Star, Power, Target } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
 import { TagBadges } from './TagBadges';
 import PhotoDropzone from './PhotoDropzone';
 import { authService } from '../services/auth.service';
+import { EntityTypeIcon } from './EntityTypeIcon';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const [embeds, setEmbeds] = useState<string[]>([]);
@@ -165,22 +166,50 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                 <CardContent className="p-6 space-y-4">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-gray-600">
-                                            <MapPin className="h-5 w-5" />
-                                            <span>{entity.entity_type.name}</span>
-                                            {entity.primary_location && (
-                                                <div>
-                                                    {entity.primary_location.address_line_one}
-                                                    {entity.primary_location.city}, {entity.primary_location.state}
-                                                </div>
-                                            )}
+                                            <EntityTypeIcon entityTypeName={entity.entity_type.name} />
+                                            <span className="font-medium">{entity.entity_type.name}</span>
                                         </div>
+
+                                        {entity.primary_location && (
+                                            <div className="flex items-start gap-2 text-gray-600">
+                                                <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="break-words">
+                                                        {entity.primary_location.address_one && (
+                                                            <div className="text-sm">
+                                                                {entity.primary_location.address_one}
+                                                            </div>
+                                                        )}
+                                                        <div className="text-sm">
+                                                            {entity.primary_location.city}
+                                                            {entity.primary_location.state && (
+                                                                <span>, {entity.primary_location.state}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    {entity.primary_location.map_url && (
+                                                        <a
+                                                            href={entity.primary_location.map_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors text-sm mt-1"
+                                                            title="View on Map"
+                                                        >
+                                                            <span>View on Map</span>
+                                                            <MapPin className="h-3 w-3" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="flex items-center gap-2 text-gray-600">
-                                            <Users className="h-5 w-5" />
+                                            <Power className="h-5 w-5" />
                                             <span>{entity.entity_status.name}</span>
                                         </div>
                                         {entity.roles.length > 0 && (
                                             <div className="flex items-center gap-2 text-gray-600">
-                                                <Users className="h-5 w-5" />
+                                                <Target className="h-5 w-5" />
                                                 <span>{entity.roles.map((role) => role.name).join(', ')}</span>
                                             </div>
                                         )}
@@ -188,7 +217,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                         {entity.links.length > 0 && (
                                             <div className="space-y-2">
                                                 <h3 className="font-semibold">Links</h3>
-                                                <ul className="list-disc list-inside">
+                                                <ul className="list list-inside">
                                                     {entity.links.map((link) => (
                                                         <li key={link.id}>
                                                             <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">

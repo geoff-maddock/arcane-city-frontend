@@ -2,39 +2,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { api } from '../lib/api';
-import MapPin from '@/components/icons/MapPin';
-import Users from '@/components/icons/Users';
+import { MapPin, Star, Target } from 'lucide-react';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
+import { EntityTypeIcon } from './EntityTypeIcon';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
-import { Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-// interface EntityType {
-//     id: number;
-//     name: string;
-// }
-
-// interface EntityStatus {
-//     id: number;
-//     name: string;
-// }
-
-// interface Link {
-//     id: number;
-//     url: string;
-// }
-
-// interface Tag {
-//     id: number;
-//     name: string;
-// }
-
-// interface Role {
-//     id: number;
-//     name: string;
-// }
 
 interface EntityCardProps {
     entity: Entity;
@@ -128,12 +103,46 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
 
                     <div className="flex items-center gap-2 text-gray-600">
-                        <MapPin className="h-5 w-5" />
-                        <span>{entity.entity_type.name}</span>
+                        <EntityTypeIcon entityTypeName={entity.entity_type.name} />
+                        <span className="font-medium">{entity.entity_type.name}</span>
                     </div>
+
+                    {entity.primary_location && (
+                        <div className="flex items-start gap-2 text-gray-600">
+                            <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                                <div className="break-words">
+                                    {entity.primary_location.address_one && (
+                                        <div className="text-sm">
+                                            {entity.primary_location.address_one}
+                                        </div>
+                                    )}
+                                    <div className="text-sm">
+                                        {entity.primary_location.city}
+                                        {entity.primary_location.state && (
+                                            <span>, {entity.primary_location.state}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                {entity.primary_location.map_url && (
+                                    <a
+                                        href={entity.primary_location.map_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors text-sm mt-1"
+                                        title="View on Map"
+                                    >
+                                        <span>View on Map</span>
+                                        <MapPin className="h-3 w-3" />
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {entity.roles.length > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
-                            <Users className="h-5 w-5" />
+                            <Target className="h-5 w-5" />
                             <span>{entity.roles.map((role) => role.name).join(', ')}</span>
                         </div>
                     )}

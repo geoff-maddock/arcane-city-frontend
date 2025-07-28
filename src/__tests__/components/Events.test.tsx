@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { render } from '../test-render' // Use our custom render with QueryClient
 import Events from '../../components/Events'
 import { useEvents } from '../../hooks/useEvents'
 import EventFilters from '../../components/EventFilters'

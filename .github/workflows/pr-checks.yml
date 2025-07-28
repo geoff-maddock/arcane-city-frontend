@@ -1,0 +1,148 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main, dev, develop ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  # Skip draft PRs
+  check-draft:
+    name: Check if PR is draft
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Continue with non-draft PR
+        run: echo "PR is ready for review"
+
+  test-pr:
+    name: Test Pull Request
+    runs-on: ubuntu-latest
+    needs: check-draft
+    
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          # Check out the PR head commit
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Run all tests
+        run: npm test -- --run
+
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --run
+
+      - name: Comment PR with test results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Try to read coverage summary if it exists
+            let coverageComment = '';
+            try {
+              if (fs.existsSync('./coverage/coverage-summary.json')) {
+                const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
+                const total = coverage.total;
+                coverageComment = `
+            ## 📊 Test Coverage
+            - **Lines**: ${total.lines.pct}%
+            - **Functions**: ${total.functions.pct}%
+            - **Branches**: ${total.branches.pct}%
+            - **Statements**: ${total.statements.pct}%
+            `;
+              }
+            } catch (error) {
+              console.log('Coverage summary not available');
+            }
+
+            const comment = `
+            ## ✅ PR Checks Complete
+            
+            **Tests Status**: ${{ job.status }}
+            **Node.js Version**: 20.x
+            **Commit**: ${{ github.event.pull_request.head.sha }}
+            
+            ${coverageComment}
+            
+            All tests in \`src/__tests__\` have been executed.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  build-pr:
+    name: Build Pull Request
+    runs-on: ubuntu-latest
+    needs: check-draft
+    
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Check build size
+        run: |
+          echo "## 📦 Build Size Report" >> build-report.md
+          echo "" >> build-report.md
+          echo "```" >> build-report.md
+          du -sh dist/* >> build-report.md
+          echo "```" >> build-report.md
+
+      - name: Comment build info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let buildReport = '';
+            try {
+              buildReport = fs.readFileSync('build-report.md', 'utf8');
+            } catch (error) {
+              buildReport = '## 📦 Build completed successfully';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: buildReport
+            });

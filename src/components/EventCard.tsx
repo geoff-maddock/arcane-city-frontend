@@ -105,7 +105,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
       };
       fetchEmbeds();
     }
-  }, [event?.id]);
+  }, [event?.id, embedsEnabled]);
 
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md event-card">

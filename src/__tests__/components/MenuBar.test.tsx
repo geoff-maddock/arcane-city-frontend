@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { screen, waitFor } from '@testing-library/react'
+import { render } from '../test-render' // Use our custom render with QueryClient
 import MenuBar from '../../components/MenuBar'
 import { authService } from '../../services/auth.service'
 
@@ -25,14 +25,8 @@ vi.mock('../../components/Calendar', () => ({
 
 vi.mock('../../services/auth.service')
 
-const client = new QueryClient()
-
 const renderMenuBar = async () => {
-  render(
-    <QueryClientProvider client={client}>
-      <MenuBar />
-    </QueryClientProvider>
-  )
+  render(<MenuBar />)
   await waitFor(() => { })
 }
 
