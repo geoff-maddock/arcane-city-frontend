@@ -34,7 +34,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
         visibility_id: 1,
         description: '',
         entity_type_id: '' as number | '',
-        entity_status_id: 1,
+        entity_status_id: 1 as number | '',
         started_at: '',
         facebook_username: '',
         twitter_username: '',

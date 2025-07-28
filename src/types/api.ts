@@ -162,8 +162,8 @@ export interface Entity {
     description?: string;
     entity_type: EntityType;
     entity_status: EntityStatus;
-    created_by: User;
-    updated_by: User;
+    created_by: number;
+    updated_by: number;
     created_at: string;
     updated_at: string;
     started_at: string;

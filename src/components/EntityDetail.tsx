@@ -4,7 +4,7 @@ import { api } from '../lib/api';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MapPin, Music, Star, Power, Target } from 'lucide-react';
+import { Loader2, ArrowLeft, MapPin, Music, Star, Pencil, Power, Target } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
@@ -134,11 +134,16 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                     {user && (
                                         <div className="flex items-center gap-2">
                                             <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
-                                                <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                                                <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
                                             </button>
-                                            {user.id === entity.created_by.id && (
-                                                <Link to={`/entity/${entity.slug}/edit`} className="text-sm underline">
-                                                    Edit
+                                            {user.id === entity.created_by && (
+                                                <Link
+                                                    to="/entity/$entitySlug/edit"
+                                                    params={{ entitySlug: entity.slug }}
+                                                    className="text-gray-600 hover:text-primary transition-colors"
+                                                    title="Edit entity"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
                                                 </Link>
                                             )}
                                         </div>

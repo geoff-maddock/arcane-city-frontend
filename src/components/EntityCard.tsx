@@ -1,4 +1,4 @@
-import { useNavigate, Link } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { api } from '../lib/api';
@@ -99,11 +99,6 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                                 <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
                                     <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
                                 </button>
-                                {user.id === entity.created_by.id && (
-                                    <Link to={`/entity/${entity.slug}/edit`} className="text-xs underline">
-                                        Edit
-                                    </Link>
-                                )}
                             </div>
                         )}
                     </div>
