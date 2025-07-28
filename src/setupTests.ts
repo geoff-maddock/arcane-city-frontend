@@ -3,29 +3,29 @@ import { QueryClient } from '@tanstack/react-query';
 
 // Mock your Vite env variables
 Object.defineProperty(window, 'import.meta', {
-    value: {
-        env: {
-            VITE_API_URL: 'http://test.api',
-            VITE_API_USERNAME: 'test-user',
-            VITE_API_PASSWORD: 'test-pass'
-        }
+  value: {
+    env: {
+      VITE_API_URL: 'http://test.api',
+      VITE_API_USERNAME: 'test-user',
+      VITE_API_PASSWORD: 'test-pass'
     }
+  }
 });
 
 // Create a test QueryClient for React Query
 export const createTestQueryClient = () => {
-    return new QueryClient({
-        defaultOptions: {
-            queries: {
-                retry: false,
-                staleTime: 0,
-                gcTime: 0,
-            },
-            mutations: {
-                retry: false,
-            },
-        },
-    });
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+        gcTime: 0,
+      },
+      mutations: {
+        retry: false,
+      },
+    },
+  });
 };
 
 // Create a basic document structure for tests

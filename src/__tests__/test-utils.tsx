@@ -25,7 +25,7 @@ interface AllTheProvidersProps {
 
 export const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
     const queryClient = createTestQueryClient();
-    
+
     return (
         <QueryClientProvider client={queryClient}>
             {children}
