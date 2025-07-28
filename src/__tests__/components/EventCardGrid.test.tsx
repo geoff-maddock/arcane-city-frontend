@@ -1,5 +1,5 @@
 import { screen, fireEvent } from '@testing-library/react';
-import { render } from '../test-utils'; // Use our custom render with QueryClient
+import { render } from '../test-render'; // Use our custom render with QueryClient
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import EventCardGrid from '../../components/EventCardGrid';
 import { EventFilterContext } from '../../context/EventFilterContext';

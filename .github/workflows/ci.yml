@@ -12,6 +12,11 @@ on:
   # Allow manual workflow runs
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   test:
     name: Test

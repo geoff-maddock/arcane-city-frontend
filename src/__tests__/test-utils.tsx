@@ -1,22 +1,6 @@
-import React, { ReactElement } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, RenderOptions } from '@testing-library/react';
-
-// Create a test QueryClient for React Query
-export const createTestQueryClient = () => {
-    return new QueryClient({
-        defaultOptions: {
-            queries: {
-                retry: false,
-                staleTime: 0,
-                gcTime: 0,
-            },
-            mutations: {
-                retry: false,
-            },
-        },
-    });
-};
+import React from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createTestQueryClient } from './test-query-client';
 
 // Wrapper component that provides QueryClient
 interface AllTheProvidersProps {
@@ -32,15 +16,3 @@ export const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) =>
         </QueryClientProvider>
     );
 };
-
-// Custom render function that includes providers
-export const customRender = (
-    ui: ReactElement,
-    options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options });
-
-// Re-export everything from testing-library/react
-export * from '@testing-library/react';
-
-// Override render method
-export { customRender as render };

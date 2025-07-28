@@ -1,5 +1,5 @@
 // src/components/ImageLightbox.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Lightbox from "yet-another-react-lightbox";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/styles.css";
@@ -20,7 +20,7 @@ export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex }: Im
     console.log(thumbnailUrl);
 
     // Handle wheel event
-    const handleWheel = (event: WheelEvent) => {
+    const handleWheel = useCallback((event: WheelEvent) => {
         event.preventDefault();
 
         if (event.deltaY > 0) {
@@ -34,7 +34,7 @@ export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex }: Im
                 prev > 0 ? prev - 1 : prev
             );
         }
-    };
+    }, [allImages.length]);
 
     // Add wheel event listener when lightbox is open
     useEffect(() => {
@@ -45,7 +45,7 @@ export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex }: Im
         return () => {
             document.removeEventListener('wheel', handleWheel);
         };
-    }, [open]);
+    }, [open, handleWheel]);
 
     return (
         <>

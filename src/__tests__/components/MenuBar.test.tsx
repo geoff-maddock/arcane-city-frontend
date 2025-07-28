@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-import { render } from '../test-utils' // Use our custom render with QueryClient
+import { render } from '../test-render' // Use our custom render with QueryClient
 import MenuBar from '../../components/MenuBar'
 import { authService } from '../../services/auth.service'
 

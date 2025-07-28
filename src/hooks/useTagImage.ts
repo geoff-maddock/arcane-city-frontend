@@ -44,8 +44,9 @@ export const useTagImage = (slug: string) => {
     let alt = '';
 
     if (event && entity) {
-        const eventDate = (event as any).created_at ? new Date((event as any).created_at).getTime() : new Date((event as any).start_at).getTime();
-        const entityDate = new Date((entity as any).created_at).getTime();
+        // Use start_at for events since they don't have created_at
+        const eventDate = new Date(event.start_at).getTime();
+        const entityDate = new Date(entity.created_at).getTime();
         const latest = eventDate >= entityDate ? event : entity;
         url = latest.primary_photo_thumbnail || latest.primary_photo || null;
         alt = latest.name;
