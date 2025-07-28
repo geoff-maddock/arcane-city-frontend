@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import EventCardGrid from '../../components/EventCardGrid';
@@ -43,6 +43,9 @@ const mockEvent: Event = {
     event_type: {
         id: 1,
         name: 'Concert',
+        slug: 'concert',
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
     },
     promoter: {
         id: 1,
@@ -53,9 +56,9 @@ const mockEvent: Event = {
     door_price: 30,
     min_age: 18,
     tags: [
-        { id: 1, name: 'rock' },
-        { id: 2, name: 'live-music' },
-        { id: 3, name: 'weekend' },
+        { id: 1, name: 'rock', slug: 'rock' },
+        { id: 2, name: 'live-music', slug: 'live-music' },
+        { id: 3, name: 'weekend', slug: 'weekend' },
     ],
     entities: [],
     attendees: [],
@@ -139,7 +142,7 @@ describe('EventCardGrid', () => {
     });
 
     it('renders without image when none provided', () => {
-        const eventWithoutImage = { ...mockEvent, primary_photo: null, primary_photo_thumbnail: null };
+        const eventWithoutImage = { ...mockEvent, primary_photo: undefined, primary_photo_thumbnail: undefined };
 
         render(
             <QueryClientProvider client={queryClient}>
@@ -158,7 +161,7 @@ describe('EventCardGrid', () => {
     });
 
     it('shows door price when no presale price', () => {
-        const eventWithDoorPrice = { ...mockEvent, presale_price: null };
+        const eventWithDoorPrice = { ...mockEvent, presale_price: 0 };
 
         render(
             <QueryClientProvider client={queryClient}>
