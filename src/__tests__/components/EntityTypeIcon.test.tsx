@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { EntityTypeIcon } from '../../components/EntityTypeIcon';
 
@@ -6,17 +6,19 @@ describe('EntityTypeIcon', () => {
     it('renders Warehouse icon for Space entity type', () => {
         render(<EntityTypeIcon entityTypeName="Space" />);
 
-        // The icon should be rendered with warehouse-related attributes
-        const icon = screen.getByRole('img', { hidden: true }) || document.querySelector('svg');
+        // The icon should be rendered and have the warehouse class
+        const icon = document.querySelector('svg');
         expect(icon).toBeInTheDocument();
+        expect(icon).toHaveClass('lucide-warehouse');
     });
 
     it('renders Users icon for non-Space entity types', () => {
         render(<EntityTypeIcon entityTypeName="Artist" />);
 
-        // The icon should be rendered
-        const icon = screen.getByRole('img', { hidden: true }) || document.querySelector('svg');
+        // The icon should be rendered and have the users class
+        const icon = document.querySelector('svg');
         expect(icon).toBeInTheDocument();
+        expect(icon).toHaveClass('lucide-users');
     });
 
     it('applies custom className', () => {
