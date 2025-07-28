@@ -4,13 +4,14 @@ import { api } from '../lib/api';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MapPin, Music, Users, Star, Power, Target, Warehouse } from 'lucide-react';
+import { Loader2, ArrowLeft, MapPin, Music, Star, Power, Target } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
 import { TagBadges } from './TagBadges';
 import PhotoDropzone from './PhotoDropzone';
 import { authService } from '../services/auth.service';
+import { EntityTypeIcon } from './EntityTypeIcon';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const [embeds, setEmbeds] = useState<string[]>([]);
@@ -165,11 +166,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                 <CardContent className="p-6 space-y-4">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-gray-600">
-                                            {entity.entity_type.name === 'Space' ? (
-                                                <Warehouse className="h-5 w-5 flex-shrink-0" />
-                                            ) : (
-                                                <Users className="h-5 w-5 flex-shrink-0" />
-                                            )}
+                                            <EntityTypeIcon entityTypeName={entity.entity_type.name} />
                                             <span className="font-medium">{entity.entity_type.name}</span>
                                         </div>
 
