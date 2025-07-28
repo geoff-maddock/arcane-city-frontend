@@ -46,7 +46,7 @@ jobs:
         run: npm test -- --run
 
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: npm run test:coverage -- --run
 
       - name: Comment PR with test results
         if: always()

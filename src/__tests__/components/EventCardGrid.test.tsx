@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { render } from '../test-utils'; // Use our custom render with QueryClient
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import EventCardGrid from '../../components/EventCardGrid';
 import { EventFilterContext } from '../../context/EventFilterContext';
 import { EventFilters } from '../../types/filters';
@@ -88,25 +88,15 @@ const mockContextValue = {
     setFilters: vi.fn(),
 };
 
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            retry: false,
-        },
-    },
-});
-
 const renderComponent = () => {
     render(
-        <QueryClientProvider client={queryClient}>
-            <EventFilterContext.Provider value={mockContextValue}>
-                <EventCardGrid
-                    event={mockEvent}
-                    allImages={mockAllImages}
-                    imageIndex={0}
-                />
-            </EventFilterContext.Provider>
-        </QueryClientProvider>
+        <EventFilterContext.Provider value={mockContextValue}>
+            <EventCardGrid
+                event={mockEvent}
+                allImages={mockAllImages}
+                imageIndex={0}
+            />
+        </EventFilterContext.Provider>
     );
 };
 
@@ -145,15 +135,13 @@ describe('EventCardGrid', () => {
         const eventWithoutImage = { ...mockEvent, primary_photo: undefined, primary_photo_thumbnail: undefined };
 
         render(
-            <QueryClientProvider client={queryClient}>
-                <EventFilterContext.Provider value={mockContextValue}>
-                    <EventCardGrid
-                        event={eventWithoutImage}
-                        allImages={[]}
-                        imageIndex={0}
-                    />
-                </EventFilterContext.Provider>
-            </QueryClientProvider>
+            <EventFilterContext.Provider value={mockContextValue}>
+                <EventCardGrid
+                    event={eventWithoutImage}
+                    allImages={[]}
+                    imageIndex={0}
+                />
+            </EventFilterContext.Provider>
         );
 
         expect(screen.getByText('Test Event')).toBeInTheDocument();
@@ -164,15 +152,13 @@ describe('EventCardGrid', () => {
         const eventWithDoorPrice = { ...mockEvent, presale_price: 0 };
 
         render(
-            <QueryClientProvider client={queryClient}>
-                <EventFilterContext.Provider value={mockContextValue}>
-                    <EventCardGrid
-                        event={eventWithDoorPrice}
-                        allImages={mockAllImages}
-                        imageIndex={0}
-                    />
-                </EventFilterContext.Provider>
-            </QueryClientProvider>
+            <EventFilterContext.Provider value={mockContextValue}>
+                <EventCardGrid
+                    event={eventWithDoorPrice}
+                    allImages={mockAllImages}
+                    imageIndex={0}
+                />
+            </EventFilterContext.Provider>
         );
 
         expect(screen.getByText('$30')).toBeInTheDocument();
