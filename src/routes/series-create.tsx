@@ -36,9 +36,6 @@ const SeriesCreate: React.FC = () => {
     ticket_link: '',
     tag_list: [] as number[],
     entity_list: [] as number[],
-    occurrence_type_id: '' as number | '',
-    occurrence_week_id: '' as number | '',
-    occurrence_day_id: '' as number | '',
   });
   const [tagQuery, setTagQuery] = useState('');
   const [entityQuery, setEntityQuery] = useState('');
@@ -46,9 +43,6 @@ const SeriesCreate: React.FC = () => {
   const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
-  // const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '');
-  // const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '');
-  // const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '');
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
