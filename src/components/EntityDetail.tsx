@@ -132,9 +132,16 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                 <div className="flex items-start justify-between">
                                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{entity.name}</h1>
                                     {user && (
-                                        <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
-                                            <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
+                                                <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                                            </button>
+                                            {user.id === entity.created_by.id && (
+                                                <Link to={`/entity/${entity.slug}/edit`} className="text-sm underline">
+                                                    Edit
+                                                </Link>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                                 {entity.short && (

@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link } from '@tanstack/react-router';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { api } from '../lib/api';
@@ -95,9 +95,16 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                             </a>
                         </h2>
                         {user && (
-                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
-                                <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
+                                    <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                                </button>
+                                {user.id === entity.created_by.id && (
+                                    <Link to={`/entity/${entity.slug}/edit`} className="text-xs underline">
+                                        Edit
+                                    </Link>
+                                )}
+                            </div>
                         )}
                     </div>
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
