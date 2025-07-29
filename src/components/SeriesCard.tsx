@@ -147,8 +147,17 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
               )}
 
               <div className="flex items-center text-sm text-gray-500">
-                <CalendarDays className="mr-2 h-4 w-4" />
-                {formatDate(series.start_at)}
+                {series.next_start_at ? (
+                  <>
+                    <CalendarDays className="mr-2 h-5 w-5" />
+                    <span>{formatDate(series.next_start_at)}</span>
+                  </>
+                ) : (
+                  <>
+                    <CalendarDays className="mr-2 h-5 w-5" />
+                    <span>No upcoming events scheduled</span>
+                  </>
+                )}
               </div>
 
               {series.venue && (

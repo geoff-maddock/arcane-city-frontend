@@ -215,6 +215,8 @@ export interface Series {
     canceled_at?: string;
     created_by?: number;
     updated_by?: number;
+    next_event?: Event;
+    next_start_at?: string;
 }
 
 export interface OccurrenceType {

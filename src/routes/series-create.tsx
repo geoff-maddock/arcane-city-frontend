@@ -157,6 +157,43 @@ const SeriesCreate: React.FC = () => {
           />
           {renderError('description')}
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="occurrence_type_id">Occurrence Type</Label>
+            <SearchableInput
+              id="occurrence_type_id"
+              endpoint="occurrence-types"
+              value={formData.occurrence_type_id}
+              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_type_id: val }))}
+              placeholder="Type to search occurrence types..."
+            />
+            {renderError('occurrence_type_id')}
+
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="occurrence_type_id">Occurrence Week</Label>
+            <SearchableInput
+              id="occurrence_week_id"
+              endpoint="occurrence-weeks"
+              value={formData.occurrence_week_id}
+              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_week_id: val }))}
+              placeholder="Type to search occurrence weeks..."
+            />
+            {renderError('occurrence_week_id')}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="occurrence_day_id">Occurrence Day</Label>
+            <SearchableInput
+              id="occurrence_day_id"
+              endpoint="occurrence-days"
+              value={formData.occurrence_day_id}
+              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_day_id: val }))}
+              placeholder="Type to search occurrence days..."
+            />
+            {renderError('occurrence_day_id')}
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="visibility_id">Visibility</Label>
@@ -290,40 +327,6 @@ const SeriesCreate: React.FC = () => {
           </div>
           <div className="space-y-2"> </div>
           <div className="space-y-2"> </div>
-          <div className="space-y-2">
-            <Label htmlFor="occurrence_type_id">Occurrence Type</Label>
-            <SearchableInput
-              id="occurrence_type_id"
-              endpoint="occurrence-types"
-              value={formData.occurrence_type_id}
-              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_type_id: val }))}
-              placeholder="Type to search occurrence types..."
-            />
-            {renderError('occurrence_type_id')}
-
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="occurrence_type_id">Occurrence Week</Label>
-            <SearchableInput
-              id="occurrence_week_id"
-              endpoint="occurrence-weeks"
-              value={formData.occurrence_week_id}
-              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_week_id: val }))}
-              placeholder="Type to search occurrence weeks..."
-            />
-            {renderError('occurrence_week_id')}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="occurrence_day_id">Occurrence Day</Label>
-            <SearchableInput
-              id="occurrence_day_id"
-              endpoint="occurrence-days"
-              value={formData.occurrence_day_id}
-              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_day_id: val }))}
-              placeholder="Type to search occurrence days..."
-            />
-            {renderError('occurrence_day_id')}
-          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -434,8 +437,8 @@ const SeriesCreate: React.FC = () => {
           </div>
         </div>
         <Button type="submit" className="w-full">Create Series</Button>
-      </form>
-    </div>
+      </form >
+    </div >
   );
 };
 
