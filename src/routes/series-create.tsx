@@ -325,67 +325,40 @@ const SeriesCreate: React.FC = () => {
             />
             {renderError('end_at')}
           </div>
+          <div className="space-y-2"> </div>
+          <div className="space-y-2"> </div>
           <div className="space-y-2">
             <Label htmlFor="occurrence_type_id">Occurrence Type</Label>
-            <Select
-              value={formData.occurrence_type_id.toString()}
-              onValueChange={(value) =>
-                setFormData((p) => ({ ...p, occurrence_type_id: Number(value) }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                {occurrenceTypeOptions?.map((option) => (
-                  <SelectItem key={option.id} value={option.id.toString()}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableInput
+              id="occurrence_type_id"
+              endpoint="occurrence-types"
+              value={formData.occurrence_type_id}
+              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_type_id: val }))}
+              placeholder="Type to search occurrence types..."
+            />
             {renderError('occurrence_type_id')}
+
           </div>
           <div className="space-y-2">
-            <Label htmlFor="occurrence_week_id">Occurrence Week</Label>
-            <Select
-              value={formData.occurrence_week_id.toString()}
-              onValueChange={(value) =>
-                setFormData((p) => ({ ...p, occurrence_week_id: Number(value) }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select week" />
-              </SelectTrigger>
-              <SelectContent>
-                {occurrenceWeekOptions?.map((option) => (
-                  <SelectItem key={option.id} value={option.id.toString()}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="occurrence_type_id">Occurrence Week</Label>
+            <SearchableInput
+              id="occurrence_week_id"
+              endpoint="occurrence-weeks"
+              value={formData.occurrence_week_id}
+              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_week_id: val }))}
+              placeholder="Type to search occurrence weeks..."
+            />
             {renderError('occurrence_week_id')}
           </div>
           <div className="space-y-2">
             <Label htmlFor="occurrence_day_id">Occurrence Day</Label>
-            <Select
-              value={formData.occurrence_day_id.toString()}
-              onValueChange={(value) =>
-                setFormData((p) => ({ ...p, occurrence_day_id: Number(value) }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select day" />
-              </SelectTrigger>
-              <SelectContent>
-                {occurrenceDayOptions?.map((option) => (
-                  <SelectItem key={option.id} value={option.id.toString()}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableInput
+              id="occurrence_day_id"
+              endpoint="occurrence-days"
+              value={formData.occurrence_day_id}
+              onValueChange={(val) => setFormData((p) => ({ ...p, occurrence_day_id: val }))}
+              placeholder="Type to search occurrence days..."
+            />
             {renderError('occurrence_day_id')}
           </div>
         </div>
