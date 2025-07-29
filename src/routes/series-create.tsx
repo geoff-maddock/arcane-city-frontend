@@ -36,6 +36,9 @@ const SeriesCreate: React.FC = () => {
     ticket_link: '',
     tag_list: [] as number[],
     entity_list: [] as number[],
+    occurrence_type_id: '' as number | '',
+    occurrence_week_id: '' as number | '',
+    occurrence_day_id: '' as number | '',
   });
   const [tagQuery, setTagQuery] = useState('');
   const [entityQuery, setEntityQuery] = useState('');
@@ -43,6 +46,9 @@ const SeriesCreate: React.FC = () => {
   const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
+  const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '');
+  const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '');
+  const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '');
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -319,8 +325,69 @@ const SeriesCreate: React.FC = () => {
             />
             {renderError('end_at')}
           </div>
-          <div className="space-y-2"> </div>
-          <div className="space-y-2"> </div>
+          <div className="space-y-2">
+            <Label htmlFor="occurrence_type_id">Occurrence Type</Label>
+            <Select
+              value={formData.occurrence_type_id.toString()}
+              onValueChange={(value) =>
+                setFormData((p) => ({ ...p, occurrence_type_id: Number(value) }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {occurrenceTypeOptions?.map((option) => (
+                  <SelectItem key={option.id} value={option.id.toString()}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {renderError('occurrence_type_id')}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="occurrence_week_id">Occurrence Week</Label>
+            <Select
+              value={formData.occurrence_week_id.toString()}
+              onValueChange={(value) =>
+                setFormData((p) => ({ ...p, occurrence_week_id: Number(value) }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select week" />
+              </SelectTrigger>
+              <SelectContent>
+                {occurrenceWeekOptions?.map((option) => (
+                  <SelectItem key={option.id} value={option.id.toString()}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {renderError('occurrence_week_id')}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="occurrence_day_id">Occurrence Day</Label>
+            <Select
+              value={formData.occurrence_day_id.toString()}
+              onValueChange={(value) =>
+                setFormData((p) => ({ ...p, occurrence_day_id: Number(value) }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select day" />
+              </SelectTrigger>
+              <SelectContent>
+                {occurrenceDayOptions?.map((option) => (
+                  <SelectItem key={option.id} value={option.id.toString()}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {renderError('occurrence_day_id')}
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
