@@ -9,16 +9,22 @@ interface Option {
 export const useSearchOptions = (
     endpoint: string,
     search: string,
-    extraParams: Record<string, string | number> = {}
+    extraParams: Record<string, string | number> = {},
+    queryOverrides: Record<string, string | number> = {}
 ) => {
     return useQuery<Option[]>({
-        queryKey: ['search', endpoint, search, extraParams],
+        queryKey: ['search', endpoint, search, extraParams, queryOverrides],
         queryFn: async () => {
-            const queryParts = [
-                'limit=20',
-                'sort=name',
-                'direction=asc'
-            ];
+            const defaultQueryParts = {
+                limit: '20',
+                sort: 'name',
+                direction: 'asc'
+            };
+
+            const mergedQuery = { ...defaultQueryParts, ...queryOverrides };
+            const queryParts = Object.entries(mergedQuery).map(([key, value]) =>
+                `${key}=${encodeURIComponent(String(value))}`
+            );
 
             if (search) {
                 queryParts.push(`filters[name]=${encodeURIComponent(search)}`);
@@ -32,7 +38,7 @@ export const useSearchOptions = (
             const { data } = await api.get<{ data: Option[] }>(
                 `/${endpoint}?${queryString}`
             );
-            return data.data.sort((a, b) => a.name.localeCompare(b.name));
+            return data.data;
         },
     });
 };

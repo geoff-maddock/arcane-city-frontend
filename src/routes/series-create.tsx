@@ -46,9 +46,9 @@ const SeriesCreate: React.FC = () => {
   const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
-  const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '');
-  const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '');
-  const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '');
+  const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '', {}, { sort: 'id', direction: 'asc' });
+  const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '', {}, { sort: 'id', direction: 'asc' });
+  const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
