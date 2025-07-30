@@ -9,6 +9,7 @@ interface SearchableInputProps {
   onValueChange: (value: number | '') => void;
   placeholder?: string;
   extraParams?: Record<string, string | number>;
+  debounceMs?: number;
 }
 
 export const SearchableInput: React.FC<SearchableInputProps> = ({
@@ -18,26 +19,44 @@ export const SearchableInput: React.FC<SearchableInputProps> = ({
   onValueChange,
   placeholder,
   extraParams = {},
+  debounceMs = 300,
 }) => {
   const [query, setQuery] = useState('');
-  const [selectedName, setSelectedName] = useState('');
-  const { data: options } = useSearchOptions(endpoint, query, extraParams);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [displayValue, setDisplayValue] = useState('');
+  const { data: options } = useSearchOptions(endpoint, debouncedQuery, extraParams);
+
+  // Debounce the query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, debounceMs);
+
+    return () => clearTimeout(timer);
+  }, [query, debounceMs]);
 
   useEffect(() => {
     if (value && options) {
       const opt = options.find((o) => o.id === value);
       if (opt) {
-        setSelectedName(opt.name);
+        // Only update display value if it's not currently being typed in
+        if (query === '') {
+          setDisplayValue(opt.name);
+        }
       }
     } else if (!value) {
-      setSelectedName('');
+      if (query === '') {
+        setDisplayValue('');
+      }
     }
-  }, [value, options]);
+  }, [value, options, query]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    setSelectedName(val);
+    setDisplayValue(val);
     setQuery(val);
+
+    // Only update the selected value if we find an exact match
     const opt = options?.find((o) => o.name === val);
     if (opt) {
       onValueChange(opt.id);
@@ -50,10 +69,10 @@ export const SearchableInput: React.FC<SearchableInputProps> = ({
     const opt = options?.find((o) => o.name === e.target.value);
     if (opt) {
       onValueChange(opt.id);
-      setSelectedName(opt.name);
+      setDisplayValue(opt.name);
     } else {
       onValueChange('');
-      setSelectedName('');
+      setDisplayValue('');
     }
     setQuery('');
   };
@@ -63,7 +82,7 @@ export const SearchableInput: React.FC<SearchableInputProps> = ({
       <Input
         id={id}
         list={`${id}-options`}
-        value={selectedName}
+        value={displayValue}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
