@@ -92,8 +92,8 @@ export default function SeriesEvents({ seriesSlug }: SeriesEventsProps) {
 
     if (!data || data.data.length === 0) {
         return (
-            <Card className="border-gray-100">
-                <CardContent className="flex h-96 items-center justify-center text-gray-500">
+            <Card className="border-gray-100 mt-4">
+                <CardContent className="flex h-96 items-center justify-center text-gray-500 ">
                     No events found for this series.
                 </CardContent>
             </Card>
