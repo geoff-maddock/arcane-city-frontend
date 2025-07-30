@@ -23,6 +23,7 @@ interface EventCardProps {
 const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) => {
     const navigate = useNavigate();
     const { setFilters } = useContext(EventFilterContext);
+    const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
         queryFn: authService.getCurrentUser,
@@ -84,16 +85,14 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
 
                     <CardHeader className="p-4 pb-2">
                         <div className="flex">
-                            {event.primary_photo_thumbnail && event.primary_photo && (
-                                <div className="w-1/3 mr-4">
-                                    <ImageLightbox
-                                        thumbnailUrl={event.primary_photo_thumbnail}
-                                        alt={event.name}
-                                        allImages={allImages}
-                                        initialIndex={imageIndex}
-                                    />
-                                </div>
-                            )}
+                            <div className="w-1/3 mr-4">
+                                <ImageLightbox
+                                    thumbnailUrl={event.primary_photo_thumbnail || placeHolderImage}
+                                    alt={event.name}
+                                    allImages={allImages}
+                                    initialIndex={imageIndex}
+                                />
+                            </div>
                             <div className="w-2/3">
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="line-clamp-2 text-xl font-semibold leading-tight text-gray-900">
