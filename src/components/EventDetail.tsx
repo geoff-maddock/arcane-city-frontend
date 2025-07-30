@@ -4,7 +4,8 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
@@ -136,14 +137,41 @@ export default function EventDetail({ slug }: { slug: string }) {
                             <div>
                                 <div className="flex items-start justify-between">
                                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
-                                    {user && (
-                                        <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
-                                            <Star
-                                                className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
-                                                fill={attending ? 'currentColor' : 'none'}
-                                            />
-                                        </button>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        {user && (
+                                            <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
+                                                <Star
+                                                    className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                    fill={attending ? 'currentColor' : 'none'}
+                                                />
+                                            </button>
+                                        )}
+                                        {user && event.created_by && user.id === event.created_by && (
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        className="text-gray-600 hover:text-gray-900 transition-colors p-1 rounded-md hover:bg-gray-100"
+                                                        title="More actions"
+                                                        aria-label="More actions"
+                                                    >
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-48 p-2" align="end">
+                                                    <div className="space-y-1">
+                                                        <Link
+                                                            to="/event/$eventSlug/edit"
+                                                            params={{ eventSlug: event.slug }}
+                                                            className="flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 w-full"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                            Edit Event
+                                                        </Link>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        )}
+                                    </div>
                                 </div>
                                 {event.short && (
                                     <p className="text-xl text-gray-600">{event.short}</p>
