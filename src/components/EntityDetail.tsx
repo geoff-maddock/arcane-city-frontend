@@ -19,7 +19,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@/components/ui/dialog';
 import {
     Popover,
@@ -195,47 +194,16 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                                                 Edit Entity
                                                             </Link>
 
-                                                            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                                                                <DialogTrigger asChild>
-                                                                    <button
-                                                                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
-                                                                        onClick={() => setActionsMenuOpen(false)}
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4" />
-                                                                        Delete Entity
-                                                                    </button>
-                                                                </DialogTrigger>
-                                                                <DialogContent>
-                                                                    <DialogHeader>
-                                                                        <DialogTitle>Delete Entity</DialogTitle>
-                                                                        <DialogDescription>
-                                                                            Are you sure you want to delete "{entity.name}"? This action cannot be undone.
-                                                                        </DialogDescription>
-                                                                    </DialogHeader>
-                                                                    <DialogFooter>
-                                                                        <Button
-                                                                            variant="outline"
-                                                                            onClick={() => setDeleteDialogOpen(false)}
-                                                                        >
-                                                                            Cancel
-                                                                        </Button>
-                                                                        <Button
-                                                                            variant="destructive"
-                                                                            onClick={handleDelete}
-                                                                            disabled={deleteMutation.isPending}
-                                                                        >
-                                                                            {deleteMutation.isPending ? (
-                                                                                <>
-                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                                    Deleting...
-                                                                                </>
-                                                                            ) : (
-                                                                                'Delete'
-                                                                            )}
-                                                                        </Button>
-                                                                    </DialogFooter>
-                                                                </DialogContent>
-                                                            </Dialog>
+                                                            <button
+                                                                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
+                                                                onClick={() => {
+                                                                    setActionsMenuOpen(false);
+                                                                    setDeleteDialogOpen(true);
+                                                                }}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                                Delete Entity
+                                                            </button>
                                                         </div>
                                                     </PopoverContent>
                                                 </Popover>
@@ -243,6 +211,40 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Delete Confirmation Dialog */}
+                                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Delete Entity</DialogTitle>
+                                            <DialogDescription>
+                                                Are you sure you want to delete "{entity.name}"? This action cannot be undone.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setDeleteDialogOpen(false)}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={handleDelete}
+                                                disabled={deleteMutation.isPending}
+                                            >
+                                                {deleteMutation.isPending ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Deleting...
+                                                    </>
+                                                ) : (
+                                                    'Delete'
+                                                )}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                                 {entity.short && (
                                     <p className="text-xl text-gray-600">{entity.short}</p>
                                 )}

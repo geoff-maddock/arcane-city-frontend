@@ -1,10 +1,19 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
@@ -16,10 +25,13 @@ import { TagBadges } from './TagBadges';
 
 
 export default function EventDetail({ slug }: { slug: string }) {
+    const navigate = useNavigate();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -54,6 +66,25 @@ export default function EventDetail({ slug }: { slug: string }) {
         } else {
             attendMutation.mutate();
         }
+    };
+
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            await api.delete(`/events/${slug}`);
+        },
+        onSuccess: () => {
+            // Navigate back to events list after successful deletion
+            navigate({ to: '/events' });
+        },
+        onError: (error) => {
+            console.error('Error deleting event:', error);
+            // You could add a toast notification here for better UX
+        },
+    });
+
+    const handleDelete = () => {
+        deleteMutation.mutate();
+        setDeleteDialogOpen(false);
     };
 
 
@@ -136,15 +167,89 @@ export default function EventDetail({ slug }: { slug: string }) {
                             <div>
                                 <div className="flex items-start justify-between">
                                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
-                                    {user && (
-                                        <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
-                                            <Star
-                                                className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
-                                                fill={attending ? 'currentColor' : 'none'}
-                                            />
-                                        </button>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        {user && (
+                                            <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
+                                                <Star
+                                                    className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                    fill={attending ? 'currentColor' : 'none'}
+                                                />
+                                            </button>
+                                        )}
+                                        {user && event.created_by && user.id === event.created_by && (
+                                            <Popover open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        className="text-gray-600 hover:text-gray-900 transition-colors p-1 rounded-md hover:bg-gray-100"
+                                                        title="More actions"
+                                                        aria-label="More actions"
+                                                    >
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-48 p-2" align="end">
+                                                    <div className="space-y-1">
+                                                        <Link
+                                                            to="/event/$eventSlug/edit"
+                                                            params={{ eventSlug: event.slug }}
+                                                            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-full"
+                                                            onClick={() => setActionsMenuOpen(false)}
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                            Edit Event
+                                                        </Link>
+
+                                                        <button
+                                                            className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
+                                                            onClick={() => {
+                                                                setActionsMenuOpen(false);
+                                                                setDeleteDialogOpen(true);
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                            Delete Event
+                                                        </button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        )}
+                                    </div>
                                 </div>
+
+                                {/* Delete Confirmation Dialog */}
+                                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Delete Event</DialogTitle>
+                                            <DialogDescription>
+                                                Are you sure you want to delete "{event.name}"? This action cannot be undone.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setDeleteDialogOpen(false)}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={handleDelete}
+                                                disabled={deleteMutation.isPending}
+                                            >
+                                                {deleteMutation.isPending ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Deleting...
+                                                    </>
+                                                ) : (
+                                                    'Delete'
+                                                )}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+
                                 {event.short && (
                                     <p className="text-xl text-gray-600">{event.short}</p>
                                 )}
