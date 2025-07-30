@@ -155,15 +155,36 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             <div className="space-y-2">
               {event.event_type && (
                 <div className="items-center">
-                  <span className="text-gray-500 font-bold">
-                    {event.event_type.name}
-                  </span>
+                  {event.series ? (
+                    <span className="text-gray-500 font-normal">
+                      <a
+                        href={`/series/${event.series.slug}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigate({
+                            to: '/series/$slug',
+                            params: { slug: event.series!.slug }
+                          });
+                        }}
+                        className="hover:text-primary transition-colors font-medium decoration-1 underline-offset-2"
+                      >
+                        {event.series.name}
+                      </a>
+                      {' '}series  <span className="text-gray-500 font-bold">{event.event_type.name}</span>
+                    </span>
+                  ) : (
+                    <span className="text-gray-500 font-bold">
+                      {event.event_type.name}
+                    </span>
+                  )}
+
                   {event.promoter && (
                     <span>
                       <span className="m-1 text-gray-500 ">
                         by
                       </span>
-                      <span className=" text-gray-500 font-bold">
+                      <span className="text-gray-500 font-bold">
                         {event.promoter.name}
                       </span>
                     </span>

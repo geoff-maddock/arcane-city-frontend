@@ -15,6 +15,7 @@ import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { SeriesFilterContext } from '../context/SeriesFilterContext';
 import { useContext } from 'react';
+import SeriesEvents from './SeriesEvents';
 
 export default function SeriesDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
@@ -252,6 +253,9 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                         </div>
                     </div>
                 </div>
+
+                {/* Series Events Section */}
+                <SeriesEvents seriesSlug={slug} />
             </div>
         </div>
     );

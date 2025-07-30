@@ -179,9 +179,27 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         <div className="space-y-2">
                                             {event.event_type && (
                                                 <div className="items-center">
+
+                                                    {event.series && (
+                                                        <span >
+                                                            <Link
+                                                                to="/series/$slug"
+                                                                params={{ slug: event.series.slug }}
+                                                                className="text-gray-600 font-bold hover:text-primary transition-colors"
+                                                                title="View Series"
+                                                            >
+                                                                {event.series.name}
+                                                            </Link>
+
+                                                            {' '}series{' '}
+                                                        </span>
+                                                    )}
+
                                                     <span className="text-gray-500 font-bold">
                                                         {event.event_type.name}
                                                     </span>
+
+
                                                     {event.promoter && (
                                                         <span>
                                                             <span className="m-1 text-gray-500 ">

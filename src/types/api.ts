@@ -24,6 +24,7 @@ export interface Event {
     attendees?: UserMinimalResponse[];
     created_by?: number;
     updated_by?: number;
+    series?: Series;
 }
 
 export interface UseEventsParams {
@@ -36,6 +37,7 @@ export interface UseEventsParams {
         event_type?: string;
         entity?: string;
         tag?: string;
+        series?: string;
         start_at?: {
             start?: string;
             end?: string;
