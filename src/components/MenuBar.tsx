@@ -22,7 +22,10 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
 
   return (
     <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`}>
-      <h1 className=" xl:block text-2xl font-bold mb-2 text-center">Arcane City</h1>
+      <Link to="/" className="text-center mb-1">
+        <h1 className=" xl:block text-2xl font-bold text-center hover:underline">Arcane City</h1>
+        <p className=" xl:block text-xs text-gray-500 dark:text-gray-400 text-center">pittsburgh events guide</p>
+      </Link>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
 
       <nav className="flex flex-col gap-2 items-center">
@@ -115,7 +118,10 @@ const MenuBar: React.FC = () => {
             <MenuContent />
           </SheetContent>
         </Sheet>
-        <span className="ml-4 font-bold">Arcane City</span>
+        <Link to="/" className="ml-4">
+          <span className="font-bold hover:underline">Arcane City</span>
+          <p className="text-xs text-gray-500 dark:text-gray-400">pittsburgh events guide</p>
+        </Link>
       </div>
 
       {/* Desktop Menu */}

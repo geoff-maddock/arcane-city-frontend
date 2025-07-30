@@ -1,4 +1,4 @@
-import { createRouter, createRoute } from '@tanstack/react-router';
+import { createRouter, createRoute, redirect } from '@tanstack/react-router';
 import { rootRoute } from './routes/root';
 import Events from './components/Events';
 import Entities from './components/Entities';
@@ -23,11 +23,19 @@ import { AboutRoute } from './routes/about';
 import { PrivacyRoute } from './routes/privacy';
 import { HelpRoute } from './routes/help';
 import { RadarRoute } from './routes/radar';
+import { authService } from './services/auth.service';
 
 // Create routes
 const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
+    beforeLoad: () => {
+        if (authService.isAuthenticated()) {
+            throw redirect({
+                to: '/radar',
+            });
+        }
+    },
     component: Events,
 });
 
