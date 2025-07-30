@@ -11,6 +11,11 @@ import PhotoDropzone from './PhotoDropzone';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { authService } from '../services/auth.service';
+import { EntityBadges } from './EntityBadges';
+import { TagBadges } from './TagBadges';
+import { SeriesFilterContext } from '../context/SeriesFilterContext';
+import { useContext } from 'react';
+import SeriesEvents from './SeriesEvents';
 
 export default function SeriesDetail({ slug }: { slug: string }) {
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
@@ -22,7 +27,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
     });
 
     const [following, setFollowing] = useState(false);
-
+    const { setFilters } = useContext(SeriesFilterContext);
     useEffect(() => {
         if (user) {
             setFollowing(user.followed_series.some(s => s.slug === slug));
@@ -53,6 +58,14 @@ export default function SeriesDetail({ slug }: { slug: string }) {
         } else {
             followMutation.mutate();
         }
+    };
+
+    const handleTagClick = (tagName: string) => {
+        setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
+    };
+
+    const handleEntityClick = (entityName: string) => {
+        setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
     };
 
     // Fetch the series data
@@ -114,8 +127,9 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                     )}
                                 </div>
                                 {series.short && (
-                                    <p className="text-xl text-gray-600">{series.short}</p>
+                                    <p className="line-clamp-2 text-sm text-gray-500">{series.short}</p>
                                 )}
+
                             </div>
 
 
@@ -142,16 +156,40 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                             <Card>
                                 <CardContent className="p-6 space-y-4">
                                     <div className="space-y-3">
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <CalendarDays className="h-5 w-5" />
-                                            <span>{formatDate(series.start_at)}</span>
-                                        </div>
-
-                                        {series.event_type && (
-                                            <h2>
-                                                <span>{series.event_type.name}</span>
-                                            </h2>
+                                        {series.occurrence_type && (
+                                            <p className="text-gray-600">{series.occurrence_type.name} {series.occurrence_repeat}</p>
                                         )}
+                                        {series.event_type && (
+                                            <div className="items-center">
+                                                <span className="text-gray-500 font-bold">
+                                                    {series.event_type.name}
+                                                </span>
+                                                {series.promoter && (
+                                                    <span>
+                                                        <span className="m-1 text-gray-500 ">
+                                                            by
+                                                        </span>
+                                                        <span className=" text-gray-500 font-bold">
+                                                            {series.promoter.name}
+                                                        </span>
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center gap-2 text-gray-600">
+                                            {series.next_start_at ? (
+                                                <>
+                                                    <CalendarDays className="h-5 w-5" />
+                                                    <span>{formatDate(series.next_start_at)}</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CalendarDays className="h-5 w-5" />
+                                                    <span>No upcoming events scheduled</span>
+                                                </>
+                                            )}
+                                        </div>
 
                                         {series.venue && (
                                             <div className="flex items-center gap-2 text-gray-600">
@@ -197,17 +235,12 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                             </a>
                                         </Button>
                                     )}
+
+                                    <EntityBadges entities={series.entities} onClick={handleEntityClick} />
+
+                                    <TagBadges tags={series.tags} onClick={handleTagClick} />
                                 </CardContent>
                             </Card>
-
-                            {series.promoter && (
-                                <Card>
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold mb-2">Presented by</h3>
-                                        <div className="text-gray-600">{series.promoter.name}</div>
-                                    </CardContent>
-                                </Card>
-                            )}
 
                             {user && series.created_by && user.id === series.created_by && (
                                 <PhotoDropzone seriesId={series.id} />
@@ -220,6 +253,9 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                         </div>
                     </div>
                 </div>
+
+                {/* Series Events Section */}
+                <SeriesEvents seriesSlug={slug} />
             </div>
         </div>
     );

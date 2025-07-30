@@ -13,6 +13,9 @@ import { SeriesFilterContext } from '../context/SeriesFilterContext';
 import { SeriesFilters } from '../types/filters';
 import { ActiveSeriesFilters as ActiveFilters } from './ActiveSeriesFilters';
 import { Button } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { authService } from '@/services/auth.service';
 import { X } from 'lucide-react';
 
 const sortOptions = [
@@ -37,6 +40,12 @@ export default function Series() {
     const toggleFilters = () => {
         setFiltersVisible(!filtersVisible);
     };
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
 
     const [filters, setFilters] = useState<SeriesFilters>({
         name: '',
@@ -152,6 +161,11 @@ export default function Series() {
                             <p className="text-lg text-gray-500">
                                 Discover and explore series in our database.
                             </p>
+                            {user && (
+                                <Button asChild className="self-start">
+                                    <Link to="/series/create">Create Series</Link>
+                                </Button>
+                            )}
                         </div>
 
                         <div className="relative">
