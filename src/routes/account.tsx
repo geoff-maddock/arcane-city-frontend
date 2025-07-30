@@ -83,7 +83,7 @@ const Account: React.FC = () => {
                 key={tag.id}
                 to="/tags/$slug"
                 params={{ slug: tag.slug }}
-                className="bg-gray-100 px-2 py-1 rounded hover:bg-gray-200"
+                className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
               >
                 {tag.name}
               </Link>
@@ -101,7 +101,7 @@ const Account: React.FC = () => {
                 key={entity.id}
                 to="/entities/$entitySlug"
                 params={{ entitySlug: entity.slug }}
-                className="bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200"
+                className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded hover:bg-blue-200 dark:hover:bg-blue-700"
               >
                 {entity.name}
               </Link>
@@ -119,7 +119,7 @@ const Account: React.FC = () => {
                 key={series.id}
                 to="/series/$slug"
                 params={{ slug: series.slug }}
-                className="bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200"
+                className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-1 rounded hover:bg-green-200 dark:hover:bg-green-700"
               >
                 {series.name}
               </Link>
@@ -133,7 +133,7 @@ const Account: React.FC = () => {
           <h3 className="text-lg font-semibold">Followed Threads</h3>
           <div className="flex flex-wrap gap-2">
             {user.followed_threads.map(thread => (
-              <span key={thread.id} className="bg-purple-100 text-purple-800 px-2 py-1 rounded">
+              <span key={thread.id} className="bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
                 {thread.name}
               </span>
             ))}
