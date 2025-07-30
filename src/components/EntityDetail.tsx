@@ -1,10 +1,10 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MapPin, Music, Star, Pencil, Power, Target } from 'lucide-react';
+import { Loader2, ArrowLeft, MapPin, Music, Star, Pencil, Power, Target, Trash2, MoreHorizontal } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
@@ -12,11 +12,28 @@ import { TagBadges } from './TagBadges';
 import PhotoDropzone from './PhotoDropzone';
 import { authService } from '../services/auth.service';
 import { EntityTypeIcon } from './EntityTypeIcon';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
+    const navigate = useNavigate();
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
 
     const { data: entity, isLoading, error, refetch } = useQuery<Entity>({
         queryKey: ['entity', entitySlug],
@@ -58,12 +75,31 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
         },
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            await api.delete(`/entities/${entitySlug}`);
+        },
+        onSuccess: () => {
+            // Navigate back to entities list after successful deletion
+            navigate({ to: '/entities' });
+        },
+        onError: (error) => {
+            console.error('Error deleting entity:', error);
+            // You could add a toast notification here for better UX
+        },
+    });
+
     const handleFollowToggle = () => {
         if (following) {
             unfollowMutation.mutate();
         } else {
             followMutation.mutate();
         }
+    };
+
+    const handleDelete = () => {
+        deleteMutation.mutate();
+        setDeleteDialogOpen(false);
     };
 
     // Fetch event embeds after the entity detail is loaded
@@ -137,14 +173,72 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                                 <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
                                             </button>
                                             {user.id === entity.created_by && (
-                                                <Link
-                                                    to="/entity/$entitySlug/edit"
-                                                    params={{ entitySlug: entity.slug }}
-                                                    className="text-gray-600 hover:text-primary transition-colors"
-                                                    title="Edit entity"
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Link>
+                                                <Popover open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
+                                                    <PopoverTrigger asChild>
+                                                        <button
+                                                            className="text-gray-600 hover:text-gray-900 transition-colors p-1 rounded-md hover:bg-gray-100"
+                                                            title="More actions"
+                                                            aria-label="More actions"
+                                                        >
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-48 p-2" align="end">
+                                                        <div className="space-y-1">
+                                                            <Link
+                                                                to="/entity/$entitySlug/edit"
+                                                                params={{ entitySlug: entity.slug }}
+                                                                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-full"
+                                                                onClick={() => setActionsMenuOpen(false)}
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                                Edit Entity
+                                                            </Link>
+
+                                                            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                                                                <DialogTrigger asChild>
+                                                                    <button
+                                                                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
+                                                                        onClick={() => setActionsMenuOpen(false)}
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                        Delete Entity
+                                                                    </button>
+                                                                </DialogTrigger>
+                                                                <DialogContent>
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>Delete Entity</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Are you sure you want to delete "{entity.name}"? This action cannot be undone.
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+                                                                    <DialogFooter>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            onClick={() => setDeleteDialogOpen(false)}
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="destructive"
+                                                                            onClick={handleDelete}
+                                                                            disabled={deleteMutation.isPending}
+                                                                        >
+                                                                            {deleteMutation.isPending ? (
+                                                                                <>
+                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                                    Deleting...
+                                                                                </>
+                                                                            ) : (
+                                                                                'Delete'
+                                                                            )}
+                                                                        </Button>
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        </div>
+                                                    </PopoverContent>
+                                                </Popover>
                                             )}
                                         </div>
                                     )}
