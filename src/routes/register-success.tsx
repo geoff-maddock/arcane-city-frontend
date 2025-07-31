@@ -28,9 +28,10 @@ const RegisterSuccess: React.FC = () => {
       <p>
         Once activated, log in to start adding and following events, entities, series and more.
       </p>
-      <Button asChild className="w-full">
+      <Button asChild variant="link" className="w-full">
         <Link to="/login">Log In</Link>
       </Button>
+
     </div>
   );
 };
