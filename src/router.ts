@@ -18,6 +18,7 @@ import Account from './routes/account';
 import { LoginRoute } from './routes/login';
 import { RegisterRoute } from './routes/register';
 import { RegisterSuccessRoute } from './routes/register-success';
+import { PasswordRecoveryRoute } from './routes/password-recovery';
 import Calendar from './components/Calendar';
 import { AboutRoute } from './routes/about';
 import { PrivacyRoute } from './routes/privacy';
@@ -98,6 +99,7 @@ const routeTree = rootRoute.addChildren([
     AboutRoute,
     HelpRoute,
     LoginRoute,
+    PasswordRecoveryRoute,
     PrivacyRoute,
     RegisterRoute,
     RegisterSuccessRoute,

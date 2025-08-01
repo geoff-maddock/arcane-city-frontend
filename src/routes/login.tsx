@@ -49,6 +49,9 @@ const Login: React.FC = () => {
       <Button asChild variant="link" className="w-full">
         <Link to="/register">Need an account? Register</Link>
       </Button>
+      <Button asChild variant="link" className="w-full">
+        <Link to="/password-recovery">Forgot your password? Recover it</Link>
+      </Button>
     </div>
   );
 };
