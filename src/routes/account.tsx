@@ -1,16 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal, Edit } from 'lucide-react';
 
 const Account: React.FC = () => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
       navigate({ to: '/login' });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['currentUser'],
@@ -24,7 +44,33 @@ const Account: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-6">
-      <h2 className="text-xl font-bold">Account</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">Account</h2>
+        <div className="relative" ref={menuRef}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-10">
+              <div className="py-1">
+                <Link
+                  to="/account/edit"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit Account
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       {user.photos.length > 0 && (
         <section className="space-y-2">
           <h3 className="text-lg font-semibold">Photos</h3>
@@ -70,6 +116,28 @@ const Account: React.FC = () => {
 
             <span className="font-semibold text-gray-600">Bio:</span>
             <span>{user.profile.bio ?? 'N/A'}</span>
+          </div>
+        </section>
+      )}
+
+      {user.profile && (
+        <section className="space-y-2">
+          <h3 className="text-lg font-semibold">Settings</h3>
+          <div className="grid grid-cols-[200px_1fr] gap-2">
+            <span className="font-semibold text-gray-600">Receive Weekly Updates:</span>
+            <span>{user.profile.setting_weekly_update ? 'Yes' : 'No'}</span>
+
+            <span className="font-semibold text-gray-600">Receive Daily Updates:</span>
+            <span>{user.profile.setting_daily_update ? 'Yes' : 'No'}</span>
+
+            <span className="font-semibold text-gray-600">Receive Instant Updates:</span>
+            <span>{user.profile.setting_instant_update ? 'Yes' : 'No'}</span>
+
+            <span className="font-semibold text-gray-600">Receive Forum Updates:</span>
+            <span>{user.profile.setting_forum_update ? 'Yes' : 'No'}</span>
+
+            <span className="font-semibold text-gray-600">Public Profile:</span>
+            <span>{user.profile.setting_public_profile ? 'Yes' : 'No'}</span>
           </div>
         </section>
       )}
