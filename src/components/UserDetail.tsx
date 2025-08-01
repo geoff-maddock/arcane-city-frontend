@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { api } from '../lib/api';
 import type { User } from '../types/auth';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,8 @@ export default function UserDetail({ id }: { id: string }) {
 
     const photo = user.photos && user.photos.length > 0 ? user.photos[0].thumbnail_path : null;
     const placeholder = `${window.location.origin}/event-placeholder.png`;
+    const joinDate = format(new Date(user.created_at), 'MM.dd.yy');
+    const lastActive = user.last_active ? format(new Date(user.last_active.created_at), 'MM.dd.yy') : 'N/A';
 
     return (
         <div className="min-h-screen">
@@ -42,17 +45,51 @@ export default function UserDetail({ id }: { id: string }) {
                         </Link>
                     </Button>
                 </div>
-                <div className="space-y-4">
-                    <img src={photo || placeholder} alt={user.name} className="h-32 w-32 object-cover rounded" />
-                    <h1 className="text-3xl font-bold">{user.name}</h1>
-                    <p className="text-gray-600">{user.email}</p>
-                    {user.profile && (
-                        <div className="space-y-2">
-                            {user.profile.alias && <p>Alias: {user.profile.alias}</p>}
-                            {user.profile.location && <p>Location: {user.profile.location}</p>}
-                            {user.profile.bio && <p>Bio: {user.profile.bio}</p>}
+                <div className="flex flex-col md:flex-row gap-8">
+                    <img
+                        src={photo || placeholder}
+                        alt={user.name}
+                        className="h-48 w-48 object-cover rounded"
+                    />
+                    <div className="flex-1 space-y-6">
+                        <h1 className="text-3xl font-bold">{user.name}</h1>
+                        <div className="grid grid-cols-[180px_1fr] gap-2 text-sm">
+                            <span className="font-semibold text-gray-600">Status:</span>
+                            <span>{user.status.name}</span>
+                            <span className="font-semibold text-gray-600">Email:</span>
+                            <span>{user.email}</span>
+                            <span className="font-semibold text-gray-600">Contact:</span>
+                            <span>{user.email}</span>
+                            {user.profile?.default_theme && (
+                                <>
+                                    <span className="font-semibold text-gray-600">Default Theme:</span>
+                                    <span>{user.profile.default_theme}</span>
+                                </>
+                            )}
                         </div>
-                    )}
+
+                        {user.profile && (
+                            <div className="space-y-2">
+                                <h2 className="text-xl font-semibold">Settings</h2>
+                                <div className="grid grid-cols-[220px_1fr] gap-2 text-sm">
+                                    <span className="font-semibold text-gray-600">Receive Weekly Updates:</span>
+                                    <span>{user.profile.setting_weekly_update ? 'Yes' : 'No'}</span>
+                                    <span className="font-semibold text-gray-600">Receive Daily Updates:</span>
+                                    <span>{user.profile.setting_daily_update ? 'Yes' : 'No'}</span>
+                                    <span className="font-semibold text-gray-600">Receive Instant Updates:</span>
+                                    <span>{user.profile.setting_instant_update ? 'Yes' : 'No'}</span>
+                                    <span className="font-semibold text-gray-600">Receive Forum Updates:</span>
+                                    <span>{user.profile.setting_forum_update ? 'Yes' : 'No'}</span>
+                                    <span className="font-semibold text-gray-600">Public Profile:</span>
+                                    <span>{user.profile.setting_public_profile ? 'Yes' : 'No'}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="text-sm text-gray-500">
+                            Joined: {joinDate} | Last Active: {lastActive}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
