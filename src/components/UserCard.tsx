@@ -34,7 +34,9 @@ export default function UserCard({ user }: UserCardProps) {
                         {user.name}
                     </a>
                 </h2>
-                <p className="text-sm text-gray-600">{user.email}</p>
+                {user.profile?.setting_public_profile ? (
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                ) : null}
             </CardContent>
         </Card>
     );

@@ -56,10 +56,20 @@ export default function UserDetail({ id }: { id: string }) {
                         <div className="grid grid-cols-[180px_1fr] gap-2 text-sm">
                             <span className="font-semibold text-gray-600">Status:</span>
                             <span>{user.status.name}</span>
-                            <span className="font-semibold text-gray-600">Email:</span>
-                            <span>{user.email}</span>
-                            <span className="font-semibold text-gray-600">Contact:</span>
-                            <span>{user.email}</span>
+                            {user.profile?.setting_public_profile ? (
+                                <>
+                                    <span className="font-semibold text-gray-600">Email:</span>
+                                    <span>{user.email}</span>
+                                    <span className="font-semibold text-gray-600">Contact:</span>
+                                    <span>{user.email}</span>
+                                </>
+                            ) : null}
+                            <span className="font-semibold text-gray-600">Alias:</span>
+                            <span>{user.profile?.alias ?? 'N/A'}</span>
+                            <span className="font-semibold text-gray-600">Location:</span>
+                            <span>{user.profile?.location ?? 'N/A'}</span>
+                            <span className="font-semibold text-gray-600">Bio:</span>
+                            <span>{user.profile?.bio ?? 'N/A'}</span>
                             {user.profile?.default_theme && (
                                 <>
                                     <span className="font-semibold text-gray-600">Default Theme:</span>
@@ -89,6 +99,80 @@ export default function UserDetail({ id }: { id: string }) {
                         <div className="text-sm text-gray-500">
                             Joined: {joinDate} | Last Active: {lastActive}
                         </div>
+
+                        {user.profile?.setting_public_profile && (
+                            <>
+                                {user.followed_tags.length > 0 && (
+                                    <section className="space-y-2">
+                                        <h3 className="text-lg font-semibold">Followed Tags</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {user.followed_tags.map(tag => (
+                                                <Link
+                                                    key={tag.id}
+                                                    to="/tags/$slug"
+                                                    params={{ slug: tag.slug }}
+                                                    className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                                                >
+                                                    {tag.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {user.followed_entities.length > 0 && (
+                                    <section className="space-y-2">
+                                        <h3 className="text-lg font-semibold">Followed Entities</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {user.followed_entities.map(entity => (
+                                                <Link
+                                                    key={entity.id}
+                                                    to="/entities/$entitySlug"
+                                                    params={{ entitySlug: entity.slug }}
+                                                    className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded hover:bg-blue-200 dark:hover:bg-blue-700"
+                                                >
+                                                    {entity.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {user.followed_series.length > 0 && (
+                                    <section className="space-y-2">
+                                        <h3 className="text-lg font-semibold">Followed Series</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {user.followed_series.map(series => (
+                                                <Link
+                                                    key={series.id}
+                                                    to="/series/$slug"
+                                                    params={{ slug: series.slug }}
+                                                    className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-1 rounded hover:bg-green-200 dark:hover:bg-green-700"
+                                                >
+                                                    {series.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {user.followed_threads.length > 0 && (
+                                    <section className="space-y-2">
+                                        <h3 className="text-lg font-semibold">Followed Threads</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {user.followed_threads.map(thread => (
+                                                <span
+                                                    key={thread.id}
+                                                    className="bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-1 rounded"
+                                                >
+                                                    {thread.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
