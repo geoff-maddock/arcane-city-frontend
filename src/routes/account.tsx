@@ -260,8 +260,8 @@ const Account: React.FC = () => {
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Followed Threads</h2>
                   <div className="flex flex-wrap gap-2">
                     {user.followed_threads.map(thread => (
-                      <span 
-                        key={thread.id} 
+                      <span
+                        key={thread.id}
                         className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm"
                       >
                         {thread.name}
