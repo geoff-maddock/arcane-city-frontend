@@ -56,7 +56,7 @@ export default function UserDetail({ id }: { id: string }) {
                         <div className="grid grid-cols-[180px_1fr] gap-2 text-sm">
                             <span className="font-semibold text-gray-600">Status:</span>
                             <span>{user.status.name}</span>
-                            {user.profile?.setting_public_profile ? (
+                            {user.profile?.setting_public_profile === 1 ? (
                                 <>
                                     <span className="font-semibold text-gray-600">Email:</span>
                                     <span>{user.email}</span>
@@ -78,7 +78,7 @@ export default function UserDetail({ id }: { id: string }) {
                             )}
                         </div>
 
-                        {user.profile && (
+                        {user.profile && user.profile.setting_public_profile === 1 && (
                             <div className="space-y-2">
                                 <h2 className="text-xl font-semibold">Settings</h2>
                                 <div className="grid grid-cols-[220px_1fr] gap-2 text-sm">
@@ -100,9 +100,9 @@ export default function UserDetail({ id }: { id: string }) {
                             Joined: {joinDate} | Last Active: {lastActive}
                         </div>
 
-                        {user.profile?.setting_public_profile && (
+                        {user.profile?.setting_public_profile === 1 && (
                             <>
-                                {user.followed_tags.length > 0 && (
+                                {user.followed_tags && user.followed_tags.length > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-lg font-semibold">Followed Tags</h3>
                                         <div className="flex flex-wrap gap-2">
@@ -120,7 +120,7 @@ export default function UserDetail({ id }: { id: string }) {
                                     </section>
                                 )}
 
-                                {user.followed_entities.length > 0 && (
+                                {user.followed_entities && user.followed_entities.length > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-lg font-semibold">Followed Entities</h3>
                                         <div className="flex flex-wrap gap-2">
@@ -138,7 +138,7 @@ export default function UserDetail({ id }: { id: string }) {
                                     </section>
                                 )}
 
-                                {user.followed_series.length > 0 && (
+                                {user.followed_series && user.followed_series.length > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-lg font-semibold">Followed Series</h3>
                                         <div className="flex flex-wrap gap-2">
@@ -156,7 +156,7 @@ export default function UserDetail({ id }: { id: string }) {
                                     </section>
                                 )}
 
-                                {user.followed_threads.length > 0 && (
+                                {user.followed_threads && user.followed_threads.length > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-lg font-semibold">Followed Threads</h3>
                                         <div className="flex flex-wrap gap-2">
