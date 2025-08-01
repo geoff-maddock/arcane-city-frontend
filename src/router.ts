@@ -28,6 +28,7 @@ import { PrivacyRoute } from './routes/privacy';
 import { HelpRoute } from './routes/help';
 import { RadarRoute } from './routes/radar';
 import { authService } from './services/auth.service';
+import { SearchRoute } from './routes/search';
 
 // Create routes
 const indexRoute = createRoute({
@@ -104,6 +105,7 @@ const routeTree = rootRoute.addChildren([
     RadarRoute,
     AboutRoute,
     HelpRoute,
+    SearchRoute,
     LoginRoute,
     PasswordRecoveryRoute,
     PrivacyRoute,

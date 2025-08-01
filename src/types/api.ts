@@ -38,6 +38,10 @@ export interface UseEventsParams {
         entity?: string;
         tag?: string;
         series?: string;
+        created_at?: {
+            start?: string;
+            end?: string;
+        };
         start_at?: {
             start?: string;
             end?: string;
