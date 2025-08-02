@@ -1,14 +1,17 @@
-import React from 'react';
-import { Link } from '@tanstack/react-router';
+import React, { useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: authService.getCurrentUser,
@@ -26,6 +29,20 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
         <h1 className=" xl:block text-2xl font-bold text-center hover:underline">Arcane City</h1>
         <p className=" xl:block text-xs text-gray-500 dark:text-gray-400 text-center">pittsburgh events guide</p>
       </Link>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const q = search.trim();
+          if (q) {
+            navigate({ to: '/search', search: { q } });
+            setSearch('');
+          }
+        }}
+        className="w-full flex gap-2 mt-2"
+      >
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search" className="h-8" />
+        <Button type="submit" size="sm" variant="outline">Go</Button>
+      </form>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
 
       <nav className="flex flex-col gap-2 items-center">
