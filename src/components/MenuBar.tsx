@@ -38,10 +38,14 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
             setSearch('');
           }
         }}
-        className="w-full flex gap-2 mt-2"
+        className="w-full mt-2 px-2 hidden xl:block"
       >
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search" className="h-8" />
-        <Button type="submit" size="sm" variant="outline">Go</Button>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search"
+          className="h-8 w-full"
+        />
       </form>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
 
@@ -129,24 +133,47 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
 };
 
 const MenuBar: React.FC = () => {
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
+
   return (
     <>
       {/* Mobile Menu */}
-      <div className="xl:hidden fixed top-0 left-0 w-full p-4 flex items-center bg-background border-b">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <HiMenu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
-            <MenuContent />
-          </SheetContent>
-        </Sheet>
-        <Link to="/" className="ml-4">
-          <span className="font-bold hover:underline">Arcane City</span>
-          <p className="text-xs text-gray-500 dark:text-gray-400">pittsburgh events guide</p>
-        </Link>
+      <div className="xl:hidden fixed top-0 left-0 w-full p-4 flex items-center justify-between bg-background border-b">
+        <div className="flex items-center">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <HiMenu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0">
+              <MenuContent />
+            </SheetContent>
+          </Sheet>
+          <Link to="/" className="ml-4">
+            <span className="font-bold hover:underline">Arcane City</span>
+            <p className="text-xs text-gray-500 dark:text-gray-400">pittsburgh events guide</p>
+          </Link>
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = search.trim();
+            if (q) {
+              navigate({ to: '/search', search: { q } });
+              setSearch('');
+            }
+          }}
+          className="px-2"
+        >
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className="h-8 w-40"
+          />
+        </form>
       </div>
 
       {/* Desktop Menu */}
