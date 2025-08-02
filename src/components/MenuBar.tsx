@@ -76,13 +76,13 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
           <HiTag />
           <span className=" xl:inline">Tags</span>
         </Link>
-        <Link to="/search" className="flex items-center gap-2 hover:underline">
-          <HiSearch />
-          <span className=" xl:inline">Search</span>
-        </Link>
         <Link to="/users" className="flex items-center gap-2 hover:underline">
           <HiUserGroup />
           <span className=" xl:inline">Users</span>
+        </Link>
+        <Link to="/search" className="flex items-center gap-2 hover:underline">
+          <HiSearch />
+          <span className=" xl:inline">Search</span>
         </Link>
 
         <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>

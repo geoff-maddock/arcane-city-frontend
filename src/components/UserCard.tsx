@@ -8,7 +8,7 @@ interface UserCardProps {
 
 export default function UserCard({ user }: UserCardProps) {
     const navigate = useNavigate();
-    const placeholder = `${window.location.origin}/event-placeholder.png`;
+    const placeholder = `${window.location.origin}/user-placeholder.jpg`;
     const photo = user.photos && user.photos.length > 0 ? user.photos[0].thumbnail_path : null;
 
     const handleClick = (e: React.MouseEvent) => {

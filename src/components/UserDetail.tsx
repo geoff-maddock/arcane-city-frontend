@@ -30,7 +30,7 @@ export default function UserDetail({ id }: { id: string }) {
     }
 
     const photo = user.photos && user.photos.length > 0 ? user.photos[0].thumbnail_path : null;
-    const placeholder = `${window.location.origin}/event-placeholder.png`;
+    const placeholder = `${window.location.origin}/user-placeholder.jpg`;
     const joinDate = format(new Date(user.created_at), 'MM.dd.yy');
     const lastActive = user.last_active ? format(new Date(user.last_active.created_at), 'MM.dd.yy') : 'N/A';
 
