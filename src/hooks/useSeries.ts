@@ -9,10 +9,10 @@ interface DateRange {
 }
 
 interface SeriesFilters {
-    name: string;
-    event_type: string;
-    tag: string;
-    entity: string;
+    name?: string;
+    event_type?: string;
+    tag?: string;
+    entity?: string;
     created_at?: DateRange;
 }
 

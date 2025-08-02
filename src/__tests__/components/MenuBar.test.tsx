@@ -6,7 +6,8 @@ import { authService } from '../../services/auth.service'
 
 // Mock Link component from react-router to avoid needing RouterProvider
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>
+  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
+  useNavigate: () => vi.fn(),
 }))
 
 // Mock route components to avoid API calls if rendered
