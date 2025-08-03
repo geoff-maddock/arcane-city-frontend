@@ -92,6 +92,11 @@ const Search: React.FC = () => {
     .filter(se => se.primary_photo && se.primary_photo_thumbnail)
     .map(se => ({ src: se.primary_photo!, alt: se.name, thumbnail: se.primary_photo_thumbnail })) ?? [];
 
+  const eventCount = events.length;
+  const entityCount = entityData?.data?.length ?? 0;
+  const seriesCount = seriesData?.data?.length ?? 0;
+  const tagCount = tagData?.data?.length ?? 0;
+
   return (
     <div className="bg-background text-foreground min-h-screen p-4">
       <div className="mx-auto px-6 py-8 max-w-[2400px] space-y-8">
@@ -110,69 +115,72 @@ const Search: React.FC = () => {
 
         {q && (
           <div className="space-y-8">
-          {events.length ? (
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Events</h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                {events.map((ev) => (
-                  <EventCardCondensed
-                    key={ev.id}
-                    event={ev}
-                    allImages={allEventImages}
-                    imageIndex={allEventImages.findIndex(img => img.src === ev.primary_photo)}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
+            <p className="text-lg">
+              Found {eventCount} events, {entityCount} entities, {seriesCount} series, and {tagCount} tags
+            </p>
+            {eventCount ? (
+              <section>
+                <h2 className="text-2xl font-semibold mb-4">Events ({eventCount})</h2>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                  {events.map((ev) => (
+                    <EventCardCondensed
+                      key={ev.id}
+                      event={ev}
+                      allImages={allEventImages}
+                      imageIndex={allEventImages.findIndex(img => img.src === ev.primary_photo)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
-          {entityData?.data?.length ? (
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Entities</h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                {entityData.data.map((en) => (
-                  <EntityCardCondensed
-                    key={en.id}
-                    entity={en}
-                    allImages={allEntityImages}
-                    imageIndex={allEntityImages.findIndex(img => img.src === en.primary_photo)}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
+            {entityCount ? (
+              <section>
+                <h2 className="text-2xl font-semibold mb-4">Entities ({entityCount})</h2>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                  {entityData!.data.map((en) => (
+                    <EntityCardCondensed
+                      key={en.id}
+                      entity={en}
+                      allImages={allEntityImages}
+                      imageIndex={allEntityImages.findIndex(img => img.src === en.primary_photo)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
-          {seriesData?.data?.length ? (
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Series</h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                {seriesData.data.map((se) => (
-                  <SeriesCardCondensed
-                    key={se.id}
-                    series={se}
-                    allImages={allSeriesImages}
-                    imageIndex={allSeriesImages.findIndex(img => img.src === se.primary_photo)}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
+            {seriesCount ? (
+              <section>
+                <h2 className="text-2xl font-semibold mb-4">Series ({seriesCount})</h2>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                  {seriesData!.data.map((se) => (
+                    <SeriesCardCondensed
+                      key={se.id}
+                      series={se}
+                      allImages={allSeriesImages}
+                      imageIndex={allSeriesImages.findIndex(img => img.src === se.primary_photo)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
-          {tagData?.data?.length ? (
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Tags</h2>
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                {tagData.data.map((tag) => (
-                  <TagCard key={tag.id} tag={tag} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-          {(!events.length && !entityData?.data?.length && !seriesData?.data?.length && !tagData?.data?.length) && (
-            <p>No results found.</p>
-          )}
-        </div>
-      )}
+            {tagCount ? (
+              <section>
+                <h2 className="text-2xl font-semibold mb-4">Tags ({tagCount})</h2>
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  {tagData!.data.map((tag) => (
+                    <TagCard key={tag.id} tag={tag} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+            {(!eventCount && !entityCount && !seriesCount && !tagCount) && (
+              <p>No results found.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
