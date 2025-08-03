@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { useEvents } from '../hooks/useEvents';
@@ -6,10 +6,13 @@ import { useEntities } from '../hooks/useEntities';
 import { useSeries } from '../hooks/useSeries';
 import { useTags } from '../hooks/useTags';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import EventCardCondensed from '../components/EventCardCondensed';
 import EntityCardCondensed from '../components/EntityCardCondensed';
 import SeriesCardCondensed from '../components/SeriesCardCondensed';
 import TagCard from '../components/TagCard';
+import type { Event } from '../types/api';
 
 interface ParsedQuery {
   name: string;
@@ -37,32 +40,47 @@ function parseSearchQuery(q: string): ParsedQuery {
   return { name: nameParts.join(' '), createdBefore, createdAfter };
 }
 
-interface SearchParams { q?: string }
+interface SearchParams { q?: string; deep?: string }
 
 const Search: React.FC = () => {
   const navigate = useNavigate();
-  const { q = '' } = useSearch({ from: '/search' }) as SearchParams;
+  const { q = '', deep } = useSearch({ from: '/search' }) as SearchParams;
+  const deepEnabled = deep === 'true';
   const [input, setInput] = useState(q);
+  const [isDeep, setIsDeep] = useState(deepEnabled);
 
   useEffect(() => {
     setInput(q);
-  }, [q]);
+    setIsDeep(deepEnabled);
+  }, [q, deepEnabled]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: '/search', search: { q: input.trim() } });
+    navigate({ to: '/search', search: { q: input.trim(), deep: isDeep ? 'true' : undefined } });
   };
 
   const { name, createdBefore, createdAfter } = parseSearchQuery(q);
 
   const dateFilter = createdBefore || createdAfter ? { start: createdAfter, end: createdBefore } : undefined;
 
-  const { data: eventData } = useEvents({ itemsPerPage: 5, filters: { name, created_at: dateFilter } });
-  const { data: entityData } = useEntities({ itemsPerPage: 5, filters: { name, created_at: dateFilter } });
-  const { data: seriesData } = useSeries({ itemsPerPage: 5, filters: { name, created_at: dateFilter } });
-  const { data: tagData } = useTags({ itemsPerPage: 5, filters: { name, created_at: dateFilter } });
+  const baseFilters = isDeep ? { name, description: name, created_at: dateFilter } : { name, created_at: dateFilter };
 
-  const allEventImages = eventData?.data
+  const { data: eventNameData } = useEvents({ itemsPerPage: 5, filters: baseFilters });
+  const { data: eventTagData } = useEvents({ itemsPerPage: 5, filters: { tag: name, created_at: dateFilter } });
+  const { data: eventEntityData } = useEvents({ itemsPerPage: 5, filters: { entity: name, created_at: dateFilter } });
+  const { data: entityData } = useEntities({ itemsPerPage: 5, filters: baseFilters });
+  const { data: seriesData } = useSeries({ itemsPerPage: 5, filters: baseFilters });
+  const { data: tagData } = useTags({ itemsPerPage: 5, filters: baseFilters });
+
+  const events = useMemo(() => {
+    const map = new Map<number, Event>();
+    eventNameData?.data?.forEach(ev => map.set(ev.id, ev));
+    eventTagData?.data?.forEach(ev => map.set(ev.id, ev));
+    eventEntityData?.data?.forEach(ev => map.set(ev.id, ev));
+    return Array.from(map.values());
+  }, [eventNameData, eventTagData, eventEntityData]);
+
+  const allEventImages = events
     .filter(ev => ev.primary_photo && ev.primary_photo_thumbnail)
     .map(ev => ({ src: ev.primary_photo!, alt: ev.name, thumbnail: ev.primary_photo_thumbnail })) ?? [];
 
@@ -81,18 +99,22 @@ const Search: React.FC = () => {
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">Search</h1>
           <p className="text-lg text-gray-500">Find events, entities, series and tags</p>
         </div>
-        <form onSubmit={handleSubmit} className="flex gap-2 max-w-md">
+        <form onSubmit={handleSubmit} className="flex gap-2 max-w-md items-center">
           <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Search" />
           <button type="submit" className="px-4 py-2 border rounded">Search</button>
+          <div className="flex items-center space-x-2">
+            <Switch id="deep-search" checked={isDeep} onCheckedChange={setIsDeep} />
+            <Label htmlFor="deep-search">Deep Search</Label>
+          </div>
         </form>
 
         {q && (
           <div className="space-y-8">
-          {eventData?.data?.length ? (
+          {events.length ? (
             <section>
               <h2 className="text-2xl font-semibold mb-4">Events</h2>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                {eventData.data.map((ev) => (
+                {events.map((ev) => (
                   <EventCardCondensed
                     key={ev.id}
                     event={ev}
@@ -146,6 +168,9 @@ const Search: React.FC = () => {
               </div>
             </section>
           ) : null}
+          {(!events.length && !entityData?.data?.length && !seriesData?.data?.length && !tagData?.data?.length) && (
+            <p>No results found.</p>
+          )}
         </div>
       )}
       </div>

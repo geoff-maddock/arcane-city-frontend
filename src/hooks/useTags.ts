@@ -3,7 +3,8 @@ import { api } from '../lib/api';
 import type { Tag, PaginatedResponse } from '../types/api';
 
 export interface TagFilters {
-    name: string;
+    name?: string;
+    description?: string;
     created_at?: {
         start?: string;
         end?: string;
@@ -26,6 +27,7 @@ export const useTags = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', d
             params.append('page', page.toString());
             params.append('limit', itemsPerPage.toString());
             if (filters?.name) params.append('filters[name]', filters.name);
+            if (filters?.description) params.append('filters[description]', filters.description);
             if (filters?.created_at?.start) params.append('filters[created_at][start]', filters.created_at.start);
             if (filters?.created_at?.end) params.append('filters[created_at][end]', filters.created_at.end);
             if (sort) params.append('sort', sort);
