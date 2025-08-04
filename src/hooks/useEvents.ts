@@ -18,6 +18,7 @@ export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort = 'start_
             if (filters?.entity) params.append('filters[related]', filters.entity);
             if (filters?.event_type) params.append('filters[event_type]', toKebabCase(filters.event_type));
             if (filters?.series) params.append('filters[series]', filters.series);
+            if (filters?.description) params.append('filters[description]', filters.description);
             if (filters?.created_at?.start) params.append('filters[created_at][start]', filters.created_at.start);
             if (filters?.created_at?.end) params.append('filters[created_at][end]', filters.created_at.end);
             if (filters?.start_at?.start) params.append('filters[start_at][start]', filters.start_at.start);
