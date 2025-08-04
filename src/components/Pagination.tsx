@@ -102,27 +102,9 @@ export function Pagination({
                         </Button>
 
                         <div className="hidden md:flex items-center gap-1">
-                            {currentPage > 2 && (
-                                <>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => onPageChange(1)}
-                                        size="sm"
-                                        className="w-9 h-9 p-0"
-                                    >
-                                        1
-                                    </Button>
-                                    {currentPage > 3 && <span className="mx-1">...</span>}
-                                </>
-                            )}
-
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                .filter(page => {
-                                    if (totalPages <= 7) return true;
-                                    if (page >= currentPage - 1 && page <= currentPage + 1) return true;
-                                    return false;
-                                })
-                                .map(page => (
+                            {totalPages <= 7 ? (
+                                // Show all pages when there are 7 or fewer
+                                Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                                     <Button
                                         key={page}
                                         variant={page === currentPage ? "default" : "outline"}
@@ -132,19 +114,51 @@ export function Pagination({
                                     >
                                         {page}
                                     </Button>
-                                ))}
-
-                            {currentPage < totalPages - 1 && (
+                                ))
+                            ) : (
+                                // Show truncated pagination for more than 7 pages
                                 <>
-                                    {currentPage < totalPages - 2 && <span className="mx-1">...</span>}
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => onPageChange(totalPages)}
-                                        size="sm"
-                                        className="w-9 h-9 p-0"
-                                    >
-                                        {totalPages}
-                                    </Button>
+                                    {currentPage > 2 && (
+                                        <>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => onPageChange(1)}
+                                                size="sm"
+                                                className="w-9 h-9 p-0"
+                                            >
+                                                1
+                                            </Button>
+                                            {currentPage > 3 && <span className="mx-1">...</span>}
+                                        </>
+                                    )}
+
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                        .filter(page => page >= currentPage - 1 && page <= currentPage + 1)
+                                        .map(page => (
+                                            <Button
+                                                key={page}
+                                                variant={page === currentPage ? "default" : "outline"}
+                                                onClick={() => onPageChange(page)}
+                                                size="sm"
+                                                className="w-9 h-9 p-0"
+                                            >
+                                                {page}
+                                            </Button>
+                                        ))}
+
+                                    {currentPage < totalPages - 1 && (
+                                        <>
+                                            {currentPage < totalPages - 2 && <span className="mx-1">...</span>}
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => onPageChange(totalPages)}
+                                                size="sm"
+                                                className="w-9 h-9 p-0"
+                                            >
+                                                {totalPages}
+                                            </Button>
+                                        </>
+                                    )}
                                 </>
                             )}
                         </div>
