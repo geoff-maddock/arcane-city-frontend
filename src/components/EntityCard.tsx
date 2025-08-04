@@ -6,6 +6,7 @@ import { MapPin, Star, Target } from 'lucide-react';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { EntityTypeIcon } from './EntityTypeIcon';
+import { SocialLinks } from './SocialLinks';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
@@ -148,6 +149,13 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                             <span>{entity.roles.map((role) => role.name).join(', ')}</span>
                         </div>
                     )}
+
+                    <SocialLinks
+                        facebookUsername={entity.facebook_username}
+                        twitterUsername={entity.twitter_username}
+                        instagramUsername={entity.instagram_username}
+                    />
+
                     {entity.description && (
                         <p className="text-gray-600">
                             {entity.description.length > 1200

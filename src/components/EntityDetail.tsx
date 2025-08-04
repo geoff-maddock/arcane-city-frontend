@@ -12,6 +12,7 @@ import { TagBadges } from './TagBadges';
 import PhotoDropzone from './PhotoDropzone';
 import { authService } from '../services/auth.service';
 import { EntityTypeIcon } from './EntityTypeIcon';
+import { SocialLinks } from './SocialLinks';
 import {
     Dialog,
     DialogContent,
@@ -321,6 +322,12 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                                 <span>{entity.roles.map((role) => role.name).join(', ')}</span>
                                             </div>
                                         )}
+
+                                        <SocialLinks
+                                            facebookUsername={entity.facebook_username}
+                                            twitterUsername={entity.twitter_username}
+                                            instagramUsername={entity.instagram_username}
+                                        />
 
                                         {entity.links.length > 0 && (
                                             <div className="space-y-2">
