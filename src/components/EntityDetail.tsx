@@ -12,6 +12,7 @@ import { TagBadges } from './TagBadges';
 import PhotoDropzone from './PhotoDropzone';
 import { authService } from '../services/auth.service';
 import { EntityTypeIcon } from './EntityTypeIcon';
+import { SocialLinks } from './SocialLinks';
 import {
     Dialog,
     DialogContent,
@@ -277,6 +278,12 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                             <EntityTypeIcon entityTypeName={entity.entity_type.name} />
                                             <span className="font-medium">{entity.entity_type.name}</span>
                                         </div>
+
+                                        <SocialLinks
+                                            facebookUsername={entity.facebook_username}
+                                            twitterUsername={entity.twitter_username}
+                                            instagramUsername={entity.instagram_username}
+                                        />
 
                                         {entity.primary_location && (
                                             <div className="flex items-start gap-2 text-gray-600">

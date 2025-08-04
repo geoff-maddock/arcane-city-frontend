@@ -5,6 +5,7 @@ import MapPin from '@/components/icons/MapPin';
 import Users from '@/components/icons/Users';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
+import { SocialLinks } from './SocialLinks';
 // import { useContext } from 'react';
 // import { EntityFilterContext } from '../context/EntityFilterContext';
 
@@ -68,6 +69,12 @@ export default function EntityCardCondensed({ entity, allImages, imageIndex }: E
                                         {entity.roles.map(role => role.name).join(', ')}
                                     </div>
                                 )}
+                                <SocialLinks
+                                    facebookUsername={entity.facebook_username}
+                                    twitterUsername={entity.twitter_username}
+                                    instagramUsername={entity.instagram_username}
+                                    className="mt-2"
+                                />
                             </div>
                         </div>
                     </CardHeader>

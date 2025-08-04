@@ -27,7 +27,7 @@ const EntityCreate: React.FC = () => {
         entity_status_id: 1,
         started_at: '',
         facebook_username: '',
-        twitter_username: '',
+        instagram_username: '',
         primary_location_id: '' as number | '',
         tag_list: [] as number[],
         role_list: [] as number[],
@@ -240,15 +240,15 @@ const EntityCreate: React.FC = () => {
                         {renderError('facebook_username')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="twitter_username">Twitter Username</Label>
+                        <Label htmlFor="instagram_username">Instagram Username</Label>
                         <Input
-                            id="twitter_username"
-                            name="twitter_username"
-                            value={formData.twitter_username}
+                            id="instagram_username"
+                            name="instagram_username"
+                            value={formData.instagram_username}
                             onChange={handleChange}
-                            placeholder="twitter_username"
+                            placeholder="instagram_username"
                         />
-                        {renderError('twitter_username')}
+                        {renderError('instagram_username')}
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

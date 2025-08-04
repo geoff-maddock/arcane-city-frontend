@@ -6,6 +6,7 @@ import { MapPin, Star, Target } from 'lucide-react';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { EntityTypeIcon } from './EntityTypeIcon';
+import { SocialLinks } from './SocialLinks';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
@@ -108,6 +109,12 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                         <EntityTypeIcon entityTypeName={entity.entity_type.name} />
                         <span className="font-medium">{entity.entity_type.name}</span>
                     </div>
+
+                    <SocialLinks
+                        facebookUsername={entity.facebook_username}
+                        twitterUsername={entity.twitter_username}
+                        instagramUsername={entity.instagram_username}
+                    />
 
                     {entity.primary_location && (
                         <div className="flex items-start gap-2 text-gray-600">

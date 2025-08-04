@@ -37,7 +37,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
         entity_status_id: 1 as number | '',
         started_at: '',
         facebook_username: '',
-        twitter_username: '',
+        instagram_username: '',
         primary_location_id: '' as number | '',
         tag_list: [] as number[],
         role_list: [] as number[],
@@ -67,7 +67,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 entity_status_id: entity.entity_status?.id || 1,
                 started_at: entity.started_at || '',
                 facebook_username: entity.facebook_username || '',
-                twitter_username: entity.twitter_username || '',
+                instagram_username: entity.instagram_username || '',
                 primary_location_id: entity.primary_location?.id || '',
                 tag_list: entity.tags?.map(t => t.id) || [],
                 role_list: entity.roles?.map(r => r.id) || [],
@@ -236,9 +236,9 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                         {renderError('facebook_username')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="twitter_username">Twitter Username</Label>
-                        <Input id="twitter_username" name="twitter_username" value={formData.twitter_username} onChange={handleChange} placeholder="twitter_username" />
-                        {renderError('twitter_username')}
+                        <Label htmlFor="instagram_username">Instagram Username</Label>
+                        <Input id="instagram_username" name="instagram_username" value={formData.instagram_username} onChange={handleChange} placeholder="instagram_username" />
+                        {renderError('instagram_username')}
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

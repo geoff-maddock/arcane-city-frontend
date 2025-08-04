@@ -68,6 +68,9 @@ export interface EntityResponse {
     entity_status?: EntityStatus;
     primary_photo?: string;
     primary_photo_thumbnail?: string;
+    facebook_username?: string;
+    twitter_username?: string;
+    instagram_username?: string;
 }
 
 export interface LocationResponse {
@@ -177,6 +180,7 @@ export interface Entity {
     started_at: string;
     facebook_username?: string;
     twitter_username?: string;
+    instagram_username?: string;
     links: Link[];
     tags: Tag[];
     roles: Role[];
