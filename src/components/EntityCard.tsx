@@ -110,12 +110,6 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                         <span className="font-medium">{entity.entity_type.name}</span>
                     </div>
 
-                    <SocialLinks
-                        facebookUsername={entity.facebook_username}
-                        twitterUsername={entity.twitter_username}
-                        instagramUsername={entity.instagram_username}
-                    />
-
                     {entity.primary_location && (
                         <div className="flex items-start gap-2 text-gray-600">
                             <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -155,6 +149,13 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                             <span>{entity.roles.map((role) => role.name).join(', ')}</span>
                         </div>
                     )}
+
+                    <SocialLinks
+                        facebookUsername={entity.facebook_username}
+                        twitterUsername={entity.twitter_username}
+                        instagramUsername={entity.instagram_username}
+                    />
+
                     {entity.description && (
                         <p className="text-gray-600">
                             {entity.description.length > 1200
