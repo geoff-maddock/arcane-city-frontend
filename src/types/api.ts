@@ -38,6 +38,11 @@ export interface UseEventsParams {
         entity?: string;
         tag?: string;
         series?: string;
+        description?: string;
+        created_at?: {
+            start?: string;
+            end?: string;
+        };
         start_at?: {
             start?: string;
             end?: string;
@@ -113,6 +118,7 @@ export interface Tag {
     id: number;
     name: string;
     slug: string;
+    description?: string;
 }
 
 export interface EntityType {

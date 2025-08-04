@@ -63,17 +63,17 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 short: entity.short || '',
                 visibility_id: (entity as { visibility_id?: number }).visibility_id || 1,
                 description: entity.description || '',
-                entity_type_id: entity.entity_type.id,
-                entity_status_id: entity.entity_status.id,
+                entity_type_id: entity.entity_type?.id || '',
+                entity_status_id: entity.entity_status?.id || 1,
                 started_at: entity.started_at || '',
                 facebook_username: entity.facebook_username || '',
                 twitter_username: entity.twitter_username || '',
                 primary_location_id: entity.primary_location?.id || '',
-                tag_list: entity.tags.map(t => t.id),
-                role_list: entity.roles.map(r => r.id),
+                tag_list: entity.tags?.map(t => t.id) || [],
+                role_list: entity.roles?.map(r => r.id) || [],
             });
-            setSelectedTags(entity.tags.map(t => ({ id: t.id, name: t.name })));
-            setSelectedRoles(entity.roles.map(r => ({ id: r.id, name: r.name })));
+            setSelectedTags(entity.tags?.map(t => ({ id: t.id, name: t.name })) || []);
+            setSelectedRoles(entity.roles?.map(r => ({ id: r.id, name: r.name })) || []);
         }
     }, [entity]);
 
@@ -271,10 +271,10 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                                         type="button"
                                         className="ml-1 text-red-500"
                                         onClick={() => {
-                                            setSelectedTags((p) => p.filter((t) => t.id !== tag.id));
+                                            setSelectedTags((p) => p?.filter((t) => t.id !== tag.id) || []);
                                             setFormData((p) => ({
                                                 ...p,
-                                                tag_list: p.tag_list.filter((t) => t !== tag.id),
+                                                tag_list: p.tag_list?.filter((t) => t !== tag.id) || [],
                                             }));
                                         }}
                                     >
@@ -314,10 +314,10 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                                         type="button"
                                         className="ml-1 text-red-500"
                                         onClick={() => {
-                                            setSelectedRoles((p) => p.filter((r) => r.id !== role.id));
+                                            setSelectedRoles((p) => p?.filter((r) => r.id !== role.id) || []);
                                             setFormData((p) => ({
                                                 ...p,
-                                                role_list: p.role_list.filter((r) => r !== role.id),
+                                                role_list: p.role_list?.filter((r) => r !== role.id) || [],
                                             }));
                                         }}
                                     >
