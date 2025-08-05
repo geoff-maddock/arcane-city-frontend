@@ -1,0 +1,18 @@
+name: arcane-city-frontend
+services:
+  - name: web
+    image: docker.io/library/node:14-alpine
+    build_command: npm run build
+    run_command: npm start
+    envs:
+      - key: DIGITALOCEAN_API_TOKEN
+        scope: RUN_AND_BUILD_TIME
+      - key: DIGITALOCEAN_APP_ID
+        scope: RUN_AND_BUILD_TIME
+    http_port: 3000
+    routes:
+      - path: /
+        preserve_path_prefix: true
+        destination: web
+        port: 3000
+        protocol: http
