@@ -101,6 +101,13 @@ export interface Location {
     map_url?: string;
 }
 
+export interface Contact {
+    id: number;
+    name: string;
+    email?: string;
+    phone?: string;
+}
+
 export interface PhotoResponse {
     id: number;
     path: string;
