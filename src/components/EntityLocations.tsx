@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { LocationResponse } from '../types/api';
+import { Location } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,27 +17,28 @@ import {
 import { MapPin, Pencil, Trash2, Loader2 } from 'lucide-react';
 
 interface EntityLocationsProps {
+    entityId: number;
     entitySlug: string;
     canEdit: boolean;
 }
 
-export default function EntityLocations({ entitySlug, canEdit }: EntityLocationsProps) {
-    const { data, isLoading, error, refetch } = useQuery<LocationResponse[]>({
+export default function EntityLocations({ entityId, entitySlug, canEdit }: EntityLocationsProps) {
+    const { data, isLoading, error, refetch } = useQuery<Location[]>({
         queryKey: ['entity', entitySlug, 'locations'],
         queryFn: async () => {
-            const { data } = await api.get<{ data: LocationResponse[] }>(`/entities/${entitySlug}/locations`);
+            const { data } = await api.get<{ data: Location[] }>(`/entities/${entitySlug}/locations`);
             return data.data;
         },
     });
 
-    const [editing, setEditing] = useState<LocationResponse | null>(null);
+    const [editing, setEditing] = useState<Location | null>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
-    const [deleting, setDeleting] = useState<LocationResponse | null>(null);
+    const [deleting, setDeleting] = useState<Location | null>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
     const saveMutation = useMutation({
-        mutationFn: async (loc: LocationResponse) => {
-            await api.put(`/entity-locations/${loc.id}`, loc);
+        mutationFn: async (loc: Location) => {
+            await api.put(`/entities/${entityId}/locations/${loc.id}`, loc);
         },
         onSuccess: () => {
             refetch();
@@ -47,7 +48,7 @@ export default function EntityLocations({ entitySlug, canEdit }: EntityLocations
 
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => {
-            await api.delete(`/entity-locations/${id}`);
+            await api.delete(`/entities/${entityId}/locations/${id}`);
         },
         onSuccess: () => {
             refetch();
@@ -79,7 +80,7 @@ export default function EntityLocations({ entitySlug, canEdit }: EntityLocations
                             <li key={loc.id} className="flex justify-between gap-2 text-sm">
                                 <div className="flex-1">
                                     <div className="font-medium">{loc.name}</div>
-                                    {loc.address_one && <div>{loc.address_one}</div>}
+                                    {loc.address_line_one && <div>{loc.address_line_one}</div>}
                                     <div>
                                         {loc.city}
                                         {loc.state && `, ${loc.state}`}
@@ -134,8 +135,10 @@ export default function EntityLocations({ entitySlug, canEdit }: EntityLocations
                                 <Label htmlFor="location-address-one">Address</Label>
                                 <Input
                                     id="location-address-one"
-                                    value={editing.address_one ?? ''}
-                                    onChange={(e) => setEditing({ ...editing, address_one: e.target.value })}
+                                    value={editing.address_line_one ?? ''}
+                                    onChange={(e) =>
+                                        setEditing({ ...editing, address_line_one: e.target.value })
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">

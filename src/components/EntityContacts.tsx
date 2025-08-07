@@ -17,11 +17,12 @@ import {
 import { User, Pencil, Trash2, Loader2, Mail, Phone } from 'lucide-react';
 
 interface EntityContactsProps {
+    entityId: number;
     entitySlug: string;
     canEdit: boolean;
 }
 
-export default function EntityContacts({ entitySlug, canEdit }: EntityContactsProps) {
+export default function EntityContacts({ entityId, entitySlug, canEdit }: EntityContactsProps) {
     const { data, isLoading, error, refetch } = useQuery<Contact[]>({
         queryKey: ['entity', entitySlug, 'contacts'],
         queryFn: async () => {
@@ -37,7 +38,7 @@ export default function EntityContacts({ entitySlug, canEdit }: EntityContactsPr
 
     const saveMutation = useMutation({
         mutationFn: async (contact: Contact) => {
-            await api.put(`/entity-contacts/${contact.id}`, contact);
+            await api.put(`/entities/${entityId}/contacts/${contact.id}`, contact);
         },
         onSuccess: () => {
             refetch();
@@ -47,7 +48,7 @@ export default function EntityContacts({ entitySlug, canEdit }: EntityContactsPr
 
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => {
-            await api.delete(`/entity-contacts/${id}`);
+            await api.delete(`/entities/${entityId}/contacts/${id}`);
         },
         onSuccess: () => {
             refetch();
