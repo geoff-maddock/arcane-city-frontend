@@ -14,7 +14,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { MapPin, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { MapPin, Pencil, Trash2, Loader2, Plus } from 'lucide-react';
 
 interface EntityLocationsProps {
     entityId: number;
@@ -40,6 +40,23 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [deleting, setDeleting] = useState<Location | null>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [creating, setCreating] = useState<Partial<Location>>({
+        name: '',
+        slug: '',
+        address_one: '',
+        address_two: '',
+        neighborhood: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: '',
+        map_url: '',
+        latitude: 0,
+        longitude: 0,
+        visibility_id: 1,
+        location_type_id: 1
+    });
 
     const saveMutation = useMutation({
         mutationFn: async (loc: Location) => {
@@ -56,6 +73,42 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                 alert(`Error: ${error.response.data.message}`);
             } else {
                 alert('Failed to update location. Please try again.');
+            }
+        },
+    });
+
+    const createMutation = useMutation({
+        mutationFn: async (loc: Partial<Location>) => {
+            await api.post(`/entities/${entityId}/locations`, loc);
+        },
+        onSuccess: () => {
+            refetch();
+            setIsCreateOpen(false);
+            // Reset the creating state
+            setCreating({
+                name: '',
+                slug: '',
+                address_one: '',
+                address_two: '',
+                neighborhood: '',
+                city: '',
+                state: '',
+                postcode: '',
+                country: '',
+                map_url: '',
+                latitude: 0,
+                longitude: 0,
+                visibility_id: 1,
+                location_type_id: 1
+            });
+        },
+        onError: (error: any) => {
+            console.error('Error creating location:', error);
+            // Show user-friendly error message
+            if (error.response?.data?.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                alert('Failed to create location. Please try again.');
             }
         },
     });
@@ -85,6 +138,21 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
 
             saveMutation.mutate(editing);
         }
+    };
+
+    const handleCreateSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Basic validation
+        if (!creating.name?.trim()) {
+            alert('Name is required');
+            return;
+        }
+        if (!creating.slug?.trim()) {
+            alert('Slug is required');
+            return;
+        }
+
+        createMutation.mutate(creating);
     };
 
     if (isLoading) {
@@ -124,9 +192,19 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
         return canEdit ? (
             <Card>
                 <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="h-5 w-5" />
-                        <h2 className="text-xl font-semibold">Locations</h2>
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <MapPin className="h-5 w-5" />
+                            <h2 className="text-xl font-semibold">Locations</h2>
+                        </div>
+                        <Button
+                            size="sm"
+                            onClick={() => setIsCreateOpen(true)}
+                            className="flex items-center gap-1"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Location
+                        </Button>
                     </div>
                     <div className="text-gray-500 text-sm">
                         No locations found for this entity.
@@ -140,9 +218,21 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
         <>
             <Card>
                 <CardContent className="p-6 space-y-4">
-                    <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="h-5 w-5" />
-                        <h2 className="text-xl font-semibold">Locations</h2>
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <MapPin className="h-5 w-5" />
+                            <h2 className="text-xl font-semibold">Locations</h2>
+                        </div>
+                        {canEdit && (
+                            <Button
+                                size="sm"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="flex items-center gap-1"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Location
+                            </Button>
+                        )}
                     </div>
                     <ul className="space-y-3">
                         {data.map((loc) => (
@@ -343,6 +433,119 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                             )}
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogContent className="max-h-[80vh] overflow-hidden flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle>Create New Location</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateSubmit} className="flex flex-col flex-1 overflow-hidden">
+                        <div className="space-y-4 mt-2 overflow-y-auto flex-1 pr-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-name">Name</Label>
+                                <Input
+                                    id="create-location-name"
+                                    value={creating.name}
+                                    onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-slug">Slug</Label>
+                                <Input
+                                    id="create-location-slug"
+                                    value={creating.slug}
+                                    onChange={(e) => setCreating({ ...creating, slug: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-address-one">Address Line 1</Label>
+                                <Input
+                                    id="create-location-address-one"
+                                    value={creating.address_one ?? ''}
+                                    onChange={(e) =>
+                                        setCreating({ ...creating, address_one: e.target.value })
+                                    }
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-address-two">Address Line 2</Label>
+                                <Input
+                                    id="create-location-address-two"
+                                    value={creating.address_two ?? ''}
+                                    onChange={(e) =>
+                                        setCreating({ ...creating, address_two: e.target.value })
+                                    }
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-neighborhood">Neighborhood</Label>
+                                <Input
+                                    id="create-location-neighborhood"
+                                    value={creating.neighborhood ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, neighborhood: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-city">City</Label>
+                                <Input
+                                    id="create-location-city"
+                                    value={creating.city ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, city: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-state">State</Label>
+                                <Input
+                                    id="create-location-state"
+                                    value={creating.state ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, state: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-postal">Postal Code</Label>
+                                <Input
+                                    id="create-location-postal"
+                                    value={creating.postcode ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, postcode: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-country">Country</Label>
+                                <Input
+                                    id="create-location-country"
+                                    value={creating.country ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, country: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-location-map-url">Map URL</Label>
+                                <Input
+                                    id="create-location-map-url"
+                                    value={creating.map_url ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, map_url: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter className="mt-4">
+                            <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={createMutation.isPending}>
+                                {createMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Creating...
+                                    </>
+                                ) : (
+                                    'Create'
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
                 </DialogContent>
             </Dialog>
         </>

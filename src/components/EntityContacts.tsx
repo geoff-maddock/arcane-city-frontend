@@ -15,7 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { User, Pencil, Trash2, Loader2, Mail, Phone } from 'lucide-react';
+import { User, Pencil, Trash2, Loader2, Mail, Phone, Plus } from 'lucide-react';
 
 interface EntityContactsProps {
     entityId: number;
@@ -41,6 +41,15 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [deleting, setDeleting] = useState<Contact | null>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [creating, setCreating] = useState<Partial<Contact>>({
+        name: '',
+        email: '',
+        phone: '',
+        other: '',
+        type: 'general',
+        visibility_id: 1
+    });
 
     const saveMutation = useMutation({
         mutationFn: async (contact: Contact) => {
@@ -57,6 +66,34 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                 alert(`Error: ${error.response.data.message}`);
             } else {
                 alert('Failed to update contact. Please try again.');
+            }
+        },
+    });
+
+    const createMutation = useMutation({
+        mutationFn: async (contact: Partial<Contact>) => {
+            await api.post(`/entities/${entityId}/contacts`, contact);
+        },
+        onSuccess: () => {
+            refetch();
+            setIsCreateOpen(false);
+            // Reset the creating state
+            setCreating({
+                name: '',
+                email: '',
+                phone: '',
+                other: '',
+                type: 'general',
+                visibility_id: 1
+            });
+        },
+        onError: (error: any) => {
+            console.error('Error creating contact:', error);
+            // Show user-friendly error message
+            if (error.response?.data?.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                alert('Failed to create contact. Please try again.');
             }
         },
     });
@@ -96,6 +133,29 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
         }
     };
 
+    const handleCreateSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Basic validation
+        if (!creating.name?.trim()) {
+            alert('Name is required');
+            return;
+        }
+        if (!creating.type?.trim()) {
+            alert('Type is required');
+            return;
+        }
+        if (creating.email && creating.email.trim()) {
+            // Simple email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(creating.email.trim())) {
+                alert('Please enter a valid email address');
+                return;
+            }
+        }
+
+        createMutation.mutate(creating);
+    };
+
     if (isLoading) {
         return (
             <Card>
@@ -131,27 +191,209 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
 
     if (!data || data.length === 0) {
         return canEdit ? (
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                        <User className="h-5 w-5" />
-                        <h2 className="text-xl font-semibold">Contacts</h2>
-                    </div>
-                    <div className="text-gray-500 text-sm">
-                        No contacts found for this entity.
-                    </div>
-                </CardContent>
-            </Card>
+            <>
+                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create New Contact</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateSubmit} className="space-y-4 mt-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="create-contact-name">Name</Label>
+                                <Input
+                                    id="create-contact-name"
+                                    value={creating.name}
+                                    onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-contact-type">Type</Label>
+                                <Select
+                                    value={creating.type}
+                                    onValueChange={(value) => setCreating({ ...creating, type: value })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select contact type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="general">General</SelectItem>
+                                        <SelectItem value="booking">Booking</SelectItem>
+                                        <SelectItem value="manager">Manager</SelectItem>
+                                        <SelectItem value="owner">Owner</SelectItem>
+                                        <SelectItem value="promoter">Promoter</SelectItem>
+                                        <SelectItem value="technical">Technical</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-contact-email">Email</Label>
+                                <Input
+                                    id="create-contact-email"
+                                    type="email"
+                                    value={creating.email ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, email: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-contact-phone">Phone</Label>
+                                <Input
+                                    id="create-contact-phone"
+                                    value={creating.phone ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, phone: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-contact-other">Other Info</Label>
+                                <Input
+                                    id="create-contact-other"
+                                    value={creating.other ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, other: e.target.value })}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={createMutation.isPending}>
+                                    {createMutation.isPending ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create'
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <User className="h-5 w-5" />
+                                <h2 className="text-xl font-semibold">Contacts</h2>
+                            </div>
+                            <Button
+                                size="sm"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="flex items-center gap-1"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Contact
+                            </Button>
+                        </div>
+                        <div className="text-gray-500 text-sm">
+                            No contacts found for this entity.
+                        </div>
+                    </CardContent>
+                </Card>
+            </>
         ) : null;
     }
 
     return (
         <>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Create New Contact</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateSubmit} className="space-y-4 mt-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="create-contact-name">Name</Label>
+                            <Input
+                                id="create-contact-name"
+                                value={creating.name}
+                                onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="create-contact-type">Type</Label>
+                            <Select
+                                value={creating.type}
+                                onValueChange={(value) => setCreating({ ...creating, type: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select contact type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="general">General</SelectItem>
+                                    <SelectItem value="booking">Booking</SelectItem>
+                                    <SelectItem value="manager">Manager</SelectItem>
+                                    <SelectItem value="owner">Owner</SelectItem>
+                                    <SelectItem value="promoter">Promoter</SelectItem>
+                                    <SelectItem value="technical">Technical</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="create-contact-email">Email</Label>
+                            <Input
+                                id="create-contact-email"
+                                type="email"
+                                value={creating.email ?? ''}
+                                onChange={(e) => setCreating({ ...creating, email: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="create-contact-phone">Phone</Label>
+                            <Input
+                                id="create-contact-phone"
+                                value={creating.phone ?? ''}
+                                onChange={(e) => setCreating({ ...creating, phone: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="create-contact-other">Other Info</Label>
+                            <Input
+                                id="create-contact-other"
+                                value={creating.other ?? ''}
+                                onChange={(e) => setCreating({ ...creating, other: e.target.value })}
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={createMutation.isPending}>
+                                {createMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Creating...
+                                    </>
+                                ) : (
+                                    'Create'
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             <Card>
                 <CardContent className="p-6 space-y-4">
-                    <div className="flex items-center gap-2 mb-2">
-                        <User className="h-5 w-5" />
-                        <h2 className="text-xl font-semibold">Contacts</h2>
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <User className="h-5 w-5" />
+                            <h2 className="text-xl font-semibold">Contacts</h2>
+                        </div>
+                        {canEdit && (
+                            <Button
+                                size="sm"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="flex items-center gap-1"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Contact
+                            </Button>
+                        )}
                     </div>
                     <ul className="space-y-3">
                         {data.map((c) => (
