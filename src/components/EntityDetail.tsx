@@ -13,6 +13,8 @@ import PhotoDropzone from './PhotoDropzone';
 import { authService } from '../services/auth.service';
 import { EntityTypeIcon } from './EntityTypeIcon';
 import { SocialLinks } from './SocialLinks';
+import EntityLocations from './EntityLocations';
+import EntityContacts from './EntityContacts';
 import {
     Dialog,
     DialogContent,
@@ -141,6 +143,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     // Replace newlines with <br /> tags in the description
     const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
     const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
+    const canEdit = !!user && user.id === entity.created_by;
 
     return (
         <div className="min-h-screen">
@@ -351,6 +354,9 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            <EntityLocations entityId={entity.id} entitySlug={entity.slug} canEdit={canEdit} />
+                            <EntityContacts entityId={entity.id} entitySlug={entity.slug} canEdit={canEdit} />
 
                             <PhotoGallery
                                 fetchUrl={`/entities/${entity.slug}/photos`}

@@ -73,6 +73,24 @@ export interface EntityResponse {
     instagram_username?: string;
 }
 
+export interface Location {
+    id: number;
+    name: string;
+    slug: string;
+    address_one?: string;
+    address_two?: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
+    postcode?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+    visibility_id?: number;
+    location_type_id?: number;
+    map_url?: string;
+}
+
 export interface LocationResponse {
     id: number;
     name: string;
@@ -82,23 +100,23 @@ export interface LocationResponse {
     neighborhood?: string;
     city?: string;
     state?: string;
-    postal_code?: string;
+    postcode?: string;
     country?: string;
+    latitude?: number;
+    longitude?: number;
+    visibility_id?: number;
+    location_type_id?: number;
     map_url?: string;
 }
 
-export interface Location {
+export interface Contact {
     id: number;
     name: string;
-    slug: string;
-    address_line_one?: string;
-    address_line_two?: string;
-    neighborhood?: string;
-    city?: string;
-    state?: string;
-    postal_code?: string;
-    country?: string;
-    map_url?: string;
+    email?: string;
+    phone?: string;
+    other?: string;
+    type: string;
+    visibility_id: number;
 }
 
 export interface PhotoResponse {
@@ -186,7 +204,7 @@ export interface Entity {
     roles: Role[];
     primary_photo?: string;
     primary_photo_thumbnail?: string;
-    primary_location?: LocationResponse;
+    primary_location?: Location;
 }
 
 export interface PaginatedResponse<T> {
