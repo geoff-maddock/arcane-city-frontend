@@ -10,7 +10,7 @@ interface SortControlsProps {
     sortOptions: { value: string; label: string }[];
 }
 
-const SortControls: React.FC<SortControlsProps> = ({ sort, setSort, direction, setDirection, sortOptions }) => {
+export const SortControls: React.FC<SortControlsProps> = ({ sort, setSort, direction, setDirection, sortOptions }) => {
     return (
 
         <div className="flex items-center gap-2">

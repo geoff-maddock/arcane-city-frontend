@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Event, PaginatedResponse, UseEventsParams } from '../types/api';
-import { toKebabCase } from '../lib/utils';
+import { toKebabCase, stableStringify } from '../lib/utils';
 
 export const useEvents = ({ page = 1, itemsPerPage = 25, filters, sort = 'start_at', direction = 'asc' }: UseEventsParams = {}) => {
+    const serializedFilters = stableStringify(filters || {});
     return useQuery<PaginatedResponse<Event>>({
-        queryKey: ['events', page, itemsPerPage, filters, sort, direction],
+        queryKey: ['events', page, itemsPerPage, serializedFilters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
 

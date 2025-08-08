@@ -16,18 +16,12 @@ import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import DOMPurify from 'dompurify';
 
 export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     const navigate = useNavigate();
@@ -141,7 +135,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
     }
 
     // Replace newlines with <br /> tags in the description
-    const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
+    const formattedDescription = entity.description ? DOMPurify.sanitize(entity.description.replace(/\n/g, '<br />')) : '';
     const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
     const canEdit = !!user && user.id === entity.created_by;
 
@@ -216,39 +210,17 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                     )}
                                 </div>
 
-                                {/* Delete Confirmation Dialog */}
-                                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Delete Entity</DialogTitle>
-                                            <DialogDescription>
-                                                Are you sure you want to delete "{entity.name}"? This action cannot be undone.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setDeleteDialogOpen(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                onClick={handleDelete}
-                                                disabled={deleteMutation.isPending}
-                                            >
-                                                {deleteMutation.isPending ? (
-                                                    <>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Deleting...
-                                                    </>
-                                                ) : (
-                                                    'Delete'
-                                                )}
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                {/* Delete Confirmation Dialog replaced */}
+                                <ConfirmDialog
+                                    open={deleteDialogOpen}
+                                    onOpenChange={setDeleteDialogOpen}
+                                    title="Delete Entity"
+                                    description={`Are you sure you want to delete "${entity.name}"? This action cannot be undone.`}
+                                    confirmLabel="Delete"
+                                    destructive
+                                    loading={deleteMutation.isPending}
+                                    onConfirm={handleDelete}
+                                />
                                 {entity.short && (
                                     <p className="text-xl text-gray-600">{entity.short}</p>
                                 )}
@@ -406,7 +378,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                             )}
                         </div>
                     </div>
-                    <EntityEvents entityName={entity.name} />
+                    <EntityEvents entitySlug={entity.slug} />
                 </div>
             </div>
         </div>

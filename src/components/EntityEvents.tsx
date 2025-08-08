@@ -1,73 +1,58 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
-import { Pagination } from './Pagination';
+import { PaginationBar } from './PaginationBar';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface EntityEventsProps {
-    entityName: string;
+    entitySlug: string; // use slug for stable filtering
 }
 
-const sortOptions = [
-    { value: 'start_at', label: 'Date' },
-    { value: 'name', label: 'Name' },
-    { value: 'venue_id', label: 'Venue' },
-    { value: 'promoter_id', label: 'Promoter' },
-    { value: 'event_type_id', label: 'Type' },
-    { value: 'created_at', label: 'Recently Added' },
-];
-
-export default function EntityEvents({ entityName }: EntityEventsProps) {
+export default function EntityEvents({ entitySlug }: EntityEventsProps) {
     const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [sort, setSort] = useState('start_at');
-    const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
+    const [itemsPerPage] = useState(10);
+
+    // Reset page when entity changes
+    useEffect(() => { setPage(1); }, [entitySlug]);
 
     const { data, isLoading, error } = useEvents({
-        filters: { entity: entityName },
+        filters: { entity: entitySlug },
         page,
         itemsPerPage,
-        sort,
-        direction,
     });
 
-    const allEventImages =
-        data?.data
-            .filter((event) => event.primary_photo && event.primary_photo_thumbnail)
-            .map((event) => ({
-                src: event.primary_photo!,
-                alt: event.name,
-                thumbnail: event.primary_photo_thumbnail,
-            })) ?? [];
+    // Clamp page if it exceeds last_page (e.g., after data change)
+    useEffect(() => {
+        if (data && page > data.last_page) {
+            setPage(data.last_page || 1);
+        }
+    }, [data, page]);
 
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    const effectivePerPage = data?.per_page ?? itemsPerPage;
 
-    const handleItemsPerPageChange = (count: number) => {
-        setItemsPerPage(count);
-        setPage(1);
-    };
+    const allEventImages = useMemo(
+        () =>
+            data?.data
+                .filter((event) => event.primary_photo && event.primary_photo_thumbnail)
+                .map((event) => ({
+                    src: event.primary_photo!,
+                    alt: event.name,
+                    thumbnail: event.primary_photo_thumbnail,
+                })) ?? [],
+        [data]
+    );
 
     const renderPagination = () => {
         if (!data) return null;
         return (
-            <Pagination
+            <PaginationBar
                 currentPage={page}
                 totalPages={data.last_page}
-                onPageChange={handlePageChange}
-                itemCount={data.data.length}
+                onPageChange={setPage}
+                itemsPerPage={effectivePerPage}
                 totalItems={data.total}
-                itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={handleItemsPerPageChange}
-                sort={sort}
-                setSort={setSort}
-                direction={direction}
-                setDirection={setDirection}
-                sortOptions={sortOptions}
             />
         );
     };

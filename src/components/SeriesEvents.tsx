@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
-import { Pagination } from './Pagination';
+import { PaginationBar } from './PaginationBar';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,27 +10,14 @@ interface SeriesEventsProps {
     seriesSlug: string;
 }
 
-const sortOptions = [
-    { value: 'start_at', label: 'Date' },
-    { value: 'name', label: 'Name' },
-    { value: 'venue_id', label: 'Venue' },
-    { value: 'promoter_id', label: 'Promoter' },
-    { value: 'event_type_id', label: 'Type' },
-    { value: 'created_at', label: 'Recently Added' },
-];
-
 export default function SeriesEvents({ seriesSlug }: SeriesEventsProps) {
     const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [sort, setSort] = useState('start_at');
-    const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
+    const [itemsPerPage] = useState(10);
 
     const { data, isLoading, error } = useEvents({
         filters: { series: seriesSlug },
         page,
         itemsPerPage,
-        sort,
-        direction,
     });
 
     const allEventImages =
@@ -42,32 +29,15 @@ export default function SeriesEvents({ seriesSlug }: SeriesEventsProps) {
                 thumbnail: event.primary_photo_thumbnail,
             })) ?? [];
 
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleItemsPerPageChange = (count: number) => {
-        setItemsPerPage(count);
-        setPage(1);
-    };
-
     const renderPagination = () => {
         if (!data) return null;
         return (
-            <Pagination
+            <PaginationBar
                 currentPage={page}
                 totalPages={data.last_page}
-                onPageChange={handlePageChange}
-                itemCount={data.data.length}
-                totalItems={data.total}
+                onPageChange={setPage}
                 itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={handleItemsPerPageChange}
-                sort={sort}
-                setSort={setSort}
-                direction={direction}
-                setDirection={setDirection}
-                sortOptions={sortOptions}
+                totalItems={data.total}
             />
         );
     };

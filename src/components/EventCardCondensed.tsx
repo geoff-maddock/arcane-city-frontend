@@ -7,11 +7,11 @@ import { AgeRestriction } from './AgeRestriction';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
-import { useContext, useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useContext } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
-import { api } from '../lib/api';
 import { EventFilterContext } from '../context/EventFilterContext';
+import { useAttend } from '@/hooks/useAttend';
 
 
 interface EventCardProps {
@@ -29,31 +29,7 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
         queryFn: authService.getCurrentUser,
         enabled: authService.isAuthenticated(),
     });
-    const [attending, setAttending] = useState(false);
-
-    useEffect(() => {
-        if (user && event.attendees) {
-            setAttending(event.attendees.some((u) => u.id === user.id));
-        }
-    }, [user, event.attendees]);
-
-    const attendMutation = useMutation({
-        mutationFn: async () => {
-            await api.post(`/events/${event.id}/attend`);
-        },
-        onSuccess: () => {
-            setAttending(true);
-        },
-    });
-
-    const unattendMutation = useMutation({
-        mutationFn: async () => {
-            await api.delete(`/events/${event.id}/attend`);
-        },
-        onSuccess: () => {
-            setAttending(false);
-        },
-    });
+    const attend = useAttend(event.slug);
 
     const handleTagClick = (tagName: string) => {
         setFilters((prevFilters) => ({ ...prevFilters, tag: tagName }));
@@ -69,11 +45,7 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
 
     const handleAttendToggle = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (attending) {
-            unattendMutation.mutate();
-        } else {
-            attendMutation.mutate();
-        }
+        attend.toggle();
     };
 
 
@@ -105,10 +77,10 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
                                         </a>
                                     </h3>
                                     {user && (
-                                        <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
+                                        <button onClick={handleAttendToggle} aria-label={attend.attending ? 'Unattend' : 'Attend'}>
                                             <Star
-                                                className={`h-5 w-5 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
-                                                fill={attending ? 'currentColor' : 'none'}
+                                                className={`h-5 w-5 ${attend.attending ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                fill={attend.attending ? 'currentColor' : 'none'}
                                             />
                                         </button>
                                     )}

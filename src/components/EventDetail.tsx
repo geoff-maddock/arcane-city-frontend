@@ -1,18 +1,10 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
@@ -22,10 +14,11 @@ import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
-
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import DOMPurify from 'dompurify';
+import { useAttend } from '@/hooks/useAttend';
 
 export default function EventDetail({ slug }: { slug: string }) {
-    const navigate = useNavigate();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
@@ -38,55 +31,6 @@ export default function EventDetail({ slug }: { slug: string }) {
         queryFn: authService.getCurrentUser,
         enabled: authService.isAuthenticated(),
     });
-    const [attending, setAttending] = useState(false);
-
-    const attendMutation = useMutation({
-        mutationFn: async () => {
-            if (!event) return;
-            await api.post(`/events/${event.slug}/attend`);
-        },
-        onSuccess: () => {
-            setAttending(true);
-        },
-    });
-
-    const unattendMutation = useMutation({
-        mutationFn: async () => {
-            if (!event) return;
-            await api.delete(`/events/${event.slug}/attend`);
-        },
-        onSuccess: () => {
-            setAttending(false);
-        },
-    });
-
-    const handleAttendToggle = () => {
-        if (attending) {
-            unattendMutation.mutate();
-        } else {
-            attendMutation.mutate();
-        }
-    };
-
-    const deleteMutation = useMutation({
-        mutationFn: async () => {
-            await api.delete(`/events/${slug}`);
-        },
-        onSuccess: () => {
-            // Navigate back to events list after successful deletion
-            navigate({ to: '/events' });
-        },
-        onError: (error) => {
-            console.error('Error deleting event:', error);
-            // You could add a toast notification here for better UX
-        },
-    });
-
-    const handleDelete = () => {
-        deleteMutation.mutate();
-        setDeleteDialogOpen(false);
-    };
-
 
     // Fetch the event data
     const { data: event, isLoading, error, refetch } = useQuery<Event>({
@@ -96,12 +40,6 @@ export default function EventDetail({ slug }: { slug: string }) {
             return data;
         },
     });
-
-    useEffect(() => {
-        if (user && event?.attendees) {
-            setAttending(event.attendees.some((u) => u.id === user.id));
-        }
-    }, [user, event?.attendees]);
 
     // Fetch event embeds after the event detail is loaded
     useEffect(() => {
@@ -123,6 +61,24 @@ export default function EventDetail({ slug }: { slug: string }) {
         }
     }, [event?.slug]);
 
+    const attend = useAttend(slug);
+
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            await api.delete(`/events/${slug}`);
+        },
+        onSuccess: () => {
+            window.location.href = '/events';
+        },
+        onError: (error) => {
+            console.error('Error deleting event:', error);
+        },
+    });
+
+    const handleDelete = () => {
+        deleteMutation.mutate();
+        setDeleteDialogOpen(false);
+    };
 
     if (isLoading) {
         return (
@@ -140,8 +96,8 @@ export default function EventDetail({ slug }: { slug: string }) {
         );
     }
 
-    // Replace newlines with <br /> tags in the description
-    const formattedDescription = event.description ? event.description.replace(/\n/g, '<br />') : '';
+    // Replace newlines and sanitize description
+    const formattedDescription = event.description ? DOMPurify.sanitize(event.description.replace(/\n/g, '<br />')) : '';
 
     return (
         <div className="min-h-screen">
@@ -169,10 +125,10 @@ export default function EventDetail({ slug }: { slug: string }) {
                                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
                                     <div className="flex items-center gap-2">
                                         {user && (
-                                            <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
+                                            <button onClick={attend.toggle} aria-label={attend.attending ? 'Unattend' : 'Attend'}>
                                                 <Star
-                                                    className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
-                                                    fill={attending ? 'currentColor' : 'none'}
+                                                    className={`h-6 w-6 ${attend.attending ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                    fill={attend.attending ? 'currentColor' : 'none'}
                                                 />
                                             </button>
                                         )}
@@ -217,38 +173,16 @@ export default function EventDetail({ slug }: { slug: string }) {
                                 </div>
 
                                 {/* Delete Confirmation Dialog */}
-                                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Delete Event</DialogTitle>
-                                            <DialogDescription>
-                                                Are you sure you want to delete "{event.name}"? This action cannot be undone.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setDeleteDialogOpen(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                onClick={handleDelete}
-                                                disabled={deleteMutation.isPending}
-                                            >
-                                                {deleteMutation.isPending ? (
-                                                    <>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Deleting...
-                                                    </>
-                                                ) : (
-                                                    'Delete'
-                                                )}
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                <ConfirmDialog
+                                    open={deleteDialogOpen}
+                                    onOpenChange={setDeleteDialogOpen}
+                                    title="Delete Event"
+                                    description={`Are you sure you want to delete "${event.name}"? This action cannot be undone.`}
+                                    confirmLabel="Delete"
+                                    destructive
+                                    loading={deleteMutation.isPending}
+                                    onConfirm={handleDelete}
+                                />
 
                                 {event.short && (
                                     <p className="text-xl text-gray-600">{event.short}</p>

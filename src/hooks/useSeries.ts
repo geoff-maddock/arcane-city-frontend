@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Series, PaginatedResponse } from '../types/api';
-import { toKebabCase } from '../lib/utils';
+import { toKebabCase, stableStringify } from '../lib/utils';
 
 interface DateRange {
     start?: string;
@@ -26,8 +26,9 @@ interface UseSeriesParams {
 }
 
 export const useSeries = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', direction = 'asc' }: UseSeriesParams = {}) => {
+    const serializedFilters = stableStringify(filters || {});
     return useQuery<PaginatedResponse<Series>>({
-        queryKey: ['series', page, itemsPerPage, filters, sort, direction],
+        queryKey: ['series', page, itemsPerPage, serializedFilters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
 

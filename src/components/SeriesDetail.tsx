@@ -5,16 +5,8 @@ import { Series } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Star, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { AgeRestriction } from './AgeRestriction';
@@ -23,8 +15,10 @@ import { authService } from '../services/auth.service';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { SeriesFilterContext } from '../context/SeriesFilterContext';
-import { useContext } from 'react';
 import SeriesEvents from './SeriesEvents';
+import { useFollow } from '@/hooks/useFollow';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import DOMPurify from 'dompurify';
 
 export default function SeriesDetail({ slug }: { slug: string }) {
     const navigate = useNavigate();
@@ -38,51 +32,19 @@ export default function SeriesDetail({ slug }: { slug: string }) {
         enabled: authService.isAuthenticated(),
     });
 
-    const [following, setFollowing] = useState(false);
+    const follow = useFollow('series', slug);
+
     const { setFilters } = useContext(SeriesFilterContext);
-    useEffect(() => {
-        if (user) {
-            setFollowing(user.followed_series.some(s => s.slug === slug));
-        }
-    }, [user, slug]);
-
-    const followMutation = useMutation({
-        mutationFn: async () => {
-            await api.post(`/series/${slug}/follow`);
-        },
-        onSuccess: () => {
-            setFollowing(true);
-        },
-    });
-
-    const unfollowMutation = useMutation({
-        mutationFn: async () => {
-            await api.post(`/series/${slug}/unfollow`);
-        },
-        onSuccess: () => {
-            setFollowing(false);
-        },
-    });
-
-    const handleFollowToggle = () => {
-        if (following) {
-            unfollowMutation.mutate();
-        } else {
-            followMutation.mutate();
-        }
-    };
 
     const deleteMutation = useMutation({
         mutationFn: async () => {
             await api.delete(`/series/${slug}`);
         },
         onSuccess: () => {
-            // Navigate back to series list after successful deletion
             navigate({ to: '/series' });
         },
         onError: (error) => {
             console.error('Error deleting series:', error);
-            // You could add a toast notification here for better UX
         },
     });
 
@@ -99,7 +61,6 @@ export default function SeriesDetail({ slug }: { slug: string }) {
         setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
     };
 
-    // Fetch the series data
     const { data: series, isLoading, error, refetch } = useQuery<Series>({
         queryKey: ['series', slug],
         queryFn: async () => {
@@ -124,8 +85,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
         );
     }
 
-    // Replace newlines with <br /> tags in the description
-    const formattedDescription = series.description ? series.description.replace(/\n/g, '<br />') : '';
+    const formattedDescription = series.description ? DOMPurify.sanitize(series.description.replace(/\n/g, '<br />')) : '';
 
     return (
         <div className="min-h-screen">
@@ -153,8 +113,8 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{series.name}</h1>
                                     {user && (
                                         <div className="flex items-center gap-2">
-                                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
-                                                <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                                            <button onClick={follow.toggle} aria-label={follow.following ? 'Unfollow' : 'Follow'}>
+                                                <Star className={`h-5 w-5 ${follow.following ? 'text-yellow-500' : 'text-gray-400'}`} fill={follow.following ? 'currentColor' : 'none'} />
                                             </button>
                                             {user.id === series.created_by && (
                                                 <Popover open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
@@ -198,38 +158,16 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                 </div>
 
                                 {/* Delete Confirmation Dialog */}
-                                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Delete Series</DialogTitle>
-                                            <DialogDescription>
-                                                Are you sure you want to delete "{series.name}"? This action cannot be undone.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setDeleteDialogOpen(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                onClick={handleDelete}
-                                                disabled={deleteMutation.isPending}
-                                            >
-                                                {deleteMutation.isPending ? (
-                                                    <>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Deleting...
-                                                    </>
-                                                ) : (
-                                                    'Delete'
-                                                )}
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                <ConfirmDialog
+                                    open={deleteDialogOpen}
+                                    onOpenChange={setDeleteDialogOpen}
+                                    title="Delete Series"
+                                    description={`Are you sure you want to delete "${series.name}"? This action cannot be undone.`}
+                                    confirmLabel="Delete"
+                                    destructive
+                                    loading={deleteMutation.isPending}
+                                    onConfirm={handleDelete}
+                                />
                                 {series.short && (
                                     <p className="line-clamp-2 text-sm text-gray-500">{series.short}</p>
                                 )}
