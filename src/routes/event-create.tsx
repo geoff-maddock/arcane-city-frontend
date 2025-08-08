@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createRoute, useNavigate } from '@tanstack/react-router';
+import { createRoute, useNavigate, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,6 +54,7 @@ const EventCreate: React.FC = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
+  const [duplicateEvent, setDuplicateEvent] = useState<{ name: string; slug: string } | null>(null);
 
   // Set default visibility to "Public" when options are loaded
   useEffect(() => {
@@ -70,6 +71,7 @@ const EventCreate: React.FC = () => {
     const slug = formData.slug.trim();
     if (!name || !slug) {
       setNameCheck('idle');
+      setDuplicateEvent(null);
       return;
     }
     const controller = new AbortController();
@@ -83,8 +85,11 @@ const EventCreate: React.FC = () => {
           signal: controller.signal,
         });
         if (data?.data?.length > 0) {
+          const evt = data.data[0];
+          setDuplicateEvent({ name: evt.name, slug: evt.slug });
           setNameCheck('duplicate');
         } else {
+          setDuplicateEvent(null);
           setNameCheck('unique');
         }
       } catch {
@@ -166,8 +171,14 @@ const EventCreate: React.FC = () => {
           {nameCheck === 'unique' && (
             <p className="text-green-500 text-sm">No other event found with the same name or slug.</p>
           )}
-          {nameCheck === 'duplicate' && (
-            <p className="text-red-500 text-sm">Another event found with the same name. Please verify this is not a duplicate.</p>
+          {nameCheck === 'duplicate' && duplicateEvent && (
+            <p className="text-red-500 text-sm">
+              Another event found with the same name:{' '}
+              <Link to={`/events/${duplicateEvent.slug}`} className="underline">
+                {duplicateEvent.name}
+              </Link>
+              . Please verify this is not a duplicate.
+            </p>
           )}
           {renderError('name')}
         </div>
