@@ -53,6 +53,7 @@ export default function EntityEvents({ entitySlug }: EntityEventsProps) {
                 onPageChange={setPage}
                 itemsPerPage={effectivePerPage}
                 totalItems={data.total}
+                pageSizeOverride={data.data.length}
             />
         );
     };

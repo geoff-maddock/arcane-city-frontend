@@ -297,7 +297,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                 </div>
 
                 {/* Series Events Section */}
-                <SeriesEvents seriesSlug={slug} />
+                <SeriesEvents seriesName={series.name} />
             </div>
         </div>
     );

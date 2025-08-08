@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from './EventCard';
 import { PaginationBar } from './PaginationBar';
@@ -7,27 +7,40 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface SeriesEventsProps {
-    seriesSlug: string;
+    seriesName: string; // API expects the series name for filters.series
 }
 
-export default function SeriesEvents({ seriesSlug }: SeriesEventsProps) {
+export default function SeriesEvents({ seriesName }: SeriesEventsProps) {
     const [page, setPage] = useState(1);
     const [itemsPerPage] = useState(10);
 
+    // Reset page when series name changes
+    useEffect(() => { setPage(1); }, [seriesName]);
+
     const { data, isLoading, error } = useEvents({
-        filters: { series: seriesSlug },
+        filters: { series: seriesName },
         page,
         itemsPerPage,
     });
 
-    const allEventImages =
+    // Clamp page
+    useEffect(() => {
+        if (data && page > data.last_page) {
+            setPage(data.last_page || 1);
+        }
+    }, [data, page]);
+
+    const effectivePerPage = data?.per_page ?? itemsPerPage;
+
+    const allEventImages = useMemo(() => (
         data?.data
             .filter((event) => event.primary_photo && event.primary_photo_thumbnail)
             .map((event) => ({
                 src: event.primary_photo!,
                 alt: event.name,
                 thumbnail: event.primary_photo_thumbnail,
-            })) ?? [];
+            })) ?? []
+    ), [data]);
 
     const renderPagination = () => {
         if (!data) return null;
@@ -36,8 +49,9 @@ export default function SeriesEvents({ seriesSlug }: SeriesEventsProps) {
                 currentPage={page}
                 totalPages={data.last_page}
                 onPageChange={setPage}
-                itemsPerPage={itemsPerPage}
+                itemsPerPage={effectivePerPage}
                 totalItems={data.total}
+                pageSizeOverride={data.data.length}
             />
         );
     };

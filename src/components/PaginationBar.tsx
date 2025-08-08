@@ -1,19 +1,25 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatPaginationRange } from '@/lib/utils';
 
 interface PaginationBarProps {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
-    itemsPerPage: number;
+    itemsPerPage: number; // requested page size
     totalItems: number;
     className?: string;
+    pageSizeOverride?: number; // actual number of items returned this page
 }
 
-export function PaginationBar({ currentPage, totalPages, onPageChange, itemsPerPage, totalItems, className }: PaginationBarProps) {
-    const startIndex = (currentPage - 1) * itemsPerPage + 1;
-    const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+export function PaginationBar({ currentPage, totalPages, onPageChange, itemsPerPage, totalItems, className, pageSizeOverride }: PaginationBarProps) {
+    // Compute display range correctly: start based on requested itemsPerPage, end based on actual items returned (override) or full page
+    const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+    const pageItemCount = pageSizeOverride ?? itemsPerPage;
+    const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + pageItemCount - 1, totalItems);
+
+    const rangeLabel = totalItems === 0
+        ? 'Showing 0 results'
+        : `Showing ${startIndex} to ${endIndex} of ${totalItems} results`;
 
     const showPage = (page: number) => (
         <Button
@@ -46,7 +52,7 @@ export function PaginationBar({ currentPage, totalPages, onPageChange, itemsPerP
         <div className={className || 'flex flex-col gap-3 border-t py-3 md:px-6'}>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <p className="text-sm text-gray-700 hidden md:block">
-                    {formatPaginationRange(startIndex, endIndex, totalItems)}
+                    {rangeLabel}
                 </p>
                 <div className="flex items-center justify-between gap-4 w-full md:w-auto">
                     <Button
