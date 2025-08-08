@@ -16,6 +16,14 @@ import {
 } from '@/components/ui/dialog';
 import { MapPin, Pencil, Trash2, Loader2, Plus } from 'lucide-react';
 
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 interface EntityLocationsProps {
     entityId: number;
     entitySlug: string;
@@ -66,7 +74,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
             refetch();
             setIsEditOpen(false);
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error('Error updating location:', error);
             // Show user-friendly error message
             if (error.response?.data?.message) {
@@ -102,7 +110,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                 location_type_id: 1
             });
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error('Error creating location:', error);
             // Show user-friendly error message
             if (error.response?.data?.message) {

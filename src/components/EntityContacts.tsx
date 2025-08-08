@@ -17,6 +17,14 @@ import {
 } from '@/components/ui/dialog';
 import { User, Pencil, Trash2, Loader2, Mail, Phone, Plus } from 'lucide-react';
 
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 interface EntityContactsProps {
     entityId: number;
     entitySlug: string;
@@ -59,7 +67,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
             refetch();
             setIsEditOpen(false);
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error('Error updating contact:', error);
             // Show user-friendly error message
             if (error.response?.data?.message) {
@@ -87,7 +95,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                 visibility_id: 1
             });
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error('Error creating contact:', error);
             // Show user-friendly error message
             if (error.response?.data?.message) {
