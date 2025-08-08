@@ -131,7 +131,7 @@ const EntityCreate: React.FC = () => {
                 role_list: formData.role_list,
             };
             const { data } = await api.post('/entities', payload);
-            navigate({ to: `/entities/${data.slug}` });
+            navigate({ to: '/entities/$entitySlug', params: { entitySlug: data.slug } });
         } catch (err) {
             if ((err as AxiosError).response?.status === 422) {
                 const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
@@ -169,7 +169,7 @@ const EntityCreate: React.FC = () => {
                     {nameCheck === 'duplicate' && duplicateEntity && (
                         <p className="text-red-500 text-sm">
                             Another entity found with the same name:{' '}
-                            <Link to={`/entities/${duplicateEntity.slug}`} className="underline">
+                            <Link to="/entities/$entitySlug" params={{ entitySlug: duplicateEntity.slug }} className="underline">
                                 {duplicateEntity.name}
                             </Link>
                             . Please verify this is not a duplicate.

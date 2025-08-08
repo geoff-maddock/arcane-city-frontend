@@ -138,7 +138,7 @@ const SeriesCreate: React.FC = () => {
         entity_list: formData.entity_list,
       };
       const { data } = await api.post('/series', payload);
-      navigate({ to: `/series/${data.slug}` });
+      navigate({ to: '/series/$slug', params: { slug: data.slug } });
     } catch (err) {
       if ((err as AxiosError).response?.status === 422) {
         const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
@@ -176,7 +176,7 @@ const SeriesCreate: React.FC = () => {
           {nameCheck === 'duplicate' && duplicateSeries && (
             <p className="text-red-500 text-sm">
               Another series found with the same name:{' '}
-              <Link to={`/series/${duplicateSeries.slug}`} className="underline">
+              <Link to="/series/$slug" params={{ slug: duplicateSeries.slug }} className="underline">
                 {duplicateSeries.name}
               </Link>
               . Please verify this is not a duplicate.

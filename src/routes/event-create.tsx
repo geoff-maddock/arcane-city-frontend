@@ -136,7 +136,7 @@ const EventCreate: React.FC = () => {
         entity_list: formData.entity_list,
       };
       const { data } = await api.post('/events', payload);
-      navigate({ to: `/events/${data.slug}` });
+      navigate({ to: '/events/$slug', params: { slug: data.slug } });
     } catch (err) {
       if ((err as AxiosError).response?.status === 422) {
         const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
@@ -174,7 +174,7 @@ const EventCreate: React.FC = () => {
           {nameCheck === 'duplicate' && duplicateEvent && (
             <p className="text-red-500 text-sm">
               Another event found with the same name:{' '}
-              <Link to={`/events/${duplicateEvent.slug}`} className="underline">
+              <Link to="/events/$slug" params={{ slug: duplicateEvent.slug }} className="underline">
                 {duplicateEvent.name}
               </Link>
               . Please verify this is not a duplicate.
