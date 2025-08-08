@@ -77,13 +77,35 @@ export interface Location {
     id: number;
     name: string;
     slug: string;
-    address_line_one?: string;
-    address_line_two?: string;
+    address_one?: string;
+    address_two?: string;
     neighborhood?: string;
     city?: string;
     state?: string;
-    postal_code?: string;
+    postcode?: string;
     country?: string;
+    latitude?: number;
+    longitude?: number;
+    visibility_id?: number;
+    location_type_id?: number;
+    map_url?: string;
+}
+
+export interface LocationResponse {
+    id: number;
+    name: string;
+    slug: string;
+    address_one?: string;
+    address_two?: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
+    postcode?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+    visibility_id?: number;
+    location_type_id?: number;
     map_url?: string;
 }
 

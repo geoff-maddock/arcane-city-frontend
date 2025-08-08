@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     Dialog,
     DialogContent,
@@ -26,8 +27,13 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
     const { data, isLoading, error, refetch } = useQuery<Contact[]>({
         queryKey: ['entity', entitySlug, 'contacts'],
         queryFn: async () => {
-            const { data } = await api.get<{ data: Contact[] }>(`/entities/${entitySlug}/contacts`);
-            return data.data;
+            try {
+                const response = await api.get<Contact[]>(`/entities/${entitySlug}/contacts`);
+                return response.data || [];
+            } catch (error) {
+                console.error('Error fetching entity contacts:', error);
+                return [];
+            }
         },
     });
 
@@ -44,6 +50,15 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
             refetch();
             setIsEditOpen(false);
         },
+        onError: (error: any) => {
+            console.error('Error updating contact:', error);
+            // Show user-friendly error message
+            if (error.response?.data?.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                alert('Failed to update contact. Please try again.');
+            }
+        },
     });
 
     const deleteMutation = useMutation({
@@ -59,12 +74,75 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editing) {
+            // Basic validation
+            if (!editing.name.trim()) {
+                alert('Name is required');
+                return;
+            }
+            if (!editing.type.trim()) {
+                alert('Type is required');
+                return;
+            }
+            if (editing.email && editing.email.trim()) {
+                // Simple email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(editing.email.trim())) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+            }
+
             saveMutation.mutate(editing);
         }
     };
 
-    if (isLoading || error || !data || data.length === 0) {
-        return null;
+    if (isLoading) {
+        return (
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <User className="h-5 w-5" />
+                        <h2 className="text-xl font-semibold">Contacts</h2>
+                    </div>
+                    <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                        <span className="ml-2 text-gray-600">Loading contacts...</span>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (error) {
+        return (
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <User className="h-5 w-5" />
+                        <h2 className="text-xl font-semibold">Contacts</h2>
+                    </div>
+                    <div className="text-red-500 text-sm">
+                        Error loading contacts. Please try again later.
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (!data || data.length === 0) {
+        return canEdit ? (
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <User className="h-5 w-5" />
+                        <h2 className="text-xl font-semibold">Contacts</h2>
+                    </div>
+                    <div className="text-gray-500 text-sm">
+                        No contacts found for this entity.
+                    </div>
+                </CardContent>
+            </Card>
+        ) : null;
     }
 
     return (
@@ -80,6 +158,11 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                             <li key={c.id} className="flex justify-between gap-2 text-sm">
                                 <div className="flex-1">
                                     <div className="font-medium">{c.name}</div>
+                                    {c.type && (
+                                        <div className="text-xs text-gray-500 capitalize mb-1">
+                                            {c.type}
+                                        </div>
+                                    )}
                                     {c.email && (
                                         <div className="flex items-center gap-1">
                                             <Mail className="h-3 w-3" />
@@ -92,13 +175,23 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                             <span>{c.phone}</span>
                                         </div>
                                     )}
+                                    {c.other && (
+                                        <div className="text-xs text-gray-600 mt-1">
+                                            {c.other}
+                                        </div>
+                                    )}
                                 </div>
                                 {canEdit && (
                                     <div className="flex gap-2">
                                         <button
                                             className="text-gray-600 hover:text-gray-900"
                                             onClick={() => {
-                                                setEditing(c);
+                                                // Ensure type has a default value if empty
+                                                const contactToEdit = {
+                                                    ...c,
+                                                    type: c.type || 'general'
+                                                };
+                                                setEditing(contactToEdit);
                                                 setIsEditOpen(true);
                                             }}
                                             aria-label="Edit contact"
@@ -136,12 +229,34 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     id="contact-name"
                                     value={editing.name}
                                     onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                                    required
                                 />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="contact-type">Type</Label>
+                                <Select
+                                    value={editing.type}
+                                    onValueChange={(value) => setEditing({ ...editing, type: value })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select contact type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="general">General</SelectItem>
+                                        <SelectItem value="booking">Booking</SelectItem>
+                                        <SelectItem value="manager">Manager</SelectItem>
+                                        <SelectItem value="owner">Owner</SelectItem>
+                                        <SelectItem value="promoter">Promoter</SelectItem>
+                                        <SelectItem value="technical">Technical</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="contact-email">Email</Label>
                                 <Input
                                     id="contact-email"
+                                    type="email"
                                     value={editing.email ?? ''}
                                     onChange={(e) => setEditing({ ...editing, email: e.target.value })}
                                 />
@@ -152,6 +267,14 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     id="contact-phone"
                                     value={editing.phone ?? ''}
                                     onChange={(e) => setEditing({ ...editing, phone: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="contact-other">Other Info</Label>
+                                <Input
+                                    id="contact-other"
+                                    value={editing.other ?? ''}
+                                    onChange={(e) => setEditing({ ...editing, other: e.target.value })}
                                 />
                             </div>
                             <DialogFooter>

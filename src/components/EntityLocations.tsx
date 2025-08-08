@@ -26,8 +26,13 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
     const { data, isLoading, error, refetch } = useQuery<Location[]>({
         queryKey: ['entity', entitySlug, 'locations'],
         queryFn: async () => {
-            const { data } = await api.get<{ data: Location[] }>(`/entities/${entitySlug}/locations`);
-            return data.data;
+            try {
+                const response = await api.get<Location[]>(`/entities/${entitySlug}/locations`);
+                return response.data || [];
+            } catch (error) {
+                console.error('Error fetching entity locations:', error);
+                return [];
+            }
         },
     });
 
@@ -44,6 +49,15 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
             refetch();
             setIsEditOpen(false);
         },
+        onError: (error: any) => {
+            console.error('Error updating location:', error);
+            // Show user-friendly error message
+            if (error.response?.data?.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                alert('Failed to update location. Please try again.');
+            }
+        },
     });
 
     const deleteMutation = useMutation({
@@ -59,12 +73,67 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editing) {
+            // Basic validation
+            if (!editing.name.trim()) {
+                alert('Name is required');
+                return;
+            }
+            if (!editing.slug.trim()) {
+                alert('Slug is required');
+                return;
+            }
+
             saveMutation.mutate(editing);
         }
     };
 
-    if (isLoading || error || !data || data.length === 0) {
-        return null;
+    if (isLoading) {
+        return (
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <MapPin className="h-5 w-5" />
+                        <h2 className="text-xl font-semibold">Locations</h2>
+                    </div>
+                    <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                        <span className="ml-2 text-gray-600">Loading locations...</span>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (error) {
+        return (
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <MapPin className="h-5 w-5" />
+                        <h2 className="text-xl font-semibold">Locations</h2>
+                    </div>
+                    <div className="text-red-500 text-sm">
+                        Error loading locations. Please try again later.
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (!data || data.length === 0) {
+        return canEdit ? (
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <MapPin className="h-5 w-5" />
+                        <h2 className="text-xl font-semibold">Locations</h2>
+                    </div>
+                    <div className="text-gray-500 text-sm">
+                        No locations found for this entity.
+                    </div>
+                </CardContent>
+            </Card>
+        ) : null;
     }
 
     return (
@@ -80,18 +149,34 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                             <li key={loc.id} className="flex justify-between gap-2 text-sm">
                                 <div className="flex-1">
                                     <div className="font-medium">{loc.name}</div>
-                                    {loc.address_line_one && <div>{loc.address_line_one}</div>}
+                                    {loc.address_one && <div>{loc.address_one}</div>}
+                                    {loc.address_two && <div>{loc.address_two}</div>}
+                                    {loc.neighborhood && (
+                                        <div className="text-xs text-gray-600">{loc.neighborhood}</div>
+                                    )}
                                     <div>
                                         {loc.city}
                                         {loc.state && `, ${loc.state}`}
+                                        {loc.postcode && ` ${loc.postcode}`}
                                     </div>
+                                    {loc.country && loc.country !== loc.city && (
+                                        <div className="text-xs text-gray-600">{loc.country}</div>
+                                    )}
                                 </div>
                                 {canEdit && (
                                     <div className="flex gap-2">
                                         <button
                                             className="text-gray-600 hover:text-gray-900"
                                             onClick={() => {
-                                                setEditing(loc);
+                                                // Ensure all fields have default values
+                                                const locationToEdit = {
+                                                    ...loc,
+                                                    latitude: loc.latitude ?? 0,
+                                                    longitude: loc.longitude ?? 0,
+                                                    visibility_id: loc.visibility_id ?? 1,
+                                                    location_type_id: loc.location_type_id ?? 1
+                                                };
+                                                setEditing(locationToEdit);
                                                 setIsEditOpen(true);
                                             }}
                                             aria-label="Edit location"
@@ -117,55 +202,101 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
             </Card>
 
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[80vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                         <DialogTitle>Edit Location</DialogTitle>
                     </DialogHeader>
                     {editing && (
-                        <form onSubmit={handleEditSubmit} className="space-y-4 mt-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="location-name">Name</Label>
-                                <Input
-                                    id="location-name"
-                                    value={editing.name}
-                                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                                />
+                        <form onSubmit={handleEditSubmit} className="flex flex-col flex-1 overflow-hidden">
+                            <div className="space-y-4 mt-2 overflow-y-auto flex-1 pr-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-name">Name</Label>
+                                    <Input
+                                        id="location-name"
+                                        value={editing.name}
+                                        onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-slug">Slug</Label>
+                                    <Input
+                                        id="location-slug"
+                                        value={editing.slug}
+                                        onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-address-one">Address Line 1</Label>
+                                    <Input
+                                        id="location-address-one"
+                                        value={editing.address_one ?? ''}
+                                        onChange={(e) =>
+                                            setEditing({ ...editing, address_one: e.target.value })
+                                        }
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-address-two">Address Line 2</Label>
+                                    <Input
+                                        id="location-address-two"
+                                        value={editing.address_two ?? ''}
+                                        onChange={(e) =>
+                                            setEditing({ ...editing, address_two: e.target.value })
+                                        }
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-neighborhood">Neighborhood</Label>
+                                    <Input
+                                        id="location-neighborhood"
+                                        value={editing.neighborhood ?? ''}
+                                        onChange={(e) => setEditing({ ...editing, neighborhood: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-city">City</Label>
+                                    <Input
+                                        id="location-city"
+                                        value={editing.city ?? ''}
+                                        onChange={(e) => setEditing({ ...editing, city: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-state">State</Label>
+                                    <Input
+                                        id="location-state"
+                                        value={editing.state ?? ''}
+                                        onChange={(e) => setEditing({ ...editing, state: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-postal">Postal Code</Label>
+                                    <Input
+                                        id="location-postal"
+                                        value={editing.postcode ?? ''}
+                                        onChange={(e) => setEditing({ ...editing, postcode: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-country">Country</Label>
+                                    <Input
+                                        id="location-country"
+                                        value={editing.country ?? ''}
+                                        onChange={(e) => setEditing({ ...editing, country: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="location-map-url">Map URL</Label>
+                                    <Input
+                                        id="location-map-url"
+                                        value={editing.map_url ?? ''}
+                                        onChange={(e) => setEditing({ ...editing, map_url: e.target.value })}
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location-address-one">Address</Label>
-                                <Input
-                                    id="location-address-one"
-                                    value={editing.address_line_one ?? ''}
-                                    onChange={(e) =>
-                                        setEditing({ ...editing, address_line_one: e.target.value })
-                                    }
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location-city">City</Label>
-                                <Input
-                                    id="location-city"
-                                    value={editing.city ?? ''}
-                                    onChange={(e) => setEditing({ ...editing, city: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location-state">State</Label>
-                                <Input
-                                    id="location-state"
-                                    value={editing.state ?? ''}
-                                    onChange={(e) => setEditing({ ...editing, state: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location-postal">Postal Code</Label>
-                                <Input
-                                    id="location-postal"
-                                    value={editing.postal_code ?? ''}
-                                    onChange={(e) => setEditing({ ...editing, postal_code: e.target.value })}
-                                />
-                            </div>
-                            <DialogFooter>
+                            <DialogFooter className="mt-4">
                                 <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
                                     Cancel
                                 </Button>
