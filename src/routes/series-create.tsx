@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createRoute, useNavigate } from '@tanstack/react-router';
+import { createRoute, useNavigate, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError, toKebabCase } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -53,6 +54,8 @@ const SeriesCreate: React.FC = () => {
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
+  const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
+  const [duplicateSeries, setDuplicateSeries] = useState<{ name: string; slug: string } | null>(null);
 
   useEffect(() => {
     if (visibilityOptions && visibilityOptions.length > 0) {
@@ -62,6 +65,42 @@ const SeriesCreate: React.FC = () => {
       }
     }
   }, [visibilityOptions, formData.visibility_id]);
+
+  useEffect(() => {
+    const name = formData.name.trim();
+    const slug = formData.slug.trim();
+    if (!name || !slug) {
+      setNameCheck('idle');
+      setDuplicateSeries(null);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams();
+        params.append('filters[name]', name);
+        params.append('filters[slug]', slug);
+        params.append('limit', '1');
+        const { data } = await api.get(`/series?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        if (data?.data?.length > 0) {
+          const ser = data.data[0];
+          setDuplicateSeries({ name: ser.name, slug: ser.slug });
+          setNameCheck('duplicate');
+        } else {
+          setDuplicateSeries(null);
+          setNameCheck('unique');
+        }
+      } catch {
+        // ignore errors
+      }
+    }, 500);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [formData.name, formData.slug]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -126,7 +165,23 @@ const SeriesCreate: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+          <div className="flex items-center gap-2">
+            <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+            {nameCheck === 'unique' && <CheckCircle className="text-green-500" />}
+            {nameCheck === 'duplicate' && <XCircle className="text-red-500" />}
+          </div>
+          {nameCheck === 'unique' && (
+            <p className="text-green-500 text-sm">No other series found with the same name or slug.</p>
+          )}
+          {nameCheck === 'duplicate' && duplicateSeries && (
+            <p className="text-red-500 text-sm">
+              Another series found with the same name:{' '}
+              <Link to={`/series/${duplicateSeries.slug}`} className="underline">
+                {duplicateSeries.name}
+              </Link>
+              . Please verify this is not a duplicate.
+            </p>
+          )}
           {renderError('name')}
         </div>
         <div className="space-y-2">
