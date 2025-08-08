@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Tag, PaginatedResponse } from '../types/api';
+import { stableStringify } from '@/lib/utils';
 
 export interface TagFilters {
     name?: string;
@@ -20,8 +21,9 @@ interface UseTagsParams {
 }
 
 export const useTags = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', direction = 'asc' }: UseTagsParams = {}) => {
+    const serializedFilters = stableStringify(filters || {});
     return useQuery<PaginatedResponse<Tag>>({
-        queryKey: ['tags', page, itemsPerPage, filters, sort, direction],
+        queryKey: ['tags', page, itemsPerPage, serializedFilters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
             params.append('page', page.toString());

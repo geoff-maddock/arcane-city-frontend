@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Entity, PaginatedResponse } from '../types/api';
-import { toKebabCase } from '../lib/utils';
+import { toKebabCase, stableStringify } from '../lib/utils';
 
 interface DateRange {
     start?: string;
@@ -28,8 +28,9 @@ interface UseEntitiesParams {
 }
 
 export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', direction = 'asc' }: UseEntitiesParams = {}) => {
+    const serializedFilters = stableStringify(filters || {});
     return useQuery<PaginatedResponse<Entity>>({
-        queryKey: ['entities', page, itemsPerPage, filters, sort, direction],
+        queryKey: ['entities', page, itemsPerPage, serializedFilters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
 

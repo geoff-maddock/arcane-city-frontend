@@ -15,6 +15,16 @@ export const toKebabCase = (str: string): string => {
     .toLowerCase();
 };
 
+// Lightweight, stable stringify for objects used in react-query keys
+export function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== 'object') return String(value);
+  if (Array.isArray(value)) return `[${value.map(v => stableStringify(v)).join(',')}]`;
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, v]) => v !== undefined)
+    .sort(([a], [b]) => a.localeCompare(b));
+  return `{${entries.map(([k, v]) => `${k}:${stableStringify(v)}`).join(',')}}`;
+}
+
 export function formatDate(dateString: string): string {
   const options: Intl.DateTimeFormatOptions = {
     weekday: 'long',
@@ -52,4 +62,23 @@ export function formatCurrency(amount: number): string {
 export function isValidDate(dateString: string): boolean {
   const date = new Date(dateString);
   return date instanceof Date && !isNaN(date.getTime());
+}
+
+// Build an array of lightbox images (shared pattern across components)
+export function buildImageList<T extends { primary_photo?: string; primary_photo_thumbnail?: string; name: string }>(items?: T[]) {
+  if (!items) return [] as { src: string; alt: string; thumbnail: string }[];
+  return items
+    .filter(i => i.primary_photo && i.primary_photo_thumbnail)
+    .map(i => ({
+      src: i.primary_photo as string,
+      alt: i.name,
+      thumbnail: i.primary_photo_thumbnail as string,
+    }));
+}
+
+export function formatPaginationRange(page: number, perPage: number, total: number) {
+  if (total === 0) return 'Showing 0 results';
+  const start = (page - 1) * perPage + 1;
+  const end = Math.min(page * perPage, total);
+  return `Showing ${start} to ${end} of ${total} results`;
 }

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Tag, Event, Entity, Series, PaginatedResponse } from '../types/api';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,8 @@ import EventCardCondensed from './EventCardCondensed';
 import EntityCardCondensed from './EntityCardCondensed';
 import SeriesCardCondensed from './SeriesCardCondensed';
 import { authService } from '../services/auth.service';
-import { useState, useEffect } from 'react';
+import { buildImageList } from '@/lib/utils';
+import { useFollow } from '@/hooks/useFollow';
 
 export default function TagDetail({ slug }: { slug: string }) {
     const { data: tag, isLoading, error } = useQuery<Tag>({
@@ -25,39 +26,7 @@ export default function TagDetail({ slug }: { slug: string }) {
         enabled: authService.isAuthenticated(),
     });
 
-    const [following, setFollowing] = useState(false);
-
-    useEffect(() => {
-        if (user) {
-            setFollowing(user.followed_tags.some(t => t.slug === slug));
-        }
-    }, [user, slug]);
-
-    const followMutation = useMutation({
-        mutationFn: async () => {
-            await api.post(`/tags/${slug}/follow`);
-        },
-        onSuccess: () => {
-            setFollowing(true);
-        },
-    });
-
-    const unfollowMutation = useMutation({
-        mutationFn: async () => {
-            await api.post(`/tags/${slug}/unfollow`);
-        },
-        onSuccess: () => {
-            setFollowing(false);
-        },
-    });
-
-    const handleFollowToggle = () => {
-        if (following) {
-            unfollowMutation.mutate();
-        } else {
-            followMutation.mutate();
-        }
-    };
+    const follow = useFollow('tags', slug);
 
     const { data: eventsData, isLoading: eventsLoading } = useQuery<PaginatedResponse<Event>>({
         queryKey: ['tagEvents', slug],
@@ -114,23 +83,9 @@ export default function TagDetail({ slug }: { slug: string }) {
         );
     }
 
-    const eventImages = eventsData?.data.filter(e => e.primary_photo && e.primary_photo_thumbnail).map(e => ({
-        src: e.primary_photo!,
-        alt: e.name,
-        thumbnail: e.primary_photo_thumbnail,
-    })) ?? [];
-
-    const entityImages = entitiesData?.data.filter(e => e.primary_photo && e.primary_photo_thumbnail).map(e => ({
-        src: e.primary_photo!,
-        alt: e.name,
-        thumbnail: e.primary_photo_thumbnail,
-    })) ?? [];
-
-    const seriesImages = seriesData?.data.filter(s => s.primary_photo && s.primary_photo_thumbnail).map(s => ({
-        src: s.primary_photo!,
-        alt: s.name,
-        thumbnail: s.primary_photo_thumbnail,
-    })) ?? [];
+    const eventImages = buildImageList(eventsData?.data);
+    const entityImages = buildImageList(entitiesData?.data);
+    const seriesImages = buildImageList(seriesData?.data);
 
     return (
         <div className="min-h-screen">
@@ -147,8 +102,8 @@ export default function TagDetail({ slug }: { slug: string }) {
                     <div className="flex items-start justify-between">
                         <h1 className="text-4xl font-bold text-gray-900">{tag.name}</h1>
                         {user && (
-                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
-                                <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                            <button onClick={follow.toggle} aria-label={follow.following ? 'Unfollow' : 'Follow'}>
+                                <Star className={`h-6 w-6 ${follow.following ? 'text-yellow-500' : 'text-gray-400'}`} fill={follow.following ? 'currentColor' : 'none'} />
                             </button>
                         )}
                     </div>
