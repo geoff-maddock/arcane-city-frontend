@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError, toKebabCase } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -52,6 +53,7 @@ const EventCreate: React.FC = () => {
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
+  const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
 
   // Set default visibility to "Public" when options are loaded
   useEffect(() => {
@@ -62,6 +64,38 @@ const EventCreate: React.FC = () => {
       }
     }
   }, [visibilityOptions, formData.visibility_id]);
+
+  useEffect(() => {
+    const name = formData.name.trim();
+    const slug = formData.slug.trim();
+    if (!name || !slug) {
+      setNameCheck('idle');
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams();
+        params.append('filters[name]', name);
+        params.append('filters[slug]', slug);
+        params.append('limit', '1');
+        const { data } = await api.get(`/events?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        if (data?.data?.length > 0) {
+          setNameCheck('duplicate');
+        } else {
+          setNameCheck('unique');
+        }
+      } catch {
+        // ignore errors
+      }
+    }, 500);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [formData.name, formData.slug]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -124,7 +158,17 @@ const EventCreate: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+          <div className="flex items-center gap-2">
+            <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+            {nameCheck === 'unique' && <CheckCircle className="text-green-500" />}
+            {nameCheck === 'duplicate' && <XCircle className="text-red-500" />}
+          </div>
+          {nameCheck === 'unique' && (
+            <p className="text-green-500 text-sm">No other event found with the same name or slug.</p>
+          )}
+          {nameCheck === 'duplicate' && (
+            <p className="text-red-500 text-sm">Another event found with the same name. Please verify this is not a duplicate.</p>
+          )}
           {renderError('name')}
         </div>
         <div className="space-y-2">
