@@ -8,7 +8,7 @@ import { Input } from './ui/input';
 import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
-const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
+const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
@@ -23,8 +23,17 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
     document.documentElement.classList.toggle('dark', theme === 'light');
   };
 
+  // Close the mobile sheet when any link inside the menu is clicked
+  const handleMenuClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    if (!onNavigate) return;
+    const target = e.target as HTMLElement | null;
+    if (target && target.closest('a')) {
+      onNavigate();
+    }
+  };
+
   return (
-    <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`}>
+    <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`} onClick={handleMenuClick}>
       <Link to="/" className="text-center mb-1">
         <h1 className=" xl:block text-2xl font-bold text-center hover:underline">Arcane City</h1>
         <p className=" xl:block text-xs text-gray-500 dark:text-gray-400 text-center">pittsburgh events guide</p>
@@ -135,20 +144,21 @@ const MenuContent: React.FC<{ className?: string }> = ({ className = '' }) => {
 const MenuBar: React.FC = () => {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   return (
     <>
       {/* Mobile Menu */}
       <div className="xl:hidden fixed top-0 left-0 w-full p-4 flex items-center justify-between bg-background border-b">
         <div className="flex items-center">
-          <Sheet>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <HiMenu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0">
-              <MenuContent />
+              <MenuContent onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
           <Link to="/" className="ml-4">
