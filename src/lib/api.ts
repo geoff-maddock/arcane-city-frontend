@@ -36,11 +36,11 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         config.headers.Authorization = `Basic ${BASIC_AUTH_TOKEN}`;
     } else {
         // Ensure we do NOT send any Authorization header for non-read requests
-        if (config.headers && (config.headers as any).Authorization) {
-            delete (config.headers as any).Authorization;
-        }
-        if (import.meta.env.DEV) {
-            console.warn(`[api] Write request without auth: ${config.method?.toUpperCase()} ${config.url}`);
+        if (config.headers) {
+            const headers = config.headers as Record<string, unknown>;
+            if ('Authorization' in headers) {
+                delete headers.Authorization;
+            }
         }
     }
 
