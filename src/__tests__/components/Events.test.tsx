@@ -26,13 +26,16 @@ vi.mock('../../components/EventCard', () => ({
 
 // Update the EventFilters mock
 vi.mock('../../components/EventFilters', () => ({
-    default: vi.fn(({ onFilterChange }) => (
+    default: vi.fn((props: { onFilterChange: (filters: { name: string; venue: string; promoter: string; event_type: string; entity: string; tag: string; start_at?: { start?: string; end?: string } }) => void }) => (
         <div data-testid="event-filters">
             <button
-                onClick={() => onFilterChange({
+                onClick={() => props.onFilterChange({
                     name: 'Test Event',
                     venue: 'Test Venue',
-                    event_type: 'concert'
+                    event_type: 'concert',
+                    promoter: '',
+                    entity: '',
+                    tag: ''
                 })}
                 data-testid="update-filters-button"
             >
@@ -112,6 +115,7 @@ describe('Events Component', () => {
             isPending: false,
             isLoadingError: false,
             isRefetchError: false,
+            isEnabled: true,
             // Add any other required properties
         } as UseQueryResult<PaginatedResponse<Event>, Error>);
         render(<Events />)
@@ -154,6 +158,7 @@ describe('Events Component', () => {
             promise: expect.any(Promise),
             refetch: expect.any(Function),
             status: 'pending',
+            isEnabled: true,
         });
 
         render(<Events />);
@@ -188,6 +193,7 @@ describe('Events Component', () => {
             promise: expect.any(Promise),
             refetch: expect.any(Function),
             status: 'error',
+            isEnabled: true,
         })
 
         render(<Events />)
@@ -222,6 +228,7 @@ describe('Events Component', () => {
             promise: expect.any(Promise),
             refetch: expect.any(Function),
             status: 'success',
+            isEnabled: true,
         } as UseQueryResult<PaginatedResponse<Event>, Error>);
 
         render(<Events />)
@@ -255,6 +262,7 @@ describe('Events Component', () => {
             promise: expect.any(Promise),
             refetch: expect.any(Function),
             status: 'success',
+            isEnabled: true,
         })
 
         render(<Events />)
@@ -302,11 +310,13 @@ describe('Events Component', () => {
                     isFetchedAfterMount: false,
                     isPaused: false,
                     isRefetching: false,
+                    isEnabled: true,
                 } as UseQueryResult<PaginatedResponse<Event>, Error>;
             });
 
             // Update the EventFilters mock to expose the onFilterChange prop
-            vi.mocked(EventFilters).mockImplementation(({ onFilterChange }) => {
+            vi.mocked(EventFilters).mockImplementation((props: { onFilterChange: (filters: { name: string; venue: string; promoter: string; event_type: string; entity: string; tag: string; start_at?: { start?: string; end?: string } }) => void }) => {
+                const { onFilterChange } = props;
                 // Expose a button that will trigger the filter change
                 return (
                     <div data-testid="event-filters">

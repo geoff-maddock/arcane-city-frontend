@@ -4,6 +4,7 @@ import { rootRoute } from './root';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { userService } from '../services/user.service';
 
 const PasswordRecovery: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -22,10 +23,7 @@ const PasswordRecovery: React.FC = () => {
         }
 
         try {
-            // TODO: Implement password recovery API call
-            // await authService.requestPasswordReset(email);
-
-            // For now, just show success message
+            await userService.sendPasswordResetEmail(email);
             setMessage('If an account with this email exists, you will receive a password recovery link shortly.');
             setIsSubmitted(true);
         } catch {
