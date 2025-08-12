@@ -14,6 +14,9 @@ import { TagFilters as TagFiltersType } from '../types/filters';
 import TagCard from './TagCard';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { authService } from '@/services/auth.service';
+import { useQuery } from '@tanstack/react-query';
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
@@ -42,6 +45,12 @@ export default function Tags() {
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('tagsPerPage', 25);
     const [sort, setSort] = useState('name');
     const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
+    });
 
     const { data, isLoading, error } = useTags({
         filters,
@@ -95,6 +104,11 @@ export default function Tags() {
                         <div className="flex flex-col space-y-2">
                             <h1 className="text-4xl font-bold tracking-tight text-gray-900">Tags</h1>
                             <p className="text-lg text-gray-500">Browse all tags</p>
+                            {user && (
+                                <Button asChild className="self-start">
+                                    <Link to="/tag/create">Create Tag</Link>
+                                </Button>
+                            )}
                         </div>
 
                         <div className="relative">

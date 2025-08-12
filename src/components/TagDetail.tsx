@@ -147,9 +147,18 @@ export default function TagDetail({ slug }: { slug: string }) {
                     <div className="flex items-start justify-between">
                         <h1 className="text-4xl font-bold text-gray-900">{tag.name}</h1>
                         {user && (
-                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
-                                <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
+                                    <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
+                                </button>
+                                {tag.created_by && user.id === tag.created_by && (
+                                    <Button size="sm" variant="outline" asChild>
+                                        <Link to="/tags/$slug/edit" params={{ slug }}>
+                                            Edit Tag
+                                        </Link>
+                                    </Button>
+                                )}
+                            </div>
                         )}
                     </div>
 

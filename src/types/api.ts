@@ -140,6 +140,13 @@ export interface Tag {
     name: string;
     slug: string;
     description?: string;
+    tag_type_id?: number;
+    tag_type?: {
+        id: number;
+        name: string;
+        slug: string;
+    };
+    created_by?: number;
 }
 
 export interface EntityType {
