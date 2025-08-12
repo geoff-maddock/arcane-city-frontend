@@ -12,7 +12,10 @@ export const userService = {
     return data;
   },
   async sendPasswordResetEmail(email: string) {
-    const { data } = await api.post('/user/send-password-reset-email', { email });
+    const { data } = await api.post('/user/send-password-reset-email', {
+      email,
+      secret: import.meta.env.VITE_API_KEY,
+    });
     return data;
   },
 };
