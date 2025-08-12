@@ -17,6 +17,14 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT || 22 }}
-        script: |
-          cd /var/www/arcane-city-frontend
-          bash deploy.sh
+          script: |
+            set -Eeuo pipefail
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            if command -v nvm >/dev/null 2>&1; then
+              nvm install 20 >/dev/null
+              nvm use 20 >/dev/null
+            fi
+            node -v || true
+            cd /var/www/arcane-city-frontend
+            bash deploy.sh
