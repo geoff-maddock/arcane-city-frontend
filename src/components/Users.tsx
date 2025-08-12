@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react';
 import { useUsers } from '../hooks/useUsers';
 import UserFilters from './UserFilters';
 import UserCard from './UserCard';
-import { Pagination } from './Pagination';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { ListLayout } from './ListLayout';
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
@@ -27,9 +23,7 @@ export default function Users() {
         localStorage.setItem('filtersVisible', JSON.stringify(filtersVisible));
     }, [filtersVisible]);
 
-    const toggleFilters = () => {
-        setFiltersVisible(!filtersVisible);
-    };
+    const toggleFilters = () => setFiltersVisible(v => !v);
 
     const [filters, setFilters] = useState({
         name: '',
@@ -48,123 +42,59 @@ export default function Users() {
         direction,
     });
 
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleItemsPerPageChange = (count: number) => {
-        setItemsPerPage(count);
-        setPage(1);
-    };
-
-    const renderPagination = () => {
-        if (!data) return null;
-        return (
-            <Pagination
-                currentPage={page}
-                totalPages={data.last_page}
-                onPageChange={handlePageChange}
-                itemCount={data.data.length}
-                totalItems={data.total}
-                itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={handleItemsPerPageChange}
-                sort={sort}
-                setSort={setSort}
-                direction={direction}
-                setDirection={setDirection}
-                sortOptions={sortOptions}
-            />
-        );
-    };
-
     const hasActiveFilters = filters.name.trim() !== '';
-
-    const handleClearAllFilters = () => {
-        setFilters({ name: '' });
-    };
+    const handleClearAllFilters = () => setFilters({ name: '' });
 
     return (
-        <div className="bg-background text-foreground min-h-screen p-4">
-            <div className="mx-auto px-6 py-8 max-w-[2400px]">
-                <div className="space-y-8">
-                    <div className="flex flex-col space-y-2">
-                        <h1 className="text-4xl font-bold tracking-tight text-gray-900">Users</h1>
-                        <p className="text-lg text-gray-500">Browse all users</p>
-                    </div>
-
-                    <div className="relative">
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={toggleFilters}
-                                    className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
-                                >
-                                    {filtersVisible ? (
-                                        <>
-                                            <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
-                                            Hide Filters
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
-                                            Show Filters
-                                        </>
-                                    )}
-                                </button>
-                                {hasActiveFilters && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleClearAllFilters}
-                                        className="mb-4 text-gray-500 hover:text-gray-900"
-                                    >
-                                        Clear All
-                                        <X className="ml-2 h-4 w-4" />
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                        {filtersVisible && (
-                            <Card className="border-gray-100 shadow-sm">
-                                <CardContent className="p-6 space-y-4">
-                                    <UserFilters filters={filters} onFilterChange={setFilters} />
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-
-                    {error ? (
-                        <Alert variant="destructive">
-                            <AlertDescription>
-                                There was an error loading users. Please try again later.
-                            </AlertDescription>
-                        </Alert>
-                    ) : isLoading ? (
-                        <div className="flex h-96 items-center justify-center">
-                            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                        </div>
-                    ) : data?.data && data.data.length > 0 ? (
-                        <>
-                            {renderPagination()}
-
-                            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                                {data.data.map((user) => (
-                                    <UserCard key={user.id} user={user} />
-                                ))}
-                            </div>
-
-                            {renderPagination()}
-                        </>
-                    ) : (
-                        <Card className="border-gray-100">
-                            <CardContent className="flex h-96 items-center justify-center text-gray-500">
-                                No users found. Try adjusting your filters.
-                            </CardContent>
-                        </Card>
-                    )}
+        <ListLayout
+            title="Users"
+            subtitle="Browse all users"
+            filtersVisible={filtersVisible}
+            onToggleFilters={toggleFilters}
+            renderFilters={() => (
+                <UserFilters filters={filters} onFilterChange={setFilters} />
+            )}
+            hasActiveFilters={hasActiveFilters}
+            onClearAllFilters={handleClearAllFilters}
+            sorting={{
+                sort,
+                direction,
+                setSort,
+                setDirection,
+                options: sortOptions
+            }}
+            pagination={data ? {
+                page,
+                totalPages: data.last_page,
+                onPageChange: setPage,
+                itemsPerPage,
+                totalItems: data.total,
+                onItemsPerPageChange: (n) => { setItemsPerPage(n); setPage(1); }
+            } : undefined}
+        >
+            {error ? (
+                <Alert variant="destructive">
+                    <AlertDescription>
+                        There was an error loading users. Please try again later.
+                    </AlertDescription>
+                </Alert>
+            ) : isLoading ? (
+                <div className="flex h-96 items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
                 </div>
-            </div>
-        </div>
+            ) : data?.data && data.data.length > 0 ? (
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    {data.data.map((user) => (
+                        <UserCard key={user.id} user={user} />
+                    ))}
+                </div>
+            ) : (
+                <Card className="border-gray-100">
+                    <CardContent className="flex h-96 items-center justify-center text-gray-500">
+                        No users found. Try adjusting your filters.
+                    </CardContent>
+                </Card>
+            )}
+        </ListLayout>
     );
 }
