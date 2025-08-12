@@ -11,4 +11,8 @@ export const userService = {
     const { data } = await api.post('/users', payload);
     return data;
   },
+  async sendPasswordResetEmail(email: string) {
+    const { data } = await api.post('/user/send-password-reset-email', { email });
+    return data;
+  },
 };
