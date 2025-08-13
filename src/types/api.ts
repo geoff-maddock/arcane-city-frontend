@@ -135,11 +135,22 @@ export interface Role {
     slug: string;
 }
 
+export interface TagType {
+    id: number;
+    name: string;
+    slug?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface Tag {
     id: number;
     name: string;
     slug: string;
     description?: string;
+    tag_type_id?: number;
+    tag_type?: TagType;
+    created_by?: number;
 }
 
 export interface EntityType {
