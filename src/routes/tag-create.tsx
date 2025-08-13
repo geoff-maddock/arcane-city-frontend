@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoute, useNavigate, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
@@ -22,12 +22,22 @@ const TagCreate: React.FC = () => {
     name: '',
     slug: '',
     description: '',
-    tag_type_id: '' as number | '',
+    tag_type_id: 1 as number | '',
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
 
   const { data: tagTypeOptions } = useTagTypes();
+
+  // Set default tag type to "Category" when options are loaded
+  useEffect(() => {
+    if (tagTypeOptions && tagTypeOptions.length > 0) {
+      const categoryOption = tagTypeOptions.find(option => option.name.toLowerCase() === 'category');
+      if (categoryOption && formData.tag_type_id === 1) {
+        setFormData(prev => ({ ...prev, tag_type_id: categoryOption.id }));
+      }
+    }
+  }, [tagTypeOptions, formData.tag_type_id]);
 
   if (!authService.isAuthenticated()) {
     return (
