@@ -165,88 +165,92 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             </Button>
                         )}
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className={cn(
-                                        "w-full justify-start text-left font-normal",
-                                        !filters.start_at?.start && "text-muted-foreground"
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="min-w-0">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !filters.start_at?.start && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                                        <span className="truncate">
+                                            {filters.start_at?.start
+                                                ? format(new Date(filters.start_at.start), "PPP")
+                                                : "From date"}
+                                        </span>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={filters.start_at?.start ? new Date(filters.start_at.start) : undefined}
+                                        onSelect={(date) => handleDateChange('start', date ?? null)}
+                                        initialFocus
+                                    />
+                                    {filters.start_at?.start && (
+                                        <div className="border-t p-3">
+                                            <Input
+                                                type="time"
+                                                value={format(new Date(filters.start_at.start), "HH:mm")}
+                                                onChange={(e) => {
+                                                    const date = filters.start_at?.start ? new Date(filters.start_at.start) : new Date();
+                                                    const [hours, minutes] = e.target.value.split(':');
+                                                    date.setHours(parseInt(hours), parseInt(minutes));
+                                                    handleDateChange('start', date);
+                                                }}
+                                            />
+                                        </div>
                                     )}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {filters.start_at?.start ? (
-                                        format(new Date(filters.start_at.start), "PPP")
-                                    ) : (
-                                        <span>From date</span>
-                                    )}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={filters.start_at?.start ? new Date(filters.start_at.start) : undefined}
-                                    onSelect={(date) => handleDateChange('start', date ?? null)}
-                                    initialFocus
-                                />
-                                {filters.start_at?.start && (
-                                    <div className="border-t p-3">
-                                        <Input
-                                            type="time"
-                                            value={format(new Date(filters.start_at.start), "HH:mm")}
-                                            onChange={(e) => {
-                                                const date = filters.start_at?.start ? new Date(filters.start_at.start) : new Date();
-                                                const [hours, minutes] = e.target.value.split(':');
-                                                date.setHours(parseInt(hours), parseInt(minutes));
-                                                handleDateChange('start', date);
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            </PopoverContent>
-                        </Popover>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
 
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className={cn(
-                                        "w-full justify-start text-left font-normal",
-                                        !filters.start_at?.end && "text-muted-foreground"
+                        <div className="min-w-0">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !filters.start_at?.end && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                                        <span className="truncate">
+                                            {filters.start_at?.end
+                                                ? format(new Date(filters.start_at.end), "PPP")
+                                                : "To date"}
+                                        </span>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={filters.start_at?.end ? new Date(filters.start_at.end) : undefined}
+                                        onSelect={(date) => handleDateChange('end', date ?? null)}
+                                        initialFocus
+                                    />
+                                    {filters.start_at?.end && (
+                                        <div className="border-t p-3">
+                                            <Input
+                                                type="time"
+                                                value={format(new Date(filters.start_at.end), "HH:mm")}
+                                                onChange={(e) => {
+                                                    const date = filters.start_at?.end ? new Date(filters.start_at.end) : new Date();
+                                                    const [hours, minutes] = e.target.value.split(':');
+                                                    date.setHours(parseInt(hours), parseInt(minutes));
+                                                    handleDateChange('end', date);
+                                                }}
+                                            />
+                                        </div>
                                     )}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {filters.start_at?.end ? (
-                                        format(new Date(filters.start_at.end), "PPP")
-                                    ) : (
-                                        <span>To date</span>
-                                    )}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={filters.start_at?.end ? new Date(filters.start_at.end) : undefined}
-                                    onSelect={(date) => handleDateChange('end', date ?? null)}
-                                    initialFocus
-                                />
-                                {filters.start_at?.end && (
-                                    <div className="border-t p-3">
-                                        <Input
-                                            type="time"
-                                            value={format(new Date(filters.start_at.end), "HH:mm")}
-                                            onChange={(e) => {
-                                                const date = filters.start_at?.end ? new Date(filters.start_at.end) : new Date();
-                                                const [hours, minutes] = e.target.value.split(':');
-                                                date.setHours(parseInt(hours), parseInt(minutes));
-                                                handleDateChange('end', date);
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            </PopoverContent>
-                        </Popover>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -256,12 +260,12 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
             <div className="space-y-2">
 
                 {/* Quick filter buttons */}
-                <div className="flex gap-2 mb-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuickFilter('today')}
-                        className="flex-1"
+                        className="w-full"
                     >
                         Today
                     </Button>
@@ -269,7 +273,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuickFilter('week')}
-                        className="flex-1"
+                        className="w-full"
                     >
                         This Week
                     </Button>
@@ -277,7 +281,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuickFilter('month')}
-                        className="flex-1"
+                        className="w-full"
                     >
                         This Month
                     </Button>
@@ -285,7 +289,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuickFilter('weekend')}
-                        className="flex-1"
+                        className="w-full"
                     >
                         Weekend
                     </Button>

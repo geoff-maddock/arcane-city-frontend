@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useTags } from '../hooks/useTags';
 import TagFilters from './TagFilters';
 import { Pagination } from './Pagination';
-import SortControls from './SortControls';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -142,13 +141,6 @@ export default function Tags() {
                                         </Button>
                                     )}
                                 </div>
-                                <SortControls
-                                    sort={sort}
-                                    setSort={setSort}
-                                    direction={direction}
-                                    setDirection={setDirection}
-                                    sortOptions={sortOptions}
-                                />
                             </div>
                             {filtersVisible && (
                                 <Card className="border-gray-100 shadow-sm">
