@@ -48,5 +48,6 @@ This project uses GitHub Actions to automatically run tests on every pull reques
 - **Test Suite**: Runs all tests in `src/__tests__` and builds the application
 - **CI**: Comprehensive testing across multiple Node.js versions with coverage reporting
 - **PR Checks**: Special checks for pull requests with automated comments
+- **Deploy**: Deploys the application to the production environment when merged to main
 
 All tests must pass before a pull request can be merged.
