@@ -10,7 +10,7 @@ import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError, toKebabCase } from '@/lib/utils';
 import { authService } from '../services/auth.service';
-import { useSearchOptions } from '../hooks/useSearchOptions';
+import { useTagTypes } from '../hooks/useTagTypes';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -27,7 +27,7 @@ const TagCreate: React.FC = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
 
-  const { data: tagTypeOptions } = useSearchOptions('tag-types', '');
+  const { data: tagTypeOptions } = useTagTypes();
 
   if (!authService.isAuthenticated()) {
     return (

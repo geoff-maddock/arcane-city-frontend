@@ -11,7 +11,7 @@ import { AxiosError } from 'axios';
 import { formatApiError, toKebabCase } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
-import { useSearchOptions } from '../hooks/useSearchOptions';
+import { useTagTypes } from '../hooks/useTagTypes';
 import { Tag } from '../types/api';
 
 interface ValidationErrors {
@@ -35,7 +35,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
     enabled: authService.isAuthenticated(),
   });
 
-  const { data: tagTypeOptions } = useSearchOptions('tag-types', '');
+    const { data: tagTypeOptions } = useTagTypes();
 
   const [formData, setFormData] = useState({
     name: '',
