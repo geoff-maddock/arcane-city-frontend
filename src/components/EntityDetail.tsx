@@ -15,6 +15,7 @@ import { EntityTypeIcon } from './EntityTypeIcon';
 import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
+import EntityLinks from './EntityLinks';
 import {
     Dialog,
     DialogContent,
@@ -332,20 +333,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                             instagramUsername={entity.instagram_username}
                                         />
 
-                                        {entity.links.length > 0 && (
-                                            <div className="space-y-2">
-                                                <h3 className="font-semibold">Links</h3>
-                                                <ul className="list list-inside">
-                                                    {entity.links.map((link) => (
-                                                        <li key={link.id}>
-                                                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">
-                                                                {link.url}
-                                                            </a>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
+                                        {/* Deprecated inline links list is replaced by the EntityLinks card below */}
                                         {entity.tags.length > 0 && (
                                             <div className="space-y-2">
                                                 <TagBadges tags={entity.tags} indexPath="/entities" />
@@ -357,6 +345,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
 
                             <EntityLocations entityId={entity.id} entitySlug={entity.slug} canEdit={canEdit} />
                             <EntityContacts entityId={entity.id} entitySlug={entity.slug} canEdit={canEdit} />
+                            <EntityLinks entityId={entity.id} entitySlug={entity.slug} canEdit={canEdit} />
 
                             <PhotoGallery
                                 fetchUrl={`/entities/${entity.slug}/photos`}
