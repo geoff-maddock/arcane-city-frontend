@@ -1,16 +1,27 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Tag, Event, Entity, Series, PaginatedResponse } from '../types/api';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, Star, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 import EventCardCondensed from './EventCardCondensed';
 import EntityCardCondensed from './EntityCardCondensed';
 import SeriesCardCondensed from './SeriesCardCondensed';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export default function TagDetail({ slug }: { slug: string }) {
+    const navigate = useNavigate();
+
     const { data: tag, isLoading, error } = useQuery<Tag>({
         queryKey: ['tag', slug],
         queryFn: async () => {
@@ -26,6 +37,8 @@ export default function TagDetail({ slug }: { slug: string }) {
     });
 
     const [following, setFollowing] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -57,6 +70,23 @@ export default function TagDetail({ slug }: { slug: string }) {
         } else {
             followMutation.mutate();
         }
+    };
+
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            await api.delete(`/tags/${slug}`);
+        },
+        onSuccess: () => {
+            navigate({ to: '/tags' });
+        },
+        onError: (error) => {
+            console.error('Error deleting tag:', error);
+        },
+    });
+
+    const handleDelete = () => {
+        deleteMutation.mutate();
+        setDeleteDialogOpen(false);
     };
 
     const { data: eventsData, isLoading: eventsLoading } = useQuery<PaginatedResponse<Event>>({
@@ -145,22 +175,86 @@ export default function TagDetail({ slug }: { slug: string }) {
                         </Button>
                     </div>
                     <div className="flex items-start justify-between">
-                        <h1 className="text-4xl font-bold text-gray-900">{tag.name}</h1>
+                        <div>
+                            <h1 className="text-4xl font-bold text-gray-900">{tag.name}</h1>
+                            {tag.tag_type && (
+                                <p className="text-xl text-gray-600">{tag.tag_type.name}</p>
+                            )}
+                            {tag.description && (
+                                <p className="mt-2 text-gray-700">{tag.description}</p>
+                            )}
+                        </div>
                         {user && (
                             <div className="flex items-center gap-2">
                                 <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
                                     <Star className={`h-6 w-6 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
                                 </button>
                                 {tag.created_by && user.id === tag.created_by && (
-                                    <Button size="sm" variant="outline" asChild>
-                                        <Link to="/tags/$slug/edit" params={{ slug }}>
-                                            Edit Tag
-                                        </Link>
-                                    </Button>
+                                    <Popover open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                className="text-gray-600 hover:text-gray-900 transition-colors p-1 rounded-md hover:bg-gray-100"
+                                                title="More actions"
+                                                aria-label="More actions"
+                                            >
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-48 p-2" align="end">
+                                            <div className="space-y-1">
+                                                <Link
+                                                    to="/tags/$slug/edit"
+                                                    params={{ slug }}
+                                                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-full"
+                                                    onClick={() => setActionsMenuOpen(false)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                    Edit Tag
+                                                </Link>
+                                                <button
+                                                    className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
+                                                    onClick={() => {
+                                                        setActionsMenuOpen(false);
+                                                        setDeleteDialogOpen(true);
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    Delete Tag
+                                                </button>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
                                 )}
                             </div>
                         )}
                     </div>
+
+                    {/* Delete Confirmation Dialog */}
+                    <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Delete Tag</DialogTitle>
+                                <DialogDescription>
+                                    Are you sure you want to delete "{tag.name}"? This action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+                                    {deleteMutation.isPending ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Deleting...
+                                        </>
+                                    ) : (
+                                        'Delete'
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
                     <div className="space-y-8">
                         <div>
