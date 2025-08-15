@@ -270,12 +270,19 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                                 </span>
                                                 {series.promoter && (
                                                     <span>
-                                                        <span className="m-1 text-gray-500 ">
-                                                            by
-                                                        </span>
-                                                        <span className=" text-gray-500 font-bold">
-                                                            {series.promoter.name}
-                                                        </span>
+                                                        <span className="m-1 text-gray-500 ">by</span>
+                                                        {series.promoter.slug ? (
+                                                            <Link
+                                                                to="/entities/$entitySlug"
+                                                                params={{ entitySlug: series.promoter.slug }}
+                                                                className="text-gray-500 font-bold hover:text-primary transition-colors underline-offset-2 hover:underline"
+                                                                title="View Promoter"
+                                                            >
+                                                                {series.promoter.name}
+                                                            </Link>
+                                                        ) : (
+                                                            <span className="text-gray-500 font-bold" title="Promoter slug unavailable">{series.promoter.name}</span>
+                                                        )}
                                                     </span>
                                                 )}
                                             </div>
@@ -298,7 +305,18 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                         {series.venue && (
                                             <div className="flex items-center gap-2 text-gray-600">
                                                 <MapPin className="h-5 w-5" />
-                                                <span>{series.venue.name}</span>
+                                                {series.venue.slug ? (
+                                                    <Link
+                                                        to="/entities/$entitySlug"
+                                                        params={{ entitySlug: series.venue.slug }}
+                                                        className="hover:text-primary transition-colors underline-offset-2 hover:underline"
+                                                        title="View Venue"
+                                                    >
+                                                        {series.venue.name}
+                                                    </Link>
+                                                ) : (
+                                                    <span title="Venue slug unavailable">{series.venue.name}</span>
+                                                )}
                                             </div>
                                         )}
 
