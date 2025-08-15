@@ -128,7 +128,20 @@ const EventCardGrid = ({ event, allImages, imageIndex }: EventCardGridProps) => 
                 {event.venue && (
                     <div className="flex items-center text-xs text-gray-500 mb-2">
                         <MapPin className="mr-1 h-3 w-3 flex-shrink-0" />
-                        <span className="line-clamp-1">{event.venue.name}</span>
+                        <a
+                            href={`/entities/${event.venue.slug}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                navigate({
+                                    to: '/entities/$entitySlug',
+                                    params: { entitySlug: event.venue!.slug }
+                                });
+                            }}
+                            className="line-clamp-1 hover:text-primary transition-colors underline-offset-2 hover:underline"
+                        >
+                            {event.venue.name}
+                        </a>
                     </div>
                 )}
 

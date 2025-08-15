@@ -184,9 +184,26 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
                       <span className="m-1 text-gray-500 ">
                         by
                       </span>
-                      <span className="text-gray-500 font-bold">
-                        {event.promoter.name}
-                      </span>
+                      {event.promoter.slug ? (
+                        <a
+                          href={`/entities/${event.promoter.slug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate({
+                              to: '/entities/$entitySlug',
+                              params: { entitySlug: event.promoter!.slug }
+                            });
+                          }}
+                          className="text-gray-500 font-bold hover:text-primary transition-colors underline-offset-2 hover:underline"
+                        >
+                          {event.promoter.name}
+                        </a>
+                      ) : (
+                        <span className="text-gray-500 font-bold" title="Promoter slug unavailable">
+                          {event.promoter.name}
+                        </span>
+                      )}
                     </span>
                   )}
                 </div>
@@ -200,7 +217,24 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
               {event.venue && (
                 <div className="flex items-center text-sm text-gray-500">
                   <MapPin className="mr-2 h-4 w-4" />
-                  {event.venue.name}
+                  {event.venue.slug ? (
+                    <a
+                      href={`/entities/${event.venue.slug}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        navigate({
+                          to: '/entities/$entitySlug',
+                          params: { entitySlug: event.venue!.slug }
+                        });
+                      }}
+                      className="hover:text-primary transition-colors underline-offset-2 hover:underline"
+                    >
+                      {event.venue.name}
+                    </a>
+                  ) : (
+                    <span title="Venue slug unavailable">{event.venue.name}</span>
+                  )}
                 </div>
               )}
 

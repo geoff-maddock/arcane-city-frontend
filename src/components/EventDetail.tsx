@@ -307,12 +307,19 @@ export default function EventDetail({ slug }: { slug: string }) {
 
                                                     {event.promoter && (
                                                         <span>
-                                                            <span className="m-1 text-gray-500 ">
-                                                                by
-                                                            </span>
-                                                            <span className=" text-gray-500 font-bold">
-                                                                {event.promoter.name}
-                                                            </span>
+                                                            <span className="m-1 text-gray-500 ">by</span>
+                                                            {event.promoter.slug ? (
+                                                                <Link
+                                                                    to="/entities/$entitySlug"
+                                                                    params={{ entitySlug: event.promoter.slug }}
+                                                                    className="text-gray-500 font-bold hover:text-primary transition-colors underline-offset-2 hover:underline"
+                                                                    title="View Promoter"
+                                                                >
+                                                                    {event.promoter.name}
+                                                                </Link>
+                                                            ) : (
+                                                                <span className="text-gray-500 font-bold" title="Promoter slug unavailable">{event.promoter.name}</span>
+                                                            )}
                                                         </span>
                                                     )}
                                                 </div>
@@ -326,7 +333,18 @@ export default function EventDetail({ slug }: { slug: string }) {
                                             {event.venue && (
                                                 <div className="flex items-center text-sm text-gray-500">
                                                     <MapPin className="mr-2 h-4 w-4" />
-                                                    {event.venue.name}
+                                                    {event.venue.slug ? (
+                                                        <Link
+                                                            to="/entities/$entitySlug"
+                                                            params={{ entitySlug: event.venue.slug }}
+                                                            className="hover:text-primary transition-colors underline-offset-2 hover:underline"
+                                                            title="View Venue"
+                                                        >
+                                                            {event.venue.name}
+                                                        </Link>
+                                                    ) : (
+                                                        <span title="Venue slug unavailable">{event.venue.name}</span>
+                                                    )}
                                                 </div>
                                             )}
 

@@ -135,12 +135,25 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
                   </span>
                   {series.promoter && (
                     <span>
-                      <span className="m-1 text-gray-500 ">
-                        by
-                      </span>
-                      <span className=" text-gray-500 font-bold">
-                        {series.promoter.name}
-                      </span>
+                      <span className="m-1 text-gray-500 ">by</span>
+                      {series.promoter.slug ? (
+                        <a
+                          href={`/entities/${series.promoter.slug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate({
+                              to: '/entities/$entitySlug',
+                              params: { entitySlug: series.promoter!.slug }
+                            });
+                          }}
+                          className="text-gray-500 font-bold hover:text-primary transition-colors underline-offset-2 hover:underline"
+                        >
+                          {series.promoter.name}
+                        </a>
+                      ) : (
+                        <span className="text-gray-500 font-bold" title="Promoter slug unavailable">{series.promoter.name}</span>
+                      )}
                     </span>
                   )}
                 </div>
@@ -163,7 +176,24 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
               {series.venue && (
                 <div className="flex items-center text-sm text-gray-500">
                   <MapPin className="mr-2 h-4 w-4" />
-                  {series.venue.name}
+                  {series.venue.slug ? (
+                    <a
+                      href={`/entities/${series.venue.slug}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        navigate({
+                          to: '/entities/$entitySlug',
+                          params: { entitySlug: series.venue!.slug }
+                        });
+                      }}
+                      className="hover:text-primary transition-colors underline-offset-2 hover:underline"
+                    >
+                      {series.venue.name}
+                    </a>
+                  ) : (
+                    <span title="Venue slug unavailable">{series.venue.name}</span>
+                  )}
                 </div>
               )}
 
