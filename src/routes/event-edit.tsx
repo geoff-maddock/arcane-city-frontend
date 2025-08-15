@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import SearchableInput from '../components/SearchableInput';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError, toKebabCase } from '@/lib/utils';
+import { formatApiError } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Event } from '../types/api';
 import { useQuery } from '@tanstack/react-query';
+import { useSlug } from '@/hooks/useSlug';
+import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -57,6 +59,11 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
     const [entityQuery, setEntityQuery] = useState('');
     const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
     const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
+    // useSlug manages name<->slug auto sync until the user edits slug manually.
+    // We will call initialize once the event data loads so that existing values
+    // are seeded WITHOUT marking the slug as manually overridden (allowing
+    // subsequent name edits to keep syncing until the user edits slug directly).
+    const { name, slug, setName, setSlug, manuallyOverridden, initialize } = useSlug('', '');
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: eventStatusOptions } = useSearchOptions('event-statuses', '');
@@ -94,8 +101,10 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
             });
             setSelectedTags(event.tags?.map(t => ({ id: t.id, name: t.name })) || []);
             setSelectedEntities(event.entities?.map(e => ({ id: e.id, name: e.name })) || []);
+            // Hydrate the slug hook (do not mark as manual override yet)
+            initialize(event.name || '', event.slug || '');
         }
-    }, [event]);
+    }, [event, initialize]);
 
     useEffect(() => {
         if (visibilityOptions && visibilityOptions.length > 0 && formData.visibility_id === 1) {
@@ -119,16 +128,15 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-        const { name, value } = target;
+        const { name: fieldName, value } = target;
         const isCheckbox = (target as HTMLInputElement).type === 'checkbox';
         const checked = (target as HTMLInputElement).checked;
-        setFormData((prev) => {
-            const updated = { ...prev, [name]: isCheckbox ? checked : value };
-            if (name === 'name') {
-                updated.slug = toKebabCase(value);
-            }
-            return updated;
-        });
+        setFormData(prev => ({ ...prev, [fieldName]: isCheckbox ? checked : value }));
+        if (fieldName === 'name') {
+            setName(value);
+            if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
+        }
+        if (fieldName === 'slug') setSlug(value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -177,12 +185,12 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+                        <Input id="name" name="name" value={name} onChange={handleChange} />
                         {renderError('name')}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="slug">Slug</Label>
-                        <Input id="slug" name="slug" value={formData.slug} onChange={handleChange} />
+                        <Input id="slug" name="slug" value={slug} onChange={handleChange} />
                         {renderError('slug')}
                     </div>
                 </div>
@@ -364,92 +372,32 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                     {renderError('ticket_link')}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="tag_input">Tags</Label>
-                        <Input
-                            id="tag_input"
-                            list="tag-options"
-                            value={tagQuery}
-                            onChange={(e) => setTagQuery(e.target.value)}
-                            onBlur={(e) => {
-                                const opt = tagOptions?.find((o) => o.name === e.target.value);
-                                if (opt && !formData.tag_list.includes(opt.id)) {
-                                    setFormData((p) => ({ ...p, tag_list: [...p.tag_list, opt.id] }));
-                                    setSelectedTags((p) => [...p, opt]);
-                                }
-                                setTagQuery('');
-                            }}
-                        />
-                        <datalist id="tag-options">
-                            {tagOptions?.map((o) => (
-                                <option key={o.id} value={o.name} />
-                            ))}
-                        </datalist>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedTags.map((tag) => (
-                                <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                                    {tag.name}
-                                    <button
-                                        type="button"
-                                        className="ml-1 text-red-500"
-                                        onClick={() => {
-                                            setSelectedTags((p) => p.filter((t) => t.id !== tag.id));
-                                            setFormData((p) => ({
-                                                ...p,
-                                                tag_list: p.tag_list.filter((t) => t !== tag.id),
-                                            }));
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                        {renderError('tag_list')}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="entity_input">Entities</Label>
-                        <Input
-                            id="entity_input"
-                            list="entity-options"
-                            value={entityQuery}
-                            onChange={(e) => setEntityQuery(e.target.value)}
-                            onBlur={(e) => {
-                                const opt = entityOptions?.find((o) => o.name === e.target.value);
-                                if (opt && !formData.entity_list.includes(opt.id)) {
-                                    setFormData((p) => ({ ...p, entity_list: [...p.entity_list, opt.id] }));
-                                    setSelectedEntities((p) => [...p, opt]);
-                                }
-                                setEntityQuery('');
-                            }}
-                        />
-                        <datalist id="entity-options">
-                            {entityOptions?.map((o) => (
-                                <option key={o.id} value={o.name} />
-                            ))}
-                        </datalist>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedEntities.map((ent) => (
-                                <span key={ent.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                                    {ent.name}
-                                    <button
-                                        type="button"
-                                        className="ml-1 text-red-500"
-                                        onClick={() => {
-                                            setSelectedEntities((p) => p.filter((t) => t.id !== ent.id));
-                                            setFormData((p) => ({
-                                                ...p,
-                                                entity_list: p.entity_list.filter((t) => t !== ent.id),
-                                            }));
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                        {renderError('entity_list')}
-                    </div>
+                    <TagEntityMultiSelect
+                        label="Tags"
+                        datalistId="tag-options"
+                        query={tagQuery}
+                        setQuery={setTagQuery}
+                        options={tagOptions}
+                        valueIds={formData.tag_list}
+                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
+                        selected={selectedTags}
+                        setSelected={setSelectedTags}
+                        placeholder="Type to add tag..."
+                        ariaLabelRemove="Remove tag"
+                    />
+                    <TagEntityMultiSelect
+                        label="Entities"
+                        datalistId="entity-options"
+                        query={entityQuery}
+                        setQuery={setEntityQuery}
+                        options={entityOptions}
+                        valueIds={formData.entity_list}
+                        setValueIds={(ids) => setFormData(p => ({ ...p, entity_list: typeof ids === 'function' ? ids(p.entity_list) : ids }))}
+                        selected={selectedEntities}
+                        setSelected={setSelectedEntities}
+                        placeholder="Type to add entity..."
+                        ariaLabelRemove="Remove entity"
+                    />
                 </div>
                 <Button type="submit" className="w-full">Save Event</Button>
             </form>

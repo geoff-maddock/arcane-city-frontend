@@ -8,11 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError, toKebabCase } from '@/lib/utils';
+import { formatApiError } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useTagTypes } from '../hooks/useTagTypes';
 import { Tag } from '../types/api';
+import { useSlug } from '@/hooks/useSlug';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -35,7 +36,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
     enabled: authService.isAuthenticated(),
   });
 
-    const { data: tagTypeOptions } = useTagTypes();
+  const { data: tagTypeOptions } = useTagTypes();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,6 +44,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
     description: '',
     tag_type_id: '' as number | '',
   });
+  const { name, slug: hookSlug, setName, setSlug, initialize } = useSlug('', '');
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
 
@@ -54,8 +56,9 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
         description: tag.description || '',
         tag_type_id: (tag.tag_type_id || tag.tag_type?.id || '') as number | '',
       });
+      initialize(tag.name, tag.slug); // allow name edits to keep syncing until slug manually changed
     }
-  }, [tag]);
+  }, [tag, initialize]);
 
   if (!authService.isAuthenticated() || !user) {
     return <div className="p-6">You must be logged in to edit a tag.</div>;
@@ -68,14 +71,10 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value } as typeof formData;
-      if (name === 'name') {
-        updated.slug = toKebabCase(value);
-      }
-      return updated;
-    });
+    const { name: fieldName, value } = e.target;
+    setFormData(prev => ({ ...prev, [fieldName]: value }));
+    if (fieldName === 'name') setName(value);
+    if (fieldName === 'slug') setSlug(value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,12 +126,12 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+          <Input id="name" name="name" value={name} onChange={handleChange} />
           {renderError('name')}
         </div>
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" name="slug" value={formData.slug} onChange={handleChange} />
+          <Input id="slug" name="slug" value={hookSlug} onChange={handleChange} />
           {renderError('slug')}
         </div>
         <div className="space-y-2">

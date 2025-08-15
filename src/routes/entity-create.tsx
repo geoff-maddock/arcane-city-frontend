@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import SearchableInput from '../components/SearchableInput';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError, toKebabCase } from '@/lib/utils';
+import { formatApiError } from '@/lib/utils';
+import { useSlug } from '@/hooks/useSlug';
+import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
 
@@ -37,6 +39,7 @@ const EntityCreate: React.FC = () => {
     const [roleQuery, setRoleQuery] = useState('');
     const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
     const [selectedRoles, setSelectedRoles] = useState<{ id: number; name: string }[]>([]);
+    const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
@@ -107,14 +110,13 @@ const EntityCreate: React.FC = () => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-        const { name, value } = target;
-        setFormData((prev) => {
-            const updated = { ...prev, [name]: value };
-            if (name === 'name') {
-                updated.slug = toKebabCase(value);
-            }
-            return updated;
-        });
+        const { name: fieldName, value } = target;
+        setFormData(prev => ({ ...prev, [fieldName]: value }));
+        if (fieldName === 'name') {
+            setName(value);
+            if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
+        }
+        if (fieldName === 'slug') setSlug(value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -159,7 +161,7 @@ const EntityCreate: React.FC = () => {
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <div className="flex items-center gap-2">
-                        <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+                        <Input id="name" name="name" value={name} onChange={handleChange} />
                         {nameCheck === 'unique' && <CheckCircle className="text-green-500" />}
                         {nameCheck === 'duplicate' && <XCircle className="text-red-500" />}
                     </div>
@@ -179,7 +181,7 @@ const EntityCreate: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="slug">Slug</Label>
-                    <Input id="slug" name="slug" value={formData.slug} onChange={handleChange} />
+                    <Input id="slug" name="slug" value={slug} onChange={handleChange} />
                     {renderError('slug')}
                 </div>
                 <div className="space-y-2">
@@ -307,92 +309,32 @@ const EntityCreate: React.FC = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="tag_input">Tags</Label>
-                        <Input
-                            id="tag_input"
-                            list="tag-options"
-                            value={tagQuery}
-                            onChange={(e) => setTagQuery(e.target.value)}
-                            onBlur={(e) => {
-                                const opt = tagOptions?.find((o) => o.name === e.target.value);
-                                if (opt && !formData.tag_list.includes(opt.id)) {
-                                    setFormData((p) => ({ ...p, tag_list: [...p.tag_list, opt.id] }));
-                                    setSelectedTags((p) => [...p, opt]);
-                                }
-                                setTagQuery('');
-                            }}
-                        />
-                        <datalist id="tag-options">
-                            {tagOptions?.map((o) => (
-                                <option key={o.id} value={o.name} />
-                            ))}
-                        </datalist>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedTags.map((tag) => (
-                                <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                                    {tag.name}
-                                    <button
-                                        type="button"
-                                        className="ml-1 text-red-500"
-                                        onClick={() => {
-                                            setSelectedTags((p) => p.filter((t) => t.id !== tag.id));
-                                            setFormData((p) => ({
-                                                ...p,
-                                                tag_list: p.tag_list.filter((t) => t !== tag.id),
-                                            }));
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                        {renderError('tag_list')}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="role_input">Roles</Label>
-                        <Input
-                            id="role_input"
-                            list="role-options"
-                            value={roleQuery}
-                            onChange={(e) => setRoleQuery(e.target.value)}
-                            onBlur={(e) => {
-                                const opt = roleOptions?.find((o) => o.name === e.target.value);
-                                if (opt && !formData.role_list.includes(opt.id)) {
-                                    setFormData((p) => ({ ...p, role_list: [...p.role_list, opt.id] }));
-                                    setSelectedRoles((p) => [...p, opt]);
-                                }
-                                setRoleQuery('');
-                            }}
-                        />
-                        <datalist id="role-options">
-                            {roleOptions?.map((o) => (
-                                <option key={o.id} value={o.name} />
-                            ))}
-                        </datalist>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedRoles.map((role) => (
-                                <span key={role.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                                    {role.name}
-                                    <button
-                                        type="button"
-                                        className="ml-1 text-red-500"
-                                        onClick={() => {
-                                            setSelectedRoles((p) => p.filter((r) => r.id !== role.id));
-                                            setFormData((p) => ({
-                                                ...p,
-                                                role_list: p.role_list.filter((r) => r !== role.id),
-                                            }));
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                        {renderError('role_list')}
-                    </div>
+                    <TagEntityMultiSelect
+                        label="Tags"
+                        datalistId="tag-options"
+                        query={tagQuery}
+                        setQuery={setTagQuery}
+                        options={tagOptions}
+                        valueIds={formData.tag_list}
+                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
+                        selected={selectedTags}
+                        setSelected={setSelectedTags}
+                        placeholder="Type to add tag..."
+                        ariaLabelRemove="Remove tag"
+                    />
+                    <TagEntityMultiSelect
+                        label="Roles"
+                        datalistId="role-options"
+                        query={roleQuery}
+                        setQuery={setRoleQuery}
+                        options={roleOptions}
+                        valueIds={formData.role_list}
+                        setValueIds={(ids) => setFormData(p => ({ ...p, role_list: typeof ids === 'function' ? ids(p.role_list) : ids }))}
+                        selected={selectedRoles}
+                        setSelected={setSelectedRoles}
+                        placeholder="Type to add role..."
+                        ariaLabelRemove="Remove role"
+                    />
                 </div>
                 <Button type="submit" className="w-full">Create Entity</Button>
             </form>

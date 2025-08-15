@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import SearchableInput from '../components/SearchableInput';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError, toKebabCase } from '@/lib/utils';
+import { formatApiError } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Series } from '../types/api';
 import { useQuery } from '@tanstack/react-query';
+import { useSlug } from '@/hooks/useSlug';
+import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -55,6 +57,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     const [entityQuery, setEntityQuery] = useState('');
     const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
     const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
+    const { name, slug, setName, setSlug, initialize, manuallyOverridden } = useSlug('', '');
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '', {}, { sort: 'id', direction: 'asc' });
@@ -92,8 +95,9 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             });
             setSelectedTags(series.tags?.map(t => ({ id: t.id, name: t.name })) || []);
             setSelectedEntities(series.entities?.map(e => ({ id: e.id, name: e.name })) || []);
+            initialize(series.name || '', series.slug || '');
         }
-    }, [series]);
+    }, [series, initialize]);
 
     useEffect(() => {
         if (visibilityOptions && visibilityOptions.length > 0 && formData.visibility_id === 1) {
@@ -108,16 +112,15 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-        const { name, value } = target;
+        const { name: fieldName, value } = target;
         const isCheckbox = (target as HTMLInputElement).type === 'checkbox';
         const checked = (target as HTMLInputElement).checked;
-        setFormData((prev) => {
-            const updated = { ...prev, [name]: isCheckbox ? checked : value } as typeof formData;
-            if (name === 'name') {
-                updated.slug = toKebabCase(value);
-            }
-            return updated;
-        });
+        setFormData(prev => ({ ...prev, [fieldName]: isCheckbox ? checked : value }));
+        if (fieldName === 'name') {
+            setName(value);
+            if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
+        }
+        if (fieldName === 'slug') setSlug(value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -167,12 +170,12 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+                    <Input id="name" name="name" value={name} onChange={handleChange} />
                     {renderError('name')}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="slug">Slug</Label>
-                    <Input id="slug" name="slug" value={formData.slug} onChange={handleChange} />
+                    <Input id="slug" name="slug" value={slug} onChange={handleChange} />
                     {renderError('slug')}
                 </div>
                 <div className="space-y-2">
@@ -203,8 +206,8 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                     <div className="space-y-2">
                         <Label htmlFor="occurrence_type_id">Occurrence Type</Label>
                         <Select
-                            value={formData.occurrence_type_id ? formData.occurrence_type_id.toString() : "none"}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_type_id: value === "none" ? '' : Number(value) }))}
+                            value={formData.occurrence_type_id ? formData.occurrence_type_id.toString() : 'none'}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_type_id: value === 'none' ? '' : Number(value) }))}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select occurrence type" />
@@ -212,7 +215,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             <SelectContent>
                                 <SelectItem value="none">No occurrence type</SelectItem>
                                 {occurrenceTypeOptions?.map((option) => (
-                                    <SelectItem key={option.id} value={String(option.id)}>
+                                    <SelectItem key={option.id} value={option.id.toString()}>
                                         {option.name}
                                     </SelectItem>
                                 ))}
@@ -223,8 +226,8 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                     <div className="space-y-2">
                         <Label htmlFor="occurrence_week_id">Occurrence Week</Label>
                         <Select
-                            value={formData.occurrence_week_id ? formData.occurrence_week_id.toString() : "none"}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_week_id: value === "none" ? '' : Number(value) }))}
+                            value={formData.occurrence_week_id ? formData.occurrence_week_id.toString() : 'none'}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_week_id: value === 'none' ? '' : Number(value) }))}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select occurrence week" />
@@ -232,7 +235,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             <SelectContent>
                                 <SelectItem value="none">No occurrence week</SelectItem>
                                 {occurrenceWeekOptions?.map((option) => (
-                                    <SelectItem key={option.id} value={String(option.id)}>
+                                    <SelectItem key={option.id} value={option.id.toString()}>
                                         {option.name}
                                     </SelectItem>
                                 ))}
@@ -243,8 +246,8 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                     <div className="space-y-2">
                         <Label htmlFor="occurrence_day_id">Occurrence Day</Label>
                         <Select
-                            value={formData.occurrence_day_id ? formData.occurrence_day_id.toString() : "none"}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_day_id: value === "none" ? '' : Number(value) }))}
+                            value={formData.occurrence_day_id ? formData.occurrence_day_id.toString() : 'none'}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_day_id: value === 'none' ? '' : Number(value) }))}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select occurrence day" />
@@ -252,7 +255,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             <SelectContent>
                                 <SelectItem value="none">No occurrence day</SelectItem>
                                 {occurrenceDayOptions?.map((option) => (
-                                    <SelectItem key={option.id} value={String(option.id)}>
+                                    <SelectItem key={option.id} value={option.id.toString()}>
                                         {option.name}
                                     </SelectItem>
                                 ))}
@@ -273,7 +276,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             </SelectTrigger>
                             <SelectContent>
                                 {visibilityOptions?.map((option) => (
-                                    <SelectItem key={option.id} value={String(option.id)}>
+                                    <SelectItem key={option.id} value={option.id.toString()}>
                                         {option.name}
                                     </SelectItem>
                                 ))}
@@ -356,8 +359,8 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                     <div className="space-y-2">
                         <Label htmlFor="min_age">Minimum Age</Label>
                         <Select
-                            value={formData.min_age ? formData.min_age.toString() : "none"}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value === "none" ? '' : value }))}
+                            value={formData.min_age ? formData.min_age.toString() : 'none'}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value === 'none' ? '' : value }))}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select minimum age" />
@@ -394,10 +397,20 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         />
                         {renderError('end_at')}
                     </div>
-                    <div className="space-y-2"> </div>
-                    <div className="space-y-2"> </div>
+                    <div className="space-y-2" />
+                    <div className="space-y-2" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="primary_link">Primary Link</Label>
+                        <Input
+                            id="primary_link"
+                            name="primary_link"
+                            value={formData.primary_link}
+                            onChange={handleChange}
+                        />
+                        {renderError('primary_link')}
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="ticket_link">Ticket Link</Label>
                         <Input
@@ -408,93 +421,32 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         />
                         {renderError('ticket_link')}
                     </div>
-                    <div className="space-y-2"> </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="tag_input">Tags</Label>
-                        <Input
-                            id="tag_input"
-                            list="tag-options"
-                            value={tagQuery}
-                            onChange={(e) => setTagQuery(e.target.value)}
-                            onBlur={(e) => {
-                                const opt = tagOptions?.find((o) => o.name === e.target.value);
-                                if (opt && !formData.tag_list.includes(opt.id)) {
-                                    setFormData((p) => ({ ...p, tag_list: [...p.tag_list, opt.id] }));
-                                    setSelectedTags((p) => [...p, opt]);
-                                }
-                                setTagQuery('');
-                            }}
-                        />
-                        <datalist id="tag-options">
-                            {tagOptions?.map((o) => (
-                                <option key={o.id} value={o.name} />
-                            ))}
-                        </datalist>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedTags.map((tag) => (
-                                <span key={tag.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                                    {tag.name}
-                                    <button
-                                        type="button"
-                                        className="ml-1 text-red-500"
-                                        onClick={() => {
-                                            setSelectedTags((p) => p.filter((t) => t.id !== tag.id));
-                                            setFormData((p) => ({
-                                                ...p,
-                                                tag_list: p.tag_list.filter((t) => t !== tag.id),
-                                            }));
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                        {renderError('tag_list')}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="entity_input">Entities</Label>
-                        <Input
-                            id="entity_input"
-                            list="entity-options"
-                            value={entityQuery}
-                            onChange={(e) => setEntityQuery(e.target.value)}
-                            onBlur={(e) => {
-                                const opt = entityOptions?.find((o) => o.name === e.target.value);
-                                if (opt && !formData.entity_list.includes(opt.id)) {
-                                    setFormData((p) => ({ ...p, entity_list: [...p.entity_list, opt.id] }));
-                                    setSelectedEntities((p) => [...p, opt]);
-                                }
-                                setEntityQuery('');
-                            }}
-                        />
-                        <datalist id="entity-options">
-                            {entityOptions?.map((o) => (
-                                <option key={o.id} value={o.name} />
-                            ))}
-                        </datalist>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedEntities.map((entity) => (
-                                <span key={entity.id} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                                    {entity.name}
-                                    <button
-                                        type="button"
-                                        className="ml-1 text-red-500"
-                                        onClick={() => {
-                                            setSelectedEntities((p) => p.filter((e) => e.id !== entity.id));
-                                            setFormData((p) => ({
-                                                ...p,
-                                                entity_list: p.entity_list.filter((e) => e !== entity.id),
-                                            }));
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                        {renderError('entity_list')}
-                    </div>
+                    <TagEntityMultiSelect
+                        label="Tags"
+                        datalistId="tag-options"
+                        query={tagQuery}
+                        setQuery={setTagQuery}
+                        options={tagOptions}
+                        valueIds={formData.tag_list}
+                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
+                        selected={selectedTags}
+                        setSelected={setSelectedTags}
+                        placeholder="Type to add tag..."
+                        ariaLabelRemove="Remove tag"
+                    />
+                    <TagEntityMultiSelect
+                        label="Entities"
+                        datalistId="entity-options"
+                        query={entityQuery}
+                        setQuery={setEntityQuery}
+                        options={entityOptions}
+                        valueIds={formData.entity_list}
+                        setValueIds={(ids) => setFormData(p => ({ ...p, entity_list: typeof ids === 'function' ? ids(p.entity_list) : ids }))}
+                        selected={selectedEntities}
+                        setSelected={setSelectedEntities}
+                        placeholder="Type to add entity..."
+                        ariaLabelRemove="Remove entity"
+                    />
                 </div>
                 <Button type="submit" className="w-full">Save Series</Button>
             </form>
