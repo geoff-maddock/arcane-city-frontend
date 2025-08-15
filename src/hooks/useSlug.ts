@@ -31,5 +31,15 @@ export function useSlug(initialName = '', initialSlug = '') {
         setSlug(toKebabCase(name.trim()));
     }, [name]);
 
-    return { name, slug, setName: onNameChange, setSlug: onSlugChange, reset, manuallyOverridden: manualOverride.current } as const;
+    /**
+     * initialize sets both name and slug WITHOUT marking the slug as manually overridden.
+     * Useful for populating edit forms with server data while preserving auto-sync on subsequent name edits.
+     */
+    const initialize = useCallback((initialNameVal: string, initialSlugVal?: string) => {
+        manualOverride.current = false;
+        setName(initialNameVal);
+        setSlug(initialSlugVal ?? toKebabCase(initialNameVal.trim()));
+    }, []);
+
+    return { name, slug, setName: onNameChange, setSlug: onSlugChange, reset, initialize, manuallyOverridden: manualOverride.current } as const;
 }

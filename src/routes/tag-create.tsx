@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError, toKebabCase } from '@/lib/utils';
+import { formatApiError } from '@/lib/utils';
+import { useSlug } from '@/hooks/useSlug';
 import { authService } from '../services/auth.service';
 import { useTagTypes } from '../hooks/useTagTypes';
 
@@ -24,6 +25,7 @@ const TagCreate: React.FC = () => {
     description: '',
     tag_type_id: 1 as number | '',
   });
+  const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
 
@@ -48,14 +50,13 @@ const TagCreate: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value } as typeof formData;
-      if (name === 'name') {
-        updated.slug = toKebabCase(value);
-      }
-      return updated;
-    });
+    const { name: fieldName, value } = e.target;
+    setFormData(prev => ({ ...prev, [fieldName]: value }));
+    if (fieldName === 'name') {
+      setName(value);
+      if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
+    }
+    if (fieldName === 'slug') setSlug(value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,12 +102,12 @@ const TagCreate: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={formData.name} onChange={handleChange} />
+          <Input id="name" name="name" value={name} onChange={handleChange} />
           {renderError('name')}
         </div>
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" name="slug" value={formData.slug} onChange={handleChange} />
+          <Input id="slug" name="slug" value={slug} onChange={handleChange} />
           {renderError('slug')}
         </div>
         <div className="space-y-2">
