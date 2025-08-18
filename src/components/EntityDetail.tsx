@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, MapPin, Music, Star, Pencil, Power, Target, Trash2, MoreHorizontal } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { sanitizeHTML, sanitizeEmbed } from '../lib/sanitize';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
 import { TagBadges } from './TagBadges';
@@ -268,7 +269,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                             {entity.description && (
                                 <Card>
                                     <CardContent className="prose max-w-none p-6">
-                                        <div dangerouslySetInnerHTML={{ __html: formattedDescription }} />
+                                        <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(formattedDescription) }} />
                                     </CardContent>
                                 </Card>
                             )}
@@ -366,14 +367,17 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
                                             <h2 className="text-xl font-semibold">Audio</h2>
                                         </div>
                                         <div className="space-y-4">
-                                            {embeds.map((embed, index) => (
-                                                <div key={index} className="rounded-md overflow-hidden">
-                                                    <div
-                                                        dangerouslySetInnerHTML={{ __html: embed }}
-                                                        className="w-full"
-                                                    />
-                                                </div>
-                                            ))}
+                                            {embeds.map((embed, index) => {
+                                                const safe = sanitizeEmbed(embed);
+                                                return (
+                                                    <div key={index} className="rounded-md overflow-hidden">
+                                                        <div
+                                                            dangerouslySetInnerHTML={{ __html: safe }}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </CardContent>
                                 </Card>

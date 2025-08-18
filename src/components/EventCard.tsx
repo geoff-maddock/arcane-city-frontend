@@ -13,6 +13,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { useState, useEffect } from 'react';
+import { sanitizeEmbed } from '../lib/sanitize';
 
 
 interface EventCardProps {
@@ -288,14 +289,17 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
               <h2 className="text-xl font-semibold">Audio</h2>
             </div>
             <div className="space-y-4">
-              {embeds.map((embed, index) => (
-                <div key={index} className="rounded-md overflow-hidden">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: embed }}
-                    className="w-full"
-                  />
-                </div>
-              ))}
+              {embeds.map((embed, index) => {
+                const safe = sanitizeEmbed(embed);
+                return (
+                  <div key={index} className="rounded-md overflow-hidden">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: safe }}
+                      className="w-full"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
