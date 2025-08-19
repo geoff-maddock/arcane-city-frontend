@@ -7,14 +7,13 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { useFilterToggle } from '../hooks/useFilterToggle';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { EventFilters } from '../types/filters';
 import { ActiveEventFilters as ActiveFilters } from './ActiveEventFilters';
+import { FilterContainer } from './FilterContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
-import { X } from 'lucide-react';
 import { authService } from '@/services/auth.service';
 import { useQuery } from '@tanstack/react-query';
 
@@ -28,25 +27,13 @@ const sortOptions = [
 ];
 
 export default function Events() {
-
-    const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
-        const savedState = localStorage.getItem('filtersVisible');
-        return savedState ? JSON.parse(savedState) : true;
-    });
+    const { filtersVisible, toggleFilters } = useFilterToggle();
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
         queryFn: authService.getCurrentUser,
         enabled: authService.isAuthenticated(),
     });
-
-    useEffect(() => {
-        localStorage.setItem('filtersVisible', JSON.stringify(filtersVisible));
-    }, [filtersVisible]);
-
-    const toggleFilters = () => {
-        setFiltersVisible(!filtersVisible);
-    };
 
 
     // Helper to get start of today
@@ -193,56 +180,20 @@ export default function Events() {
                             )}
                         </div>
 
-                        <div className="relative">
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={toggleFilters}
-                                        className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
-                                    >
-                                        {filtersVisible ? (
-                                            <>
-                                                <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
-                                                Hide Filters
-                                            </>
-                                        ) : (
-                                            <>
-                                                <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
-                                                Show Filters
-                                            </>
-                                        )}
-                                    </button>
-
-                                    {!filtersVisible && (
-                                        <ActiveFilters
-                                            filters={filters}
-                                            onRemoveFilter={handleRemoveFilter}
-                                        />
-                                    )}
-
-                                    {hasActiveFilters && (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={handleClearAllFilters}
-                                            className="mb-4 text-gray-500 hover:text-gray-900"
-                                        >
-                                            Clear All
-                                            <X className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-
-                            {filtersVisible && (
-                                <Card className="shadow-sm">
-                                    <CardContent className="p-6 space-y-4">
-                                        <EventFilter filters={filters} onFilterChange={setFilters} />
-
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
+                        <FilterContainer
+                            filtersVisible={filtersVisible}
+                            onToggleFilters={toggleFilters}
+                            hasActiveFilters={hasActiveFilters}
+                            onClearAllFilters={handleClearAllFilters}
+                            activeFiltersComponent={
+                                <ActiveFilters
+                                    filters={filters}
+                                    onRemoveFilter={handleRemoveFilter}
+                                />
+                            }
+                        >
+                            <EventFilter filters={filters} onFilterChange={setFilters} />
+                        </FilterContainer>
 
                         {error ? (
                             <Alert variant="destructive">
