@@ -111,13 +111,6 @@ export const seriesEditSchema: Schema = {
 export const seriesCreateSchema = seriesEditSchema;
 export const eventEditSchema = eventCreateSchema;
 
-// Tag schemas (create/edit) - only name & slug validated currently
-export const tagCreateSchema: Schema = {
-    name: [required(), minLength(3), maxLength(32)],
-    slug: [required(), minLength(3), maxLength(32)],
-};
-export const tagEditSchema = tagCreateSchema;
-
 export function collectFieldErrors(errors: Record<string, string[]>, field: string): string | null {
     if (!errors[field] || errors[field].length === 0) return null;
     return errors[field].join(' ');
