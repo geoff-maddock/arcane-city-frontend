@@ -51,15 +51,12 @@ export function ActiveSeriesFilters({ filters, onRemoveFilter }: ActiveSeriesFil
                 <Button
                     key={key}
                     variant="secondary"
-                    className="mb-4 text-gray-500 hover:text-gray-900"
+                    className="mb-4 text-gray-500 hover:text-gray-900 flex items-center"
+                    onClick={() => onRemoveFilter(key as keyof SeriesFilters)}
+                    aria-label={`Remove filter ${label}`}
                 >
-                    {label}
-                    <button
-                        onClick={() => onRemoveFilter(key as keyof SeriesFilters)}
-                        className="ml-1 hover:text-destructive"
-                    >
-                        <X className="h-3 w-3" />
-                    </button>
+                    <span className="mr-1">{label}</span>
+                    <X className="h-3 w-3" aria-hidden="true" />
                 </Button>
             ))}
         </div>

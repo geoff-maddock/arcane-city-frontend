@@ -13,6 +13,9 @@ import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Series } from '../types/api';
 import { useQuery } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
+import { seriesEditSchema } from '@/validation/schemas';
+import ValidationSummary from '@/components/ValidationSummary';
+import { useFormValidation } from '@/hooks/useFormValidation';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 
 interface ValidationErrors {
@@ -65,20 +68,34 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
     const { data: tagOptions } = useSearchOptions('tags', tagQuery);
     const { data: entityOptions } = useSearchOptions('entities', entityQuery);
-    const [errors, setErrors] = useState<ValidationErrors>({});
-    const [generalError, setGeneralError] = useState('');
+    const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
+        initialValues: formData,
+        schema: seriesEditSchema,
+        buildValidationValues: (vals) => ({
+            name: name,
+            slug: slug,
+            short: vals.short,
+            description: vals.description,
+            presale_price: vals.presale_price,
+            door_price: vals.door_price,
+            start_at: vals.start_at,
+            end_at: vals.end_at,
+            primary_link: vals.primary_link,
+            ticket_link: vals.ticket_link,
+        })
+    });
 
     useEffect(() => {
         if (series) {
-            setFormData({
+            const populated: typeof formData = {
                 name: series.name || '',
                 slug: series.slug || '',
                 short: series.short || '',
                 visibility_id: (series as { visibility_id?: number }).visibility_id || 1,
                 description: series.description || '',
-                event_type_id: series.event_type?.id || '',
-                promoter_id: series.promoter?.id || '',
-                venue_id: series.venue?.id || '',
+                event_type_id: (series.event_type?.id ?? '') as number | '',
+                promoter_id: (series.promoter?.id ?? '') as number | '',
+                venue_id: (series.venue?.id ?? '') as number | '',
                 is_benefit: series.is_benefit || false,
                 presale_price: series.presale_price?.toString() || '',
                 door_price: series.door_price?.toString() || '',
@@ -89,15 +106,17 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                 ticket_link: series.ticket_link || '',
                 tag_list: series.tags?.map(t => t.id) || [],
                 entity_list: series.entities?.map(e => e.id) || [],
-                occurrence_type_id: series.occurrence_type?.id || '',
-                occurrence_week_id: series.occurrence_week?.id || '',
-                occurrence_day_id: series.occurrence_day?.id || '',
-            });
+                occurrence_type_id: (series.occurrence_type?.id ?? '') as number | '',
+                occurrence_week_id: (series.occurrence_week?.id ?? '') as number | '',
+                occurrence_day_id: (series.occurrence_day?.id ?? '') as number | '',
+            };
+            setFormData(populated);
+            setFormValuesInternal(populated);
             setSelectedTags(series.tags?.map(t => ({ id: t.id, name: t.name })) || []);
             setSelectedEntities(series.entities?.map(e => ({ id: e.id, name: e.name })) || []);
             initialize(series.name || '', series.slug || '');
         }
-    }, [series, initialize]);
+    }, [series, initialize, setFormValuesInternal]);
 
     useEffect(() => {
         if (visibilityOptions && visibilityOptions.length > 0 && formData.visibility_id === 1) {
@@ -108,25 +127,29 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
         }
     }, [visibilityOptions, formData.visibility_id]);
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    type FormState = typeof formData;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-        const { name: fieldName, value } = target;
-        const isCheckbox = (target as HTMLInputElement).type === 'checkbox';
-        const checked = (target as HTMLInputElement).checked;
-        setFormData(prev => ({ ...prev, [fieldName]: isCheckbox ? checked : value }));
+        const fieldName = target.name;
+        const value = (target as HTMLInputElement).type === 'checkbox' ? (target as HTMLInputElement).checked : target.value;
+        setFormData(prev => ({ ...prev, [fieldName]: value }));
+        baseHandleChange(e);
         if (fieldName === 'name') {
-            setName(value);
+            setName(String(value));
             if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
         }
-        if (fieldName === 'slug') setSlug(value);
+        if (fieldName === 'slug') setSlug(String(value));
     };
+
+    // handleBlur provided by hook
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setErrors({});
         setGeneralError('');
+        setFormValuesInternal(v => ({ ...v }));
+        const ok = validateForm();
+        if (!ok) return;
         try {
             const payload = {
                 ...formData,
@@ -148,7 +171,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             if ((err as AxiosError).response?.status === 422) {
                 const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
                 if (resp?.data?.errors) {
-                    setErrors(resp.data.errors);
+                    applyExternalErrors(resp.data.errors);
                     return;
                 }
             }
@@ -157,9 +180,9 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     };
 
     const renderError = (field: string) => {
-        if (errors[field]) {
-            return <div className="text-red-500 text-sm">{errors[field].join(' ')}</div>;
-        }
+        if (!touched[field] && !(errors[field] && errors[field].length)) return null;
+        const message = getFieldError(field as keyof FormState);
+        if (message) return <div className="text-red-500 text-sm">{message}</div>;
         return null;
     };
 
@@ -167,15 +190,16 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
         <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto p-4 space-y-4">
             <h1 className="text-2xl font-bold">Edit Series</h1>
             {generalError && <div className="text-red-500">{generalError}</div>}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <ValidationSummary errorSummary={errorSummary} />
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" value={name} onChange={handleChange} />
+                    <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} />
                     {renderError('name')}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="slug">Slug</Label>
-                    <Input id="slug" name="slug" value={slug} onChange={handleChange} />
+                    <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} />
                     {renderError('slug')}
                 </div>
                 <div className="space-y-2">
@@ -186,6 +210,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         className="w-full border rounded p-2"
                         value={formData.short}
                         onChange={handleChange}
+                        onBlur={handleBlur}
                     />
                     {renderError('short')}
                 </div>
@@ -198,6 +223,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         className="w-full border rounded p-2"
                         value={formData.description}
                         onChange={handleChange}
+                        onBlur={handleBlur}
                     />
                     {renderError('description')}
                 </div>
@@ -330,6 +356,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             step="0.01"
                             value={formData.presale_price}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
                         {renderError('presale_price')}
                     </div>
@@ -342,6 +369,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             step="0.01"
                             value={formData.door_price}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
                         {renderError('door_price')}
                     </div>
@@ -383,6 +411,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             type="datetime-local"
                             value={formData.start_at}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
                         {renderError('start_at')}
                     </div>
@@ -394,6 +423,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             type="datetime-local"
                             value={formData.end_at}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
                         {renderError('end_at')}
                     </div>
@@ -408,6 +438,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             name="primary_link"
                             value={formData.primary_link}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
                         {renderError('primary_link')}
                     </div>
@@ -418,6 +449,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             name="ticket_link"
                             value={formData.ticket_link}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
                         {renderError('ticket_link')}
                     </div>
