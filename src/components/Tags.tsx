@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTags } from '../hooks/useTags';
 import TagFilters from './TagFilters';
 import { Pagination } from './Pagination';
@@ -6,13 +6,12 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { useFilterToggle } from '../hooks/useFilterToggle';
 import { TagFilterContext } from '../context/TagFilterContext';
 import { TagFilters as TagFiltersType } from '../types/filters';
 import TagCard from './TagCard';
+import { FilterContainer } from './FilterContainer';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { authService } from '@/services/auth.service';
 import { useQuery } from '@tanstack/react-query';
@@ -23,18 +22,7 @@ const sortOptions = [
 ];
 
 export default function Tags() {
-    const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
-        const savedState = localStorage.getItem('filtersVisible');
-        return savedState ? JSON.parse(savedState) : true;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('filtersVisible', JSON.stringify(filtersVisible));
-    }, [filtersVisible]);
-
-    const toggleFilters = () => {
-        setFiltersVisible(!filtersVisible);
-    };
+    const { filtersVisible, toggleFilters } = useFilterToggle();
 
     const [filters, setFilters] = useState<TagFiltersType>({
         name: '',
@@ -110,46 +98,14 @@ export default function Tags() {
                             )}
                         </div>
 
-                        <div className="relative">
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={toggleFilters}
-                                        className="mb-4 flex items-center border rounded-t-md px-4 py-2 shadow-sm"
-                                    >
-                                        {filtersVisible ? (
-                                            <>
-                                                <FontAwesomeIcon icon={faChevronUp} className="mr-2" />
-                                                Hide Filters
-                                            </>
-                                        ) : (
-                                            <>
-                                                <FontAwesomeIcon icon={faChevronDown} className="mr-2" />
-                                                Show Filters
-                                            </>
-                                        )}
-                                    </button>
-                                    {hasActiveFilters && (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={handleClearAllFilters}
-                                            className="mb-4 text-gray-500 hover:text-gray-900"
-                                        >
-                                            Clear All
-                                            <X className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                            {filtersVisible && (
-                                <Card className="border-gray-100 shadow-sm">
-                                    <CardContent className="p-6 space-y-4">
-                                        <TagFilters filters={filters} onFilterChange={setFilters} />
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
+                        <FilterContainer
+                            filtersVisible={filtersVisible}
+                            onToggleFilters={toggleFilters}
+                            hasActiveFilters={hasActiveFilters}
+                            onClearAllFilters={handleClearAllFilters}
+                        >
+                            <TagFilters filters={filters} onFilterChange={setFilters} />
+                        </FilterContainer>
 
                         {error ? (
                             <Alert variant="destructive">
