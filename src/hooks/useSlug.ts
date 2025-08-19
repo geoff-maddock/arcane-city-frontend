@@ -1,5 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { toKebabCase } from '@/lib/utils';
+
+// Local slug generator to satisfy stricter requirements without impacting other toKebabCase usages.
+// Rules:
+// 1. Replace spaces with dashes
+// 2. Remove all characters that are non-alphanumeric or dashes
+// 3. Lowercase all letters
+// 4. Collapse multiple dashes
+// 5. Trim leading/trailing dashes
+// Also strips diacritics (é -> e) for broader compatibility.
+const generateSlug = (value: string): string => {
+    return value
+        .trim()
+        .normalize('NFKD') // split accented chars
+        .replace(/[\u0300-\u036f]/g, '') // remove diacritic marks
+        .replace(/\s+/g, '-') // spaces -> dashes
+        .replace(/[^a-zA-Z0-9-]/g, '') // drop non alphanumeric / dash
+        .toLowerCase()
+        .replace(/-{2,}/g, '-') // collapse dashes
+        .replace(/^-+|-+$/g, ''); // trim stray dashes
+};
 
 /**
  * useSlug synchronizes a name field to a slug until the slug is manually changed.
@@ -13,7 +32,7 @@ export function useSlug(initialName = '', initialSlug = '') {
 
     useEffect(() => {
         if (!manualOverride.current) {
-            setSlug(toKebabCase(name.trim()));
+            setSlug(generateSlug(name));
         }
     }, [name]);
 
@@ -28,7 +47,7 @@ export function useSlug(initialName = '', initialSlug = '') {
 
     const reset = useCallback(() => {
         manualOverride.current = false;
-        setSlug(toKebabCase(name.trim()));
+        setSlug(generateSlug(name));
     }, [name]);
 
     /**
@@ -38,7 +57,7 @@ export function useSlug(initialName = '', initialSlug = '') {
     const initialize = useCallback((initialNameVal: string, initialSlugVal?: string) => {
         manualOverride.current = false;
         setName(initialNameVal);
-        setSlug(initialSlugVal ?? toKebabCase(initialNameVal.trim()));
+        setSlug(initialSlugVal ?? generateSlug(initialNameVal));
     }, []);
 
     return { name, slug, setName: onNameChange, setSlug: onSlugChange, reset, initialize, manuallyOverridden: manualOverride.current } as const;
