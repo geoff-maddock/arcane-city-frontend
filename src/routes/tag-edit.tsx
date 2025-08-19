@@ -103,7 +103,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
           setDuplicateTag(null);
           setNameCheck('unique');
         }
-      } catch {/* ignore */}
+      } catch {/* ignore */ }
     }, 400);
     return () => { controller.abort(); clearTimeout(timer); };
   }, [name, hookSlug, tag]);

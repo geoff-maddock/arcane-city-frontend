@@ -29,7 +29,7 @@ const TagCreate: React.FC = () => {
   const { setValues: setInternalValues, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
     initialValues: formData,
     schema: tagCreateSchema,
-  buildValidationValues: () => ({
+    buildValidationValues: () => ({
       name: name,
       slug: slug,
     })
@@ -55,8 +55,8 @@ const TagCreate: React.FC = () => {
         const { data } = await api.get(`/tags?${params.toString()}`, { signal: controller.signal });
         if (data?.data?.length > 0) {
           const t = data.data[0];
-            setDuplicateTag({ name: t.name, slug: t.slug });
-            setNameCheck('duplicate');
+          setDuplicateTag({ name: t.name, slug: t.slug });
+          setNameCheck('duplicate');
         } else {
           setDuplicateTag(null);
           setNameCheck('unique');
