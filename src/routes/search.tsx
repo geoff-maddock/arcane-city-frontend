@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { useEvents } from '../hooks/useEvents';
@@ -12,7 +12,7 @@ import EventCardCondensed from '../components/EventCardCondensed';
 import EntityCardCondensed from '../components/EntityCardCondensed';
 import SeriesCardCondensed from '../components/SeriesCardCondensed';
 import TagCard from '../components/TagCard';
-import type { Event } from '../types/api';
+import type { Event, Entity, Series, Tag } from '../types/api';
 
 interface ParsedQuery {
   name: string;
@@ -48,54 +48,222 @@ const Search: React.FC = () => {
   const deepEnabled = deep === 'true';
   const [input, setInput] = useState(q);
   const [isDeep, setIsDeep] = useState(deepEnabled);
+  // debounced navigation handled internally (no external use of debounced value)
+  const debounceTimerRef = useRef<number | undefined>();
 
   useEffect(() => {
     setInput(q);
     setIsDeep(deepEnabled);
+    // sync already handled by input state
   }, [q, deepEnabled]);
+
+  // Debounce user typing to auto-trigger search navigation
+  useEffect(() => {
+    if (debounceTimerRef.current) window.clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = window.setTimeout(() => {
+      const trimmed = input.trim();
+      if (trimmed !== q) {
+        navigate({ to: '/search', search: { q: trimmed, deep: isDeep ? 'true' : undefined } });
+      }
+    }, 400);
+    return () => { if (debounceTimerRef.current) window.clearTimeout(debounceTimerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input, isDeep]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: '/search', search: { q: input.trim(), deep: isDeep ? 'true' : undefined } });
+    // Immediate navigate bypassing debounce
+    const trimmed = input.trim();
+    navigate({ to: '/search', search: { q: trimmed, deep: isDeep ? 'true' : undefined } });
   };
 
   const { name, createdBefore, createdAfter } = parseSearchQuery(q);
 
   const dateFilter = createdBefore || createdAfter ? { start: createdAfter, end: createdBefore } : undefined;
 
-  const baseFilters = isDeep ? { name, description: name, created_at: dateFilter } : { name, created_at: dateFilter };
+  // Default: search name only. Deep: search description only (broader text field) without name duplication.
+  const baseFilters = isDeep
+    ? { description: name, created_at: dateFilter }
+    : { name, created_at: dateFilter };
 
-  const { data: eventNameData } = useEvents({ itemsPerPage: 5, filters: baseFilters });
-  const { data: eventTagData } = useEvents({ itemsPerPage: 5, filters: { tag: name, created_at: dateFilter } });
-  const { data: eventEntityData } = useEvents({ itemsPerPage: 5, filters: { entity: name, created_at: dateFilter } });
-  const { data: entityData } = useEntities({ itemsPerPage: 5, filters: baseFilters });
-  const { data: seriesData } = useSeries({ itemsPerPage: 5, filters: baseFilters });
-  const { data: tagData } = useTags({ itemsPerPage: 5, filters: baseFilters });
+  // Pagination state
+  const [eventPage, setEventPage] = useState(1);
+  const [entityPage, setEntityPage] = useState(1);
+  const [seriesPage, setSeriesPage] = useState(1);
+  const [tagPage, setTagPage] = useState(1);
 
-  const events = useMemo(() => {
-    const map = new Map<number, Event>();
-    eventNameData?.data?.forEach(ev => map.set(ev.id, ev));
-    eventTagData?.data?.forEach(ev => map.set(ev.id, ev));
-    eventEntityData?.data?.forEach(ev => map.set(ev.id, ev));
-    return Array.from(map.values());
+  // Accumulated results
+  const [eventMap, setEventMap] = useState<Map<number, Event>>(new Map());
+  const [entityResults, setEntityResults] = useState<Entity[]>([]);
+  const [seriesResults, setSeriesResults] = useState<Series[]>([]);
+  const [tagResults, setTagResults] = useState<Tag[]>([]);
+
+  // Reset pagination & accumulators when query/deep changes
+  useEffect(() => {
+    setEventPage(1); setEntityPage(1); setSeriesPage(1); setTagPage(1);
+    setEventMap(new Map());
+    setEntityResults([]); setSeriesResults([]); setTagResults([]);
+  }, [q, isDeep]);
+
+  const { data: eventNameData } = useEvents({ page: eventPage, itemsPerPage: 10, filters: baseFilters, sort: 'start_at', direction: 'desc' });
+  const { data: eventTagData } = useEvents({ page: eventPage, itemsPerPage: 10, filters: { tag: name, created_at: dateFilter }, sort: 'start_at', direction: 'desc' });
+  const { data: eventEntityData } = useEvents({ page: eventPage, itemsPerPage: 10, filters: { entity: name, created_at: dateFilter }, sort: 'start_at', direction: 'desc' });
+  const { data: entityData } = useEntities({ page: entityPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
+  const { data: seriesData } = useSeries({ page: seriesPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
+  const { data: tagData } = useTags({ page: tagPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
+
+  // Accumulate event results (merged across three queries)
+  useEffect(() => {
+    // Use functional update to avoid stale closure and remove need to depend on eventMap
+    setEventMap(prev => {
+      const updated = new Map(prev);
+      eventNameData?.data?.forEach(ev => updated.set(ev.id, ev));
+      eventTagData?.data?.forEach(ev => updated.set(ev.id, ev));
+      eventEntityData?.data?.forEach(ev => updated.set(ev.id, ev));
+      return updated;
+    });
   }, [eventNameData, eventTagData, eventEntityData]);
+
+  // Accumulate other resource results, avoiding duplicates
+  useEffect(() => {
+    if (entityData?.data) {
+      setEntityResults(prev => {
+        const ids = new Set(prev.map(e => e.id));
+        const merged = [...prev];
+        entityData.data.forEach(e => { if (!ids.has(e.id)) merged.push(e); });
+        return merged;
+      });
+    }
+  }, [entityData]);
+
+  useEffect(() => {
+    if (seriesData?.data) {
+      setSeriesResults(prev => {
+        const ids = new Set(prev.map(s => s.id));
+        const merged = [...prev];
+        seriesData.data.forEach(s => { if (!ids.has(s.id)) merged.push(s); });
+        return merged;
+      });
+    }
+  }, [seriesData]);
+
+  useEffect(() => {
+    if (tagData?.data) {
+      setTagResults(prev => {
+        const ids = new Set(prev.map(t => t.id));
+        const merged = [...prev];
+        tagData.data.forEach(t => { if (!ids.has(t.id)) merged.push(t); });
+        return merged;
+      });
+    }
+  }, [tagData]);
+
+  const events = useMemo(() => Array.from(eventMap.values()), [eventMap]);
 
   const allEventImages = events
     .filter(ev => ev.primary_photo && ev.primary_photo_thumbnail)
     .map(ev => ({ src: ev.primary_photo!, alt: ev.name, thumbnail: ev.primary_photo_thumbnail })) ?? [];
 
-  const allEntityImages = entityData?.data
+  const allEntityImages = entityResults
     .filter(en => en.primary_photo && en.primary_photo_thumbnail)
     .map(en => ({ src: en.primary_photo!, alt: en.name, thumbnail: en.primary_photo_thumbnail })) ?? [];
 
-  const allSeriesImages = seriesData?.data
+  const allSeriesImages = seriesResults
     .filter(se => se.primary_photo && se.primary_photo_thumbnail)
     .map(se => ({ src: se.primary_photo!, alt: se.name, thumbnail: se.primary_photo_thumbnail })) ?? [];
 
   const eventCount = events.length;
-  const entityCount = entityData?.data?.length ?? 0;
-  const seriesCount = seriesData?.data?.length ?? 0;
-  const tagCount = tagData?.data?.length ?? 0;
+  const entityCount = entityResults.length;
+  const seriesCount = seriesResults.length;
+  const tagCount = tagResults.length;
+
+  // Totals from API (events need special handling due to multiple queries)
+  const eventTotal = Math.max(
+    eventNameData?.total ?? 0,
+    eventTagData?.total ?? 0,
+    eventEntityData?.total ?? 0
+  );
+  const entityTotal = entityData?.total ?? 0;
+  const seriesTotal = seriesData?.total ?? 0;
+  const tagTotal = tagData?.total ?? 0;
+
+  const canLoadMoreEvents = [eventNameData, eventTagData, eventEntityData].some(d => d && d.current_page < d.last_page);
+  const canLoadMoreEntities = !!entityData && entityData.current_page < entityData.last_page;
+  const canLoadMoreSeries = !!seriesData && seriesData.current_page < seriesData.last_page;
+  const canLoadMoreTags = !!tagData && tagData.current_page < tagData.last_page;
+
+  const [activeSection, setActiveSection] = useState<string | undefined>();
+
+  const prefersReducedMotion = useMemo(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
+
+  const handleSectionLink = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+    // Update hash manually
+    const url = new URL(window.location.href);
+    url.hash = id;
+    window.history.replaceState(null, '', url.toString());
+  };
+
+  // Observe sections for active highlighting
+  useEffect(() => {
+    const sectionIds = ['events', 'entities', 'series', 'tags'];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find entry with highest intersection ratio that is intersecting
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length) {
+          visible.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          const top = visible[0].target.id;
+          setActiveSection(prev => (prev === top ? prev : top));
+        }
+      },
+      {
+        root: null,
+        threshold: [0.25, 0.4, 0.6, 0.75],
+        rootMargin: '0px 0px -40% 0px', // bias toward sections near top
+      }
+    );
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [eventCount, entityCount, seriesCount, tagCount]);
+
+  // Sync hash with activeSection (without adding history entries)
+  useEffect(() => {
+    if (activeSection) {
+      const url = new URL(window.location.href);
+      if (url.hash !== `#${activeSection}`) {
+        url.hash = activeSection;
+        window.history.replaceState(null, '', url.toString());
+      }
+    }
+  }, [activeSection]);
+
+  // On initial mount, scroll to hash if present
+  useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+        }, 50);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const linkClass = (id: string, total: number) => {
+    const baseInactive = total ? 'underline cursor-pointer' : 'text-muted-foreground cursor-not-allowed';
+    if (!total) return baseInactive;
+    return activeSection === id ? 'underline cursor-pointer font-semibold text-primary' : baseInactive;
+  };
 
   return (
     <div className="bg-background text-foreground min-h-screen p-4">
@@ -115,12 +283,32 @@ const Search: React.FC = () => {
 
         {q && (
           <div className="space-y-8">
-            <p className="text-lg">
-              Found {eventCount} events, {entityCount} entities, {seriesCount} series, and {tagCount} tags
+            <p className="text-lg space-x-1 flex flex-wrap items-center">
+              <span>Found</span>
+              <a
+                href="#events"
+                onClick={(e) => handleSectionLink(e, 'events')}
+                className={linkClass('events', eventTotal)}
+              >{eventCount} of {eventTotal} events</a>,
+              <a
+                href="#entities"
+                onClick={(e) => handleSectionLink(e, 'entities')}
+                className={linkClass('entities', entityTotal)}
+              >{entityCount} of {entityTotal} entities</a>,
+              <a
+                href="#series"
+                onClick={(e) => handleSectionLink(e, 'series')}
+                className={linkClass('series', seriesTotal)}
+              >{seriesCount} of {seriesTotal} series</a>,
+              <a
+                href="#tags"
+                onClick={(e) => handleSectionLink(e, 'tags')}
+                className={linkClass('tags', tagTotal)}
+              >{tagCount} of {tagTotal} tags</a>
             </p>
             {eventCount ? (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Events ({eventCount})</h2>
+              <section id="events">
+                <h2 className="text-2xl font-semibold mb-4">Events ({eventCount} of {eventTotal})</h2>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {events.map((ev) => (
                     <EventCardCondensed
@@ -131,14 +319,19 @@ const Search: React.FC = () => {
                     />
                   ))}
                 </div>
+                {canLoadMoreEvents && (
+                  <div className="mt-4 flex justify-center">
+                    <button type="button" onClick={() => setEventPage(p => p + 1)} className="px-4 py-2 border rounded">Load more events</button>
+                  </div>
+                )}
               </section>
             ) : null}
 
             {entityCount ? (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Entities ({entityCount})</h2>
+              <section id="entities">
+                <h2 className="text-2xl font-semibold mb-4">Entities ({entityCount} of {entityTotal})</h2>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                  {entityData!.data.map((en) => (
+                  {entityResults.map((en) => (
                     <EntityCardCondensed
                       key={en.id}
                       entity={en}
@@ -147,14 +340,19 @@ const Search: React.FC = () => {
                     />
                   ))}
                 </div>
+                {canLoadMoreEntities && (
+                  <div className="mt-4 flex justify-center">
+                    <button type="button" onClick={() => setEntityPage(p => p + 1)} className="px-4 py-2 border rounded">Load more entities</button>
+                  </div>
+                )}
               </section>
             ) : null}
 
             {seriesCount ? (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Series ({seriesCount})</h2>
+              <section id="series">
+                <h2 className="text-2xl font-semibold mb-4">Series ({seriesCount} of {seriesTotal})</h2>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                  {seriesData!.data.map((se) => (
+                  {seriesResults.map((se) => (
                     <SeriesCardCondensed
                       key={se.id}
                       series={se}
@@ -163,17 +361,27 @@ const Search: React.FC = () => {
                     />
                   ))}
                 </div>
+                {canLoadMoreSeries && (
+                  <div className="mt-4 flex justify-center">
+                    <button type="button" onClick={() => setSeriesPage(p => p + 1)} className="px-4 py-2 border rounded">Load more series</button>
+                  </div>
+                )}
               </section>
             ) : null}
 
             {tagCount ? (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Tags ({tagCount})</h2>
+              <section id="tags">
+                <h2 className="text-2xl font-semibold mb-4">Tags ({tagCount} of {tagTotal})</h2>
                 <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                  {tagData!.data.map((tag) => (
+                  {tagResults.map((tag) => (
                     <TagCard key={tag.id} tag={tag} />
                   ))}
                 </div>
+                {canLoadMoreTags && (
+                  <div className="mt-4 flex justify-center">
+                    <button type="button" onClick={() => setTagPage(p => p + 1)} className="px-4 py-2 border rounded">Load more tags</button>
+                  </div>
+                )}
               </section>
             ) : null}
             {(!eventCount && !entityCount && !seriesCount && !tagCount) && (
