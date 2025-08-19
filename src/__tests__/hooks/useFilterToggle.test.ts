@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useFilterToggle } from '../../hooks/useFilterToggle';
+import { vi } from 'vitest';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -23,7 +24,7 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 // Mock console.warn to suppress warnings during tests
-const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => { });
+const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 
 describe('useFilterToggle', () => {
     beforeEach(() => {
@@ -112,7 +113,7 @@ describe('useFilterToggle', () => {
     it('should handle localStorage write errors gracefully', () => {
         // Mock localStorage.setItem to throw an error
         const originalSetItem = localStorageMock.setItem;
-        localStorageMock.setItem = jest.fn().mockImplementation(() => {
+        localStorageMock.setItem = vi.fn().mockImplementation(() => {
             throw new Error('Storage quota exceeded');
         });
 

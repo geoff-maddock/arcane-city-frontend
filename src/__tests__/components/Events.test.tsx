@@ -4,8 +4,8 @@ import { render } from '../test-render' // Use our custom render with QueryClien
 import Events from '../../components/Events'
 import { useEvents } from '../../hooks/useEvents'
 import EventFilters from '../../components/EventFilters'
-import { PaginatedResponse, Event, UseEventsParams } from '../../types/api'; // Adjust the import paths as necessary
-import { UseQueryResult } from '@tanstack/react-query'; // Import UseQueryResult
+import { PaginatedResponse, Event, UseEventsParams } from '../../types/api';
+import { UseQueryResult } from '@tanstack/react-query';
 // import { EventFilters as EventFilterParams, EventFiltersProps } from '../../types/filters';
 
 // Mock the custom hooks and components
@@ -100,24 +100,45 @@ describe('Events Component', () => {
         per_page: 2
     }
 
+    // Helper to build a react-query result object with sensible defaults; we cast to any to avoid brittle union exactness.
+    const buildResult = (overrides: Partial<UseQueryResult<PaginatedResponse<Event>, Error>>): UseQueryResult<PaginatedResponse<Event>, Error> => ({
+        data: undefined,
+        error: null,
+        status: 'success',
+        fetchStatus: 'idle',
+        isError: false,
+        isLoading: false,
+        isPending: false,
+        isSuccess: true,
+        isFetched: true,
+        isFetchedAfterMount: true,
+        isFetching: false,
+        isRefetching: false,
+        isStale: false,
+        refetch: vi.fn(),
+        failureCount: 0,
+        failureReason: null,
+        dataUpdatedAt: 0,
+        errorUpdatedAt: 0,
+        errorUpdateCount: 0,
+        isPaused: false,
+        isPlaceholderData: false,
+        promise: Promise.resolve(undefined),
+        ...overrides,
+    }) as unknown as UseQueryResult<PaginatedResponse<Event>, Error>;
+
     beforeEach(() => {
-        vi.resetAllMocks()
-        localStorage.clear()
-    })
+        vi.resetAllMocks();
+        localStorage.clear();
+    });
 
     it('renders events when data is loaded', async () => {
-        // Mock the useEvents hook to return success state
-        vi.mocked(useEvents).mockReturnValue({
+        vi.mocked(useEvents).mockReturnValue(buildResult({
             data: mockEvents,
             isLoading: false,
-            error: null,
-            isError: false,
-            isPending: false,
-            isLoadingError: false,
-            isRefetchError: false,
-            isEnabled: true,
-            // Add any other required properties
-        } as UseQueryResult<PaginatedResponse<Event>, Error>);
+            status: 'success',
+            isSuccess: true,
+        }));
         render(<Events />)
 
         // Check for main components
@@ -131,139 +152,50 @@ describe('Events Component', () => {
     })
 
     it('shows loading state', () => {
-        // Mock the useEvents hook to return loading state
-        vi.mocked(useEvents).mockReturnValue({
+        vi.mocked(useEvents).mockReturnValue(buildResult({
             data: undefined,
-            dataUpdatedAt: 0,
-            error: null,
-            errorUpdatedAt: 0,
-            errorUpdateCount: 0,
-            failureCount: 0,
-            failureReason: null,
-            fetchStatus: 'fetching',
-            isError: false,
-            isFetched: false,
-            isFetchedAfterMount: false,
-            isFetching: true,
-            isInitialLoading: false,
             isLoading: true,
-            isLoadingError: false,
-            isPaused: false,
             isPending: true,
-            isPlaceholderData: false,
-            isRefetching: false,
-            isRefetchError: false,
-            isStale: true,
-            isSuccess: false,
-            promise: expect.any(Promise),
-            refetch: expect.any(Function),
+            fetchStatus: 'fetching',
             status: 'pending',
-            isEnabled: true,
-        });
+            isSuccess: false,
+        }));
 
         render(<Events />);
         expect(screen.getByRole('status')).toBeInTheDocument();
     });
 
     it('shows error message when loading fails', () => {
-        // Mock the useEvents hook to return error state
-        vi.mocked(useEvents).mockReturnValue({
+        vi.mocked(useEvents).mockReturnValue(buildResult({
             data: undefined,
-            dataUpdatedAt: 0,
             error: new Error('Failed to load'),
-            errorUpdatedAt: 0,
-            errorUpdateCount: 0,
-            failureCount: 0,
-            failureReason: null,
-            fetchStatus: 'fetching',
             isError: true,
-            isFetched: false,
-            isFetchedAfterMount: false,
-            isFetching: true,
-            isInitialLoading: false,
             isLoading: false,
-            isLoadingError: true,
-            isPaused: false,
-            isPending: false,
-            isPlaceholderData: false,
-            isRefetching: false,
-            isRefetchError: false,
-            isStale: true,
-            isSuccess: false,
-            promise: expect.any(Promise),
-            refetch: expect.any(Function),
             status: 'error',
-            isEnabled: true,
-        })
+            isSuccess: false,
+        }));
 
         render(<Events />)
         expect(screen.getByText(/there was an error loading events/i)).toBeInTheDocument()
     })
 
     it('shows empty state when no events are found', () => {
-        // Mock the useEvents hook to return empty data
-        vi.mocked(useEvents).mockReturnValue({
+        vi.mocked(useEvents).mockReturnValue(buildResult({
             data: { ...mockEvents, data: [], total: 0 },
-            dataUpdatedAt: 0,
-            error: null,
-            errorUpdatedAt: 0,
-            errorUpdateCount: 0,
-            failureCount: 0,
-            failureReason: null,
-            fetchStatus: 'fetching',
-            isError: false,
-            isPending: false,
-            isLoadingError: false,
-            isFetched: false,
-            isFetchedAfterMount: false,
-            isFetching: true,
-            isInitialLoading: false,
-            isLoading: false,
-            isPaused: false,
-            isPlaceholderData: false,
-            isRefetching: false,
-            isRefetchError: false,
-            isStale: true,
-            isSuccess: true,
-            promise: expect.any(Promise),
-            refetch: expect.any(Function),
             status: 'success',
-            isEnabled: true,
-        } as UseQueryResult<PaginatedResponse<Event>, Error>);
+            isSuccess: true,
+        }));
 
         render(<Events />)
         expect(screen.getByText(/no events found/i)).toBeInTheDocument()
     })
 
     it('toggles filters visibility', () => {
-        vi.mocked(useEvents).mockReturnValue({
+        vi.mocked(useEvents).mockReturnValue(buildResult({
             data: mockEvents,
-            dataUpdatedAt: 0,
-            error: null,
-            errorUpdatedAt: 0,
-            errorUpdateCount: 0,
-            failureCount: 0,
-            failureReason: null,
-            fetchStatus: 'fetching',
-            isError: false,
-            isPending: false,
-            isLoadingError: false,
-            isFetched: false,
-            isFetchedAfterMount: false,
-            isFetching: true,
-            isInitialLoading: false,
-            isLoading: false,
-            isPaused: false,
-            isPlaceholderData: false,
-            isRefetching: false,
-            isRefetchError: false,
-            isStale: true,
-            isSuccess: true,
-            promise: expect.any(Promise),
-            refetch: expect.any(Function),
             status: 'success',
-            isEnabled: true,
-        })
+            isSuccess: true,
+        }));
 
         render(<Events />)
 
@@ -284,34 +216,13 @@ describe('Events Component', () => {
 
             mockUseEvents.mockImplementation((params: UseEventsParams = {}) => {
                 Object.assign(capturedParams, params);
-                return {
+                return buildResult({
                     data: mockEvents,
                     isLoading: false,
-                    error: null,
-                    isError: false,
-                    isPending: false,
-                    isLoadingError: false,
-                    isRefetchError: false,
-                    isSuccess: true,
-                    refetch: vi.fn(),
-                    fetchStatus: 'idle',
-                    isFetching: false,
-                    isFetched: true,
-                    isStale: false,
-                    isPlaceholderData: false,
-                    isInitialLoading: false,
-                    dataUpdatedAt: 0,
-                    errorUpdatedAt: 0,
-                    errorUpdateCount: 0,
-                    failureCount: 0,
-                    failureReason: null,
                     status: 'success',
+                    isSuccess: true,
                     promise: Promise.resolve(mockEvents),
-                    isFetchedAfterMount: false,
-                    isPaused: false,
-                    isRefetching: false,
-                    isEnabled: true,
-                } as UseQueryResult<PaginatedResponse<Event>, Error>;
+                });
             });
 
             // Update the EventFilters mock to expose the onFilterChange prop

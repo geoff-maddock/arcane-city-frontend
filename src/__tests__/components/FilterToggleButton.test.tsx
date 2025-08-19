@@ -1,8 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FilterToggleButton } from '../../components/FilterToggleButton';
+import { vi } from 'vitest';
 
 describe('FilterToggleButton', () => {
-    const mockOnToggle = jest.fn();
+    const mockOnToggle = vi.fn();
 
     beforeEach(() => {
         mockOnToggle.mockClear();
