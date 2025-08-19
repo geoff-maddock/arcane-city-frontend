@@ -13,6 +13,8 @@ import { useSlug } from '@/hooks/useSlug';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { seriesCreateSchema } from '@/validation/schemas';
+import { useFormValidation } from '@/hooks/useFormValidation';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -55,8 +57,22 @@ const SeriesCreate: React.FC = () => {
   const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
   const { data: tagOptions } = useSearchOptions('tags', tagQuery);
   const { data: entityOptions } = useSearchOptions('entities', entityQuery);
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [generalError, setGeneralError] = useState('');
+  const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
+    initialValues: formData,
+    schema: seriesCreateSchema,
+    buildValidationValues: (vals) => ({
+      name: name,
+      slug: slug,
+      short: vals.short,
+      description: vals.description,
+      presale_price: vals.presale_price,
+      door_price: vals.door_price,
+      start_at: vals.start_at,
+      end_at: vals.end_at,
+      primary_link: vals.primary_link,
+      ticket_link: vals.ticket_link,
+    })
+  });
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
   const [duplicateSeries, setDuplicateSeries] = useState<{ name: string; slug: string } | null>(null);
 
@@ -105,25 +121,29 @@ const SeriesCreate: React.FC = () => {
     };
   }, [formData.name, formData.slug]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  type FormState = typeof formData;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-    const { name: fieldName, value } = target;
-    const isCheckbox = (target as HTMLInputElement).type === 'checkbox';
-    const checked = (target as HTMLInputElement).checked;
-    setFormData((prev) => ({ ...prev, [fieldName]: isCheckbox ? checked : value }));
+    const fieldName = target.name;
+    const value = (target as HTMLInputElement).type === 'checkbox' ? (target as HTMLInputElement).checked : target.value;
+    setFormData(prev => ({ ...prev, [fieldName]: value }));
+    baseHandleChange(e);
     if (fieldName === 'name') {
-      setName(value);
+      setName(String(value));
       if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
     }
-    if (fieldName === 'slug') setSlug(value);
+    if (fieldName === 'slug') setSlug(String(value));
   };
+
+  // handleBlur provided by hook
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
     setGeneralError('');
+    setFormValuesInternal(v => ({ ...v }));
+    const ok = validateForm();
+    if (!ok) return;
     try {
       const payload = {
         ...formData,
@@ -145,7 +165,7 @@ const SeriesCreate: React.FC = () => {
       if ((err as AxiosError).response?.status === 422) {
         const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
         if (resp?.data?.errors) {
-          setErrors(resp.data.errors);
+          applyExternalErrors(resp.data.errors);
           return;
         }
       }
@@ -154,9 +174,9 @@ const SeriesCreate: React.FC = () => {
   };
 
   const renderError = (field: string) => {
-    if (errors[field]) {
-      return <div className="text-red-500 text-sm">{errors[field].join(' ')}</div>;
-    }
+    if (!touched[field] && !(errors[field] && errors[field].length)) return null;
+    const message = getFieldError(field as keyof FormState);
+    if (message) return <div className="text-red-500 text-sm">{message}</div>;
     return null;
   };
 
@@ -164,11 +184,19 @@ const SeriesCreate: React.FC = () => {
     <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Create Series</h1>
       {generalError && <div className="text-red-500">{generalError}</div>}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {errorSummary && (
+        <div className="border border-red-400 bg-red-50 text-red-700 p-3 text-sm" role="alert" aria-live="polite">
+          <p className="font-semibold mb-1">There {errorSummary.fieldCount === 1 ? 'is 1 field error' : `are ${errorSummary.fieldCount} field errors`}:</p>
+          <ul className="list-disc ml-5 space-y-1">
+            {errorSummary.messages.map(m => <li key={m}>{m}</li>)}
+          </ul>
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
           <div className="flex items-center gap-2">
-            <Input id="name" name="name" value={name} onChange={handleChange} />
+            <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} />
             {nameCheck === 'unique' && <CheckCircle className="text-green-500" />}
             {nameCheck === 'duplicate' && <XCircle className="text-red-500" />}
           </div>
@@ -188,7 +216,7 @@ const SeriesCreate: React.FC = () => {
         </div>
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" name="slug" value={slug} onChange={handleChange} />
+          <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} />
           {renderError('slug')}
         </div>
         <div className="space-y-2">
@@ -199,6 +227,7 @@ const SeriesCreate: React.FC = () => {
             className="w-full border rounded p-2"
             value={formData.short}
             onChange={handleChange}
+            onBlur={handleBlur}
           />
           {renderError('short')}
         </div>
@@ -211,6 +240,7 @@ const SeriesCreate: React.FC = () => {
             className="w-full border rounded p-2"
             value={formData.description}
             onChange={handleChange}
+            onBlur={handleBlur}
           />
           {renderError('description')}
         </div>
@@ -340,6 +370,7 @@ const SeriesCreate: React.FC = () => {
               step="0.01"
               value={formData.presale_price}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             {renderError('presale_price')}
           </div>
@@ -352,6 +383,7 @@ const SeriesCreate: React.FC = () => {
               step="0.01"
               value={formData.door_price}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             {renderError('door_price')}
           </div>
@@ -391,6 +423,7 @@ const SeriesCreate: React.FC = () => {
               type="datetime-local"
               value={formData.start_at}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             {renderError('start_at')}
           </div>
@@ -402,6 +435,7 @@ const SeriesCreate: React.FC = () => {
               type="datetime-local"
               value={formData.end_at}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             {renderError('end_at')}
           </div>
@@ -416,6 +450,7 @@ const SeriesCreate: React.FC = () => {
               name="primary_link"
               value={formData.primary_link}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             {renderError('primary_link')}
           </div>
@@ -426,6 +461,7 @@ const SeriesCreate: React.FC = () => {
               name="ticket_link"
               value={formData.ticket_link}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             {renderError('ticket_link')}
           </div>
