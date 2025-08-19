@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Star, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { sanitizeHTML } from '../lib/sanitize';
 import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { AgeRestriction } from './AgeRestriction';
@@ -249,7 +250,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                             {series.description && (
                                 <Card>
                                     <CardContent className="prose max-w-none p-6">
-                                        <div dangerouslySetInnerHTML={{ __html: formattedDescription }} />
+                                        <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(formattedDescription) }} />
                                     </CardContent>
                                 </Card>
                             )}
@@ -289,7 +290,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                         )}
 
                                         <div className="flex items-center gap-2 text-gray-600">
-                                            {series.next_start_at ? (
+                                            {series.next_start_at && series.occurrence_type && series.occurrence_type.name !== 'No Schedule' ? (
                                                 <>
                                                     <CalendarDays className="h-5 w-5" />
                                                     <span>{formatDate(series.next_start_at)}</span>
@@ -377,7 +378,7 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                 </div>
 
                 {/* Series Events Section */}
-                <SeriesEvents seriesSlug={slug} />
+                <SeriesEvents seriesName={series.name} />
             </div>
         </div>
     );

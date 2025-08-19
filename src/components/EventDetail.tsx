@@ -18,6 +18,7 @@ import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
+import { sanitizeHTML, sanitizeEmbed } from '../lib/sanitize';
 import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
@@ -268,7 +269,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                             {event.description && (
                                 <Card>
                                     <CardContent className="prose max-w-none p-6">
-                                        <div dangerouslySetInnerHTML={{ __html: formattedDescription }} />
+                                        <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(formattedDescription) }} />
                                     </CardContent>
                                 </Card>
                             )}
@@ -404,14 +405,17 @@ export default function EventDetail({ slug }: { slug: string }) {
                                             <h2 className="text-xl font-semibold">Audio</h2>
                                         </div>
                                         <div className="space-y-4">
-                                            {embeds.map((embed, index) => (
-                                                <div key={index} className="rounded-md overflow-hidden">
-                                                    <div
-                                                        dangerouslySetInnerHTML={{ __html: embed }}
-                                                        className="w-full"
-                                                    />
-                                                </div>
-                                            ))}
+                                            {embeds.map((embed, index) => {
+                                                const safe = sanitizeEmbed(embed);
+                                                return (
+                                                    <div key={index} className="rounded-md overflow-hidden">
+                                                        <div
+                                                            dangerouslySetInnerHTML={{ __html: safe }}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </CardContent>
                                 </Card>

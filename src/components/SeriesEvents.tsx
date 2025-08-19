@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface SeriesEventsProps {
-    seriesSlug: string;
+    seriesName: string;
 }
 
 const sortOptions = [
@@ -19,14 +19,14 @@ const sortOptions = [
     { value: 'created_at', label: 'Recently Added' },
 ];
 
-export default function SeriesEvents({ seriesSlug }: SeriesEventsProps) {
+export default function SeriesEvents({ seriesName }: SeriesEventsProps) {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [sort, setSort] = useState('start_at');
     const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
 
     const { data, isLoading, error } = useEvents({
-        filters: { series: seriesSlug },
+        filters: { series: seriesName },
         page,
         itemsPerPage,
         sort,
