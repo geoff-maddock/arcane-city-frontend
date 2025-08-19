@@ -26,4 +26,10 @@ describe('useSlug', () => {
         act(() => result.current.reset());
         expect(result.current.slug).toBe('original-name');
     });
+
+    it('applies stricter slug rules (remove punctuation, lowercase, collapse dashes, strip diacritics)', () => {
+        const { result } = renderHook(() => useSlug('', ''));
+        act(() => result.current.setName('  Tést --- Event!!!  2025  '));
+        expect(result.current.slug).toBe('test-event-2025');
+    });
 });
