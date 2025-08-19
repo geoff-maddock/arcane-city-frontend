@@ -14,6 +14,7 @@ import { Series } from '../types/api';
 import { useQuery } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import { seriesEditSchema } from '@/validation/schemas';
+import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 
@@ -189,14 +190,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
         <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto p-4 space-y-4">
             <h1 className="text-2xl font-bold">Edit Series</h1>
             {generalError && <div className="text-red-500">{generalError}</div>}
-            {errorSummary && (
-                <div className="border border-red-400 bg-red-50 text-red-700 p-3 text-sm" role="alert" aria-live="polite">
-                    <p className="font-semibold mb-1">There {errorSummary.fieldCount === 1 ? 'is 1 field error' : `are ${errorSummary.fieldCount} field errors`}:</p>
-                    <ul className="list-disc ml-5 space-y-1">
-                        {errorSummary.messages.map(m => <li key={m}>{m}</li>)}
-                    </ul>
-                </div>
-            )}
+            <ValidationSummary errorSummary={errorSummary} />
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>

@@ -10,12 +10,12 @@ import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSlug } from '@/hooks/useSlug';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { tagCreateSchema } from '@/validation/schemas';
+import ValidationSummary from '@/components/ValidationSummary';
 import { authService } from '../services/auth.service';
 import { useTagTypes } from '../hooks/useTagTypes';
 
-interface ValidationErrors {
-  [key: string]: string[];
-}
 
 const TagCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -26,8 +26,47 @@ const TagCreate: React.FC = () => {
     tag_type_id: 1 as number | '',
   });
   const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [generalError, setGeneralError] = useState('');
+  const { setValues: setInternalValues, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
+    initialValues: formData,
+    schema: tagCreateSchema,
+  buildValidationValues: () => ({
+      name: name,
+      slug: slug,
+    })
+  });
+  const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
+  const [duplicateTag, setDuplicateTag] = useState<{ name: string; slug: string } | null>(null);
+
+  useEffect(() => {
+    const trimmedName = name.trim();
+    const trimmedSlug = slug.trim();
+    if (!trimmedName || !trimmedSlug) {
+      setNameCheck('idle');
+      setDuplicateTag(null);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams();
+        params.append('filters[name]', trimmedName);
+        params.append('filters[slug]', trimmedSlug);
+        params.append('limit', '1');
+        const { data } = await api.get(`/tags?${params.toString()}`, { signal: controller.signal });
+        if (data?.data?.length > 0) {
+          const t = data.data[0];
+            setDuplicateTag({ name: t.name, slug: t.slug });
+            setNameCheck('duplicate');
+        } else {
+          setDuplicateTag(null);
+          setNameCheck('unique');
+        }
+      } catch {
+        /* ignore */
+      }
+    }, 400);
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [name, slug]);
 
   const { data: tagTypeOptions } = useTagTypes();
 
@@ -47,11 +86,12 @@ const TagCreate: React.FC = () => {
     );
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name: fieldName, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = e.target;
+    const fieldName = target.name;
+    const value = target.value;
     setFormData(prev => ({ ...prev, [fieldName]: value }));
+    baseHandleChange(e);
     if (fieldName === 'name') {
       setName(value);
       if (!manuallyOverridden) queueMicrotask(() => setFormData(p => ({ ...p, slug })));
@@ -61,8 +101,9 @@ const TagCreate: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
     setGeneralError('');
+    setInternalValues(v => ({ ...v }));
+    if (!validateForm()) return;
     try {
       const payload = {
         ...formData,
@@ -72,19 +113,17 @@ const TagCreate: React.FC = () => {
       navigate({ to: '/tags/$slug', params: { slug: data.slug } });
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 422) {
-        setErrors(error.response.data.errors || {});
-      } else {
-        setGeneralError(formatApiError(error));
+        applyExternalErrors(error.response.data.errors || {});
+        return;
       }
+      setGeneralError(formatApiError(error));
     }
   };
 
   const renderError = (field: string) => {
-    if (errors[field]) {
-      return (
-        <p className="text-sm text-red-500 mt-1">{errors[field].join(', ')}</p>
-      );
-    }
+    if (!touched[field] && !(errors[field] && errors[field].length)) return null;
+    const message = getFieldError(field as keyof typeof formData);
+    if (message) return <p className="text-sm text-red-500 mt-1">{message}</p>;
     return null;
   };
 
@@ -99,20 +138,27 @@ const TagCreate: React.FC = () => {
       {generalError && (
         <div className="text-red-500">{generalError}</div>
       )}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <ValidationSummary errorSummary={errorSummary} />
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={name} onChange={handleChange} />
+          <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} />
+          {nameCheck === 'unique' && <p className="text-green-600 text-xs">Unique</p>}
+          {nameCheck === 'duplicate' && duplicateTag && (
+            <p className="text-red-600 text-xs">Duplicate tag exists: <Link to="/tags/$slug" params={{ slug: duplicateTag.slug }} className="underline">{duplicateTag.name}</Link></p>
+          )}
           {renderError('name')}
         </div>
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" name="slug" value={slug} onChange={handleChange} />
+          <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} />
+          {nameCheck === 'unique' && <p className="text-green-600 text-xs">Unique</p>}
+          {nameCheck === 'duplicate' && duplicateTag && <p className="text-red-600 text-xs">Slug in use</p>}
           {renderError('slug')}
         </div>
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
-          <Textarea id="description" name="description" value={formData.description} onChange={handleChange} />
+          <Textarea id="description" name="description" value={formData.description} onChange={handleChange} onBlur={handleBlur} />
           {renderError('description')}
         </div>
         <div className="space-y-2">
