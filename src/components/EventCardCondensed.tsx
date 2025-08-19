@@ -8,7 +8,7 @@ import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext, useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { api } from '../lib/api';
 import { EventFilterContext } from '../context/EventFilterContext';
@@ -30,6 +30,7 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
         enabled: authService.isAuthenticated(),
     });
     const [attending, setAttending] = useState(false);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (user && event.attendees) {
@@ -43,6 +44,17 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
         },
         onSuccess: () => {
             setAttending(true);
+            // Optimistically add to attending events query cache so Radar updates immediately
+            if (user?.id) {
+                queryClient.setQueryData<import('../types/api').PaginatedResponse<Event> | undefined>(['userAttendingEvents', user.id], (old) => {
+                    if (!old) return old; // no cache yet
+                    if (old.data?.some((e: Event) => e.id === event.id)) return old;
+                    const newData = [...old.data, event].sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+                    return { ...old, data: newData, total: (old.total ?? newData.length) + 1 };
+                });
+            }
+            // Also trigger a background refetch for accuracy
+            queryClient.invalidateQueries({ queryKey: ['userAttendingEvents'] });
         },
     });
 
@@ -52,6 +64,16 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
         },
         onSuccess: () => {
             setAttending(false);
+            // Remove from attending events cache immediately
+            if (user?.id) {
+                queryClient.setQueryData<import('../types/api').PaginatedResponse<Event> | undefined>(['userAttendingEvents', user.id], (old) => {
+                    if (!old) return old;
+                    if (!old.data?.some((e: Event) => e.id === event.id)) return old;
+                    const newData = old.data.filter((e) => e.id !== event.id);
+                    return { ...old, data: newData, total: Math.max(0, (old.total ?? newData.length) - 1) };
+                });
+            }
+            queryClient.invalidateQueries({ queryKey: ['userAttendingEvents'] });
         },
     });
 

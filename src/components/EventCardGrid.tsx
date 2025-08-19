@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CalendarDays, MapPin, Star } from 'lucide-react';
 import { ImageLightbox } from './ImageLightbox';
 import { useContext, useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { api } from '../lib/api';
 import { EventFilterContext } from '../context/EventFilterContext';
@@ -25,6 +25,7 @@ const EventCardGrid = ({ event, allImages, imageIndex }: EventCardGridProps) => 
         enabled: authService.isAuthenticated(),
     });
     const [attending, setAttending] = useState(false);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (user && event.attendees) {
@@ -38,6 +39,15 @@ const EventCardGrid = ({ event, allImages, imageIndex }: EventCardGridProps) => 
         },
         onSuccess: () => {
             setAttending(true);
+            if (user?.id) {
+                queryClient.setQueryData<import('../types/api').PaginatedResponse<Event> | undefined>(['userAttendingEvents', user.id], (old) => {
+                    if (!old) return old;
+                    if (old.data.some(e => e.id === event.id)) return old;
+                    const newData = [...old.data, event].sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+                    return { ...old, data: newData, total: (old.total ?? newData.length) + 1 };
+                });
+            }
+            queryClient.invalidateQueries({ queryKey: ['userAttendingEvents'] });
         },
     });
 
@@ -47,6 +57,15 @@ const EventCardGrid = ({ event, allImages, imageIndex }: EventCardGridProps) => 
         },
         onSuccess: () => {
             setAttending(false);
+            if (user?.id) {
+                queryClient.setQueryData<import('../types/api').PaginatedResponse<Event> | undefined>(['userAttendingEvents', user.id], (old) => {
+                    if (!old) return old;
+                    if (!old.data.some(e => e.id === event.id)) return old;
+                    const newData = old.data.filter(e => e.id !== event.id);
+                    return { ...old, data: newData, total: Math.max(0, (old.total ?? newData.length) - 1) };
+                });
+            }
+            queryClient.invalidateQueries({ queryKey: ['userAttendingEvents'] });
         },
     });
 
