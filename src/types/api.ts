@@ -9,6 +9,8 @@ export interface Event {
     venue?: EntityResponse;
     promoter?: EntityResponse;
     event_type?: EventType;
+    // Visibility id (e.g., maps to 'Public', 'Private', etc.)
+    visibility_id?: number;
     presale_price?: number;
     door_price?: number;
     min_age?: number;
