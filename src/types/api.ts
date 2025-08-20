@@ -9,8 +9,7 @@ export interface Event {
     venue?: EntityResponse;
     promoter?: EntityResponse;
     event_type?: EventType;
-    // Visibility id (e.g., maps to 'Public', 'Private', etc.)
-    visibility_id?: number;
+    visibility?: VisibilityResponse;
     presale_price?: number;
     door_price?: number;
     min_age?: number;
@@ -27,6 +26,11 @@ export interface Event {
     created_by?: number;
     updated_by?: number;
     series?: Series;
+}
+
+export interface VisibilityResponse {
+    id: number;
+    name: string;
 }
 
 export interface UseEventsParams {

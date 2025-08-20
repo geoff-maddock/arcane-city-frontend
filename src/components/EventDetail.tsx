@@ -225,17 +225,6 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                 />
                                             </button>
                                         )}
-                                        {/* Instagram Post Button: any authenticated user, public event only */}
-                                        {user && publicVisibilityId && event.visibility_id === publicVisibilityId && (
-                                            <button
-                                                onClick={() => setInstagramDialogOpen(true)}
-                                                aria-label="Post event to Instagram"
-                                                className="text-purple-600 hover:text-purple-800 transition-colors p-1 rounded-md hover:bg-purple-50"
-                                                title="Post to Instagram"
-                                            >
-                                                <InstagramIcon className="h-5 w-5" />
-                                            </button>
-                                        )}
                                         {user && event.created_by && user.id === event.created_by && (
                                             <Popover open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
                                                 <PopoverTrigger asChild>
@@ -249,6 +238,17 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-48 p-2" align="end">
                                                     <div className="space-y-1">
+                                                        {/* Instagram Post Button: any authenticated user, public event only */}
+                                                        {user && publicVisibilityId && user.id === event.created_by && event.visibility && event.visibility.id === publicVisibilityId && (
+                                                            <button
+                                                                onClick={() => setInstagramDialogOpen(true)}
+                                                                aria-label="Post event to Instagram"
+                                                                className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:text-purple-800 transition-colors p-1 rounded-md hover:bg-purple-50"
+                                                                title="Post to Instagram"
+                                                            >
+                                                                <InstagramIcon className="h-5 w-5" /> Post to Instagram
+                                                            </button>
+                                                        )}
                                                         <Link
                                                             to="/event/$eventSlug/edit"
                                                             params={{ eventSlug: event.slug }}
