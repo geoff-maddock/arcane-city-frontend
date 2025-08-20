@@ -23,7 +23,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-4">
+    <div className="max-w-md mx-auto p-4 space-y-4 bg-white dark:bg-black">
       <h2 className="text-xl font-bold">Login</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">

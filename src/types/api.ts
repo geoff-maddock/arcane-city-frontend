@@ -284,3 +284,26 @@ export interface OccurrenceDay {
     id: number;
     name: string;
 }
+
+export interface Blog {
+    id: number;
+    name: string;
+    slug: string;
+    visibility_id?: number;
+    content_type_id?: number;
+    body?: string;
+    menu_id?: number;
+    sort_order?: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface UseBlogsParams {
+    page?: number;
+    itemsPerPage?: number;
+    filters?: {
+        name?: string;
+    };
+    sort?: string;
+    direction?: 'desc' | 'asc';
+}

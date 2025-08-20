@@ -5,7 +5,7 @@ import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
@@ -28,7 +28,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
-  try { localStorage.setItem('themeSource', 'user'); } catch { /* ignore */ }
+    try { localStorage.setItem('themeSource', 'user'); } catch { /* ignore */ }
     userSetRef.current = true;
   };
 
@@ -76,7 +76,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search"
-          className="h-8 w-full"
+          className="h-8 w-full bg-white dark:bg-black border-gray-300 dark:border-gray-600"
         />
       </form>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
@@ -122,6 +122,10 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           <HiInformationCircle />
           <span className=" xl:inline">About</span>
         </Link>
+        <Link to="/blogs" className="flex items-center gap-2 hover:underline">
+          <HiBookOpen />
+          <span className=" xl:inline">Blogs</span>
+        </Link>
         <Link to="/help" className="flex items-center gap-2 hover:underline">
           <HiQuestionMarkCircle />
           <span className=" xl:inline">Help</span>
@@ -154,7 +158,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           </Button>
         </>
       )}
-  <Button onClick={toggleTheme} data-testid="theme-toggle" className="mt-auto flex items-center gap-2">
+      <Button onClick={toggleTheme} data-testid="theme-toggle" className="mt-auto flex items-center gap-2">
         {theme === 'light' ? <HiMoon /> : <HiSun />}
         <span className="hidden xl:inline">
           Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
