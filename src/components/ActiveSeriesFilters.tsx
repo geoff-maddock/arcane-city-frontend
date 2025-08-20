@@ -15,12 +15,40 @@ export function ActiveSeriesFilters({ filters, onRemoveFilter }: ActiveSeriesFil
             activeFilters.push({ key: 'name', label: `Name: ${filters.name}` });
         }
 
+        if (filters.venue) {
+            activeFilters.push({ key: 'venue', label: `Venue: ${filters.venue}` });
+        }
+
+        if (filters.promoter) {
+            activeFilters.push({ key: 'promoter', label: `Promoter: ${filters.promoter}` });
+        }
+
+        if (filters.entity) {
+            activeFilters.push({ key: 'entity', label: `Entity: ${filters.entity}` });
+        }
+
         if (filters.event_type) {
             activeFilters.push({ key: 'event_type', label: `Type: ${filters.event_type}` });
         }
 
         if (filters.tag) {
             activeFilters.push({ key: 'tag', label: `Tag: ${filters.tag}` });
+        }
+
+        if (filters.occurrence_type) {
+            activeFilters.push({ key: 'occurrence_type', label: `Occurrence Type: ${filters.occurrence_type}` });
+        }
+
+        if (filters.occurrence_week) {
+            activeFilters.push({ key: 'occurrence_week', label: `Occurrence Week: ${filters.occurrence_week}` });
+        }
+
+        if (filters.occurrence_day) {
+            activeFilters.push({ key: 'occurrence_day', label: `Occurrence Day: ${filters.occurrence_day}` });
+        }
+
+        if (filters.occurrence_repeat) {
+            activeFilters.push({ key: 'occurrence_repeat', label: `Occurrence Repeat: ${filters.occurrence_repeat}` });
         }
 
         if (filters.founded_at) {
@@ -34,7 +62,7 @@ export function ActiveSeriesFilters({ filters, onRemoveFilter }: ActiveSeriesFil
                     const endDate = new Date(filters.founded_at.end).toLocaleDateString();
                     dateRange.push(`to ${endDate}`);
                 }
-                activeFilters.push({ key: 'created_at', label: `Date: ${dateRange.join(' ')}` });
+                activeFilters.push({ key: 'founded_at', label: `Date: ${dateRange.join(' ')}` });
             }
         }
 

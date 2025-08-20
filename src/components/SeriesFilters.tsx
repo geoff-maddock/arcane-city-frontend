@@ -19,12 +19,16 @@ interface DateRange {
 interface SeriesFiltersProps {
     filters: {
         name: string;
-        entity: string;
-        event_type: string;
         venue: string;
         promoter: string;
+        entity: string;
+        event_type: string;
         tag: string;
-        created_at?: DateRange;
+        founded_at?: DateRange;
+        occurrence_type: string;
+        occurrence_week: string;
+        occurrence_day: string;
+        occurrence_repeat: string;
     };
     onFilterChange: (filters: SeriesFiltersProps['filters']) => void;
 }
@@ -33,8 +37,8 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
     const handleDateChange = (field: 'start' | 'end', value: Date | null) => {
         onFilterChange({
             ...filters,
-            created_at: {
-                ...filters.created_at,
+            founded_at: {
+                ...filters.founded_at,
                 [field]: value ? value.toISOString() : undefined
             }
         });
@@ -43,13 +47,13 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
     const handleClearDates = () => {
         onFilterChange({
             ...filters,
-            created_at: undefined
+            founded_at: undefined
         });
     };
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-6 2xl:grid-cols-9">
                 <div className="space-y-2">
                     <Label htmlFor="name">Series Name</Label>
                     <div className="relative">
@@ -60,6 +64,34 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                             className="pl-9"
                             value={filters.name}
                             onChange={(e) => onFilterChange({ ...filters, name: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="venue">Venue</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="venue"
+                            placeholder="Filter by venue..."
+                            className="pl-9"
+                            value={filters.venue}
+                            onChange={(e) => onFilterChange({ ...filters, venue: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="promoter">Promoter</Label>
+                    <div className="relative">
+                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="promoter"
+                            placeholder="Filter by promoter..."
+                            className="pl-9"
+                            value={filters.promoter}
+                            onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
                         />
                     </div>
                 </div>
@@ -77,7 +109,6 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                         />
                     </div>
                 </div>
-
 
                 <div className="space-y-2">
                     <Label htmlFor="event_type">Type</Label>
@@ -108,9 +139,67 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                 </div>
 
                 <div className="space-y-2">
+                    <Label htmlFor="occurrence_type">Occurrence Type</Label>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="occurrence_type"
+                            placeholder="Filter by occurrence type..."
+                            className="pl-9"
+                            value={filters.occurrence_type}
+                            onChange={(e) => onFilterChange({ ...filters, occurrence_type: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="occurrence_week">Occurrence Week</Label>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="occurrence_week"
+                            placeholder="Filter by occurrence week..."
+                            className="pl-9"
+                            value={filters.occurrence_week}
+                            onChange={(e) => onFilterChange({ ...filters, occurrence_week: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="occurrence_day">Occurrence Day</Label>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="occurrence_day"
+                            placeholder="Filter by occurrence day..."
+                            className="pl-9"
+                            value={filters.occurrence_day}
+                            onChange={(e) => onFilterChange({ ...filters, occurrence_day: e.target.value })}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                    <Label htmlFor="occurrence_repeat">Occurrence Repeat</Label>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="occurrence_repeat"
+                            placeholder="Filter by occurrence repeat..."
+                            className="pl-9"
+                            value={filters.occurrence_repeat}
+                            onChange={(e) => onFilterChange({ ...filters, occurrence_repeat: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
                     <div className="h-6 flex items-center justify-between">
                         <Label>Date Range</Label>
-                        {(filters.created_at?.start || filters.created_at?.end) && (
+                        {(filters.founded_at?.start || filters.founded_at?.end) && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -130,13 +219,13 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                                         variant="outline"
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
-                                            !filters.created_at?.start && "text-muted-foreground"
+                                            !filters.founded_at?.start && "text-muted-foreground"
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
                                         <span className="truncate">
-                                            {filters.created_at?.start
-                                                ? format(new Date(filters.created_at.start), "PPP")
+                                            {filters.founded_at?.start
+                                                ? format(new Date(filters.founded_at.start), "PPP")
                                                 : "From date"}
                                         </span>
                                     </Button>
@@ -144,17 +233,17 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={filters.created_at?.start ? new Date(filters.created_at.start) : undefined}
+                                        selected={filters.founded_at?.start ? new Date(filters.founded_at.start) : undefined}
                                         onSelect={(date) => handleDateChange('start', date ?? null)}
                                         initialFocus
                                     />
-                                    {filters.created_at?.start && (
+                                    {filters.founded_at?.start && (
                                         <div className="border-t p-3">
                                             <Input
                                                 type="time"
-                                                value={format(new Date(filters.created_at.start), "HH:mm")}
+                                                value={format(new Date(filters.founded_at.start), "HH:mm")}
                                                 onChange={(e) => {
-                                                    const date = filters.created_at?.start ? new Date(filters.created_at.start) : new Date();
+                                                    const date = filters.founded_at?.start ? new Date(filters.founded_at.start) : new Date();
                                                     const [hours, minutes] = e.target.value.split(':');
                                                     date.setHours(parseInt(hours), parseInt(minutes));
                                                     handleDateChange('start', date);
@@ -173,13 +262,13 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                                         variant="outline"
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
-                                            !filters.created_at?.end && "text-muted-foreground"
+                                            !filters.founded_at?.end && "text-muted-foreground"
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
                                         <span className="truncate">
-                                            {filters.created_at?.end
-                                                ? format(new Date(filters.created_at.end), "PPP")
+                                            {filters.founded_at?.end
+                                                ? format(new Date(filters.founded_at.end), "PPP")
                                                 : "To date"}
                                         </span>
                                     </Button>
@@ -187,17 +276,17 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={filters.created_at?.end ? new Date(filters.created_at.end) : undefined}
+                                        selected={filters.founded_at?.end ? new Date(filters.founded_at.end) : undefined}
                                         onSelect={(date) => handleDateChange('end', date ?? null)}
                                         initialFocus
                                     />
-                                    {filters.created_at?.end && (
+                                    {filters.founded_at?.end && (
                                         <div className="border-t p-3">
                                             <Input
                                                 type="time"
-                                                value={format(new Date(filters.created_at.end), "HH:mm")}
+                                                value={format(new Date(filters.founded_at.end), "HH:mm")}
                                                 onChange={(e) => {
-                                                    const date = filters.created_at?.end ? new Date(filters.created_at.end) : new Date();
+                                                    const date = filters.founded_at?.end ? new Date(filters.founded_at.end) : new Date();
                                                     const [hours, minutes] = e.target.value.split(':');
                                                     date.setHours(parseInt(hours), parseInt(minutes));
                                                     handleDateChange('end', date);

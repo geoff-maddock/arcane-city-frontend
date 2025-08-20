@@ -44,7 +44,11 @@ export default function Series() {
         founded_at: {
             start: undefined,
             end: undefined
-        }
+        },
+        occurrence_type: '',
+        occurrence_week: '',
+        occurrence_day: '',
+        occurrence_repeat: ''
     });
 
     const [page, setPage] = useState(1);
@@ -86,7 +90,11 @@ export default function Series() {
             founded_at: {
                 start: undefined,
                 end: undefined
-            }
+            },
+            occurrence_type: '',
+            occurrence_week: '',
+            occurrence_day: '',
+            occurrence_repeat: ''
         });
     };
 
@@ -130,7 +138,7 @@ export default function Series() {
     };
 
     const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
-        if (key === 'created_at') {
+        if (key === 'founded_at') {
             return value?.start || value?.end;
         }
         return value !== '';
