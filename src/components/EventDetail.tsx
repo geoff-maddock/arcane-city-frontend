@@ -14,10 +14,28 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+// Lucide doesn't ship an Instagram brand icon; create a lightweight inline SVG component
+const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        {...props}
+    >
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+        <circle cx="17.5" cy="6.5" r="1" />
+    </svg>
+);
 import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
 import { formatDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
+import { useSearchOptions } from '../hooks/useSearchOptions';
 import { sanitizeHTML, sanitizeEmbed } from '../lib/sanitize';
 import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
@@ -33,6 +51,11 @@ export default function EventDetail({ slug }: { slug: string }) {
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+    const [instagramDialogOpen, setInstagramDialogOpen] = useState(false);
+    const [instagramResult, setInstagramResult] = useState<string | null>(null);
+    // Load visibility options to determine which id corresponds to Public
+    const { data: visibilityOptions } = useSearchOptions('visibilities', '');
+    const publicVisibilityId = visibilityOptions?.find(v => v.name.toLowerCase() === 'public')?.id;
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -86,6 +109,31 @@ export default function EventDetail({ slug }: { slug: string }) {
     const handleDelete = () => {
         deleteMutation.mutate();
         setDeleteDialogOpen(false);
+    };
+
+    // Instagram post mutation
+    const instagramPostMutation = useMutation<{ message: string } | unknown, Error>({
+        mutationFn: async () => {
+            if (!event) throw new Error('Event not loaded');
+            const { data } = await api.post(`/events/${event.id}/instagram-post`);
+            return data as { message?: string };
+        },
+        onSuccess: (data) => {
+            const msg = (data as { message?: string })?.message || 'Event posted to Instagram.';
+            setInstagramResult(msg);
+        },
+        onError: (err) => {
+            console.error('Instagram post failed', err);
+            setInstagramResult('Failed to post to Instagram.');
+        },
+        onSettled: () => {
+            // Keep the dialog open to show result; user can close manually.
+        }
+    });
+
+    const handleInstagramPost = () => {
+        setInstagramResult(null);
+        instagramPostMutation.mutate();
     };
 
 
@@ -190,6 +238,17 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-48 p-2" align="end">
                                                     <div className="space-y-1">
+                                                        {/* Instagram Post Button: any authenticated user, public event only */}
+                                                        {user && publicVisibilityId && user.id === event.created_by && event.visibility && event.visibility.id === publicVisibilityId && (
+                                                            <button
+                                                                onClick={() => setInstagramDialogOpen(true)}
+                                                                aria-label="Post event to Instagram"
+                                                                className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:text-purple-800 transition-colors p-1 rounded-md hover:bg-purple-50"
+                                                                title="Post to Instagram"
+                                                            >
+                                                                <InstagramIcon className="h-5 w-5" /> Post to Instagram
+                                                            </button>
+                                                        )}
                                                         <Link
                                                             to="/event/$eventSlug/edit"
                                                             params={{ eventSlug: event.slug }}
@@ -199,7 +258,6 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                             <Edit className="h-4 w-4" />
                                                             Edit Event
                                                         </Link>
-
                                                         <button
                                                             className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
                                                             onClick={() => {
@@ -247,6 +305,47 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                     'Delete'
                                                 )}
                                             </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+
+                                {/* Instagram Post Confirmation Dialog */}
+                                <Dialog open={instagramDialogOpen} onOpenChange={(open) => { setInstagramDialogOpen(open); if (!open) setInstagramResult(null); }}>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Post to Instagram</DialogTitle>
+                                            <DialogDescription>
+                                                {instagramResult
+                                                    ? 'Result:'
+                                                    : `Are you sure you want to post "${event.name}" to Instagram?`}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        {instagramResult && (
+                                            <div className={`text-sm ${instagramResult.includes('Failed') ? 'text-red-600' : 'text-green-600'}`}>{instagramResult}</div>
+                                        )}
+                                        <DialogFooter>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setInstagramDialogOpen(false)}
+                                                disabled={instagramPostMutation.isPending}
+                                            >
+                                                {instagramResult ? 'Close' : 'Cancel'}
+                                            </Button>
+                                            {!instagramResult && (
+                                                <Button
+                                                    onClick={handleInstagramPost}
+                                                    disabled={instagramPostMutation.isPending}
+                                                >
+                                                    {instagramPostMutation.isPending ? (
+                                                        <>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Posting...
+                                                        </>
+                                                    ) : (
+                                                        'Post'
+                                                    )}
+                                                </Button>
+                                            )}
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
