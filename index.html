@@ -27,6 +27,23 @@
 </head>
 
 <body>
+  <script>
+    // Initialize theme early: stored value wins; else system preference fallback.
+    (function() {
+      try {
+        var raw = localStorage.getItem('theme');
+        if (raw) {
+          var t = JSON.parse(raw);
+          if (t === 'dark') document.documentElement.classList.add('dark');
+        } else {
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var initial = prefersDark ? 'dark' : 'light';
+          localStorage.setItem('theme', JSON.stringify(initial));
+          if (initial === 'dark') document.documentElement.classList.add('dark');
+        }
+      } catch (e) { /* swallow */ }
+    })();
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>

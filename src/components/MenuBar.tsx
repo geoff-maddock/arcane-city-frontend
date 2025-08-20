@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
@@ -18,10 +18,33 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
     enabled: authService.isAuthenticated(),
   });
 
+  // Ensure the HTML element reflects the stored theme value
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  // Track whether user explicitly toggled
+  const userSetRef = useRef(false);
+
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', theme === 'light');
+  try { localStorage.setItem('themeSource', 'user'); } catch { /* ignore */ }
+    userSetRef.current = true;
   };
+
+  // Listen for system preference changes if user hasn't explicitly chosen
+  useEffect(() => {
+    const source = localStorage.getItem('themeSource');
+    if (source === 'user') return;
+    if (!window.matchMedia) return;
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => {
+      if (userSetRef.current || localStorage.getItem('themeSource') === 'user') return;
+      setTheme(e.matches ? 'dark' : 'light');
+    };
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [setTheme]);
 
   // Close the mobile sheet when any link inside the menu is clicked
   const handleMenuClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
@@ -131,7 +154,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           </Button>
         </>
       )}
-      <Button onClick={toggleTheme} className="mt-auto flex items-center gap-2">
+  <Button onClick={toggleTheme} data-testid="theme-toggle" className="mt-auto flex items-center gap-2">
         {theme === 'light' ? <HiMoon /> : <HiSun />}
         <span className="hidden xl:inline">
           Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
