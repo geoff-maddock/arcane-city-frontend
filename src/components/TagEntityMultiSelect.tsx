@@ -19,7 +19,8 @@ interface TagEntityMultiSelectProps {
 
 /**
  * Reusable multiselect built on native datalist for lightweight fuzzy picking.
- * Commits selection on blur or Enter if exact name match found.
+ * Commits selection immediately on exact match (e.g., clicking datalist option),
+ * or on blur/Enter if exact name match found.
  */
 export const TagEntityMultiSelect: React.FC<TagEntityMultiSelectProps> = ({
     label,
@@ -44,6 +45,18 @@ export const TagEntityMultiSelect: React.FC<TagEntityMultiSelectProps> = ({
         setQuery('');
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setQuery(value);
+        
+        // Check if this is an exact match (likely from datalist selection)
+        const exactMatch = options?.find(o => o.name === value);
+        if (exactMatch && !valueIds.includes(exactMatch.id)) {
+            // Use setTimeout to allow the state to update first
+            setTimeout(() => commit(value), 0);
+        }
+    };
+
     return (
         <div className="space-y-2">
             <label htmlFor={`${datalistId}_input`} className="font-medium text-sm">{label}</label>
@@ -52,7 +65,7 @@ export const TagEntityMultiSelect: React.FC<TagEntityMultiSelectProps> = ({
                 list={datalistId}
                 value={query}
                 placeholder={placeholder}
-                onChange={e => setQuery(e.target.value)}
+                onChange={handleChange}
                 onBlur={e => commit(e.target.value)}
                 onKeyDown={e => {
                     if (e.key === 'Enter') {
