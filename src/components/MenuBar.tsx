@@ -5,7 +5,7 @@ import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
@@ -107,6 +107,10 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         <Link to="/tags" className="flex items-center gap-2 hover:underline">
           <HiTag />
           <span className=" xl:inline">Tags</span>
+        </Link>
+        <Link to="/blogs" className="flex items-center gap-2 hover:underline">
+          <HiBookOpen />
+          <span className=" xl:inline">Blogs</span>
         </Link>
         <Link to="/users" className="flex items-center gap-2 hover:underline">
           <HiUserGroup />

@@ -12,6 +12,7 @@ import { TagCreateRoute } from './routes/tag-create.tsx';
 import { TagEditRoute } from './routes/tag-edit.tsx';
 import { UsersRoute } from './routes/users.tsx';
 import { UserDetailRoute } from './routes/user-detail.tsx';
+import { BlogsRoute } from './routes/blogs.tsx';
 import { EventCreateRoute } from './routes/event-create.tsx';
 import { EventEditRoute } from './routes/event-edit.tsx';
 import { SeriesCreateRoute } from './routes/series-create.tsx';
@@ -89,6 +90,7 @@ const routeTree = rootRoute.addChildren([
     entityRoute,
     seriesRoute,
     tagRoute,
+    BlogsRoute,
     UsersRoute,
     TagCreateRoute,
     TagEditRoute,
