@@ -72,6 +72,7 @@ const EventCreate: React.FC = () => {
       end_at: vals.end_at,
       primary_link: vals.primary_link,
       ticket_link: vals.ticket_link,
+      event_type_id: vals.event_type_id ? Number(vals.event_type_id) : undefined,
     })
   });
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
@@ -266,9 +267,11 @@ const EventCreate: React.FC = () => {
               id="event_type_id"
               endpoint="event-types"
               value={formData.event_type_id}
-              onValueChange={(val) =>
-                setFormData((p) => ({ ...p, event_type_id: val }))
-              }
+              onValueChange={(val) => {
+                setFormData((p) => ({ ...p, event_type_id: val }));
+                // Sync into validation state so the hook sees the updated value
+                setFormDataProxy((p: typeof formData) => ({ ...p, event_type_id: val }));
+              }}
               placeholder="Type to search event types..."
             />
             {renderError('event_type_id')}

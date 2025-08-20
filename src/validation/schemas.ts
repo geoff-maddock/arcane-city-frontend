@@ -88,6 +88,7 @@ export const eventCreateSchema: Schema = {
     presale_price: [isNumber(), positive()],
     door_price: [isNumber(), positive()],
     start_at: [required()],
+    event_type_id: [required()],
     end_at: [datetimeOrder('start_at', 'end_at')],
     primary_link: [url()],
     ticket_link: [url()],

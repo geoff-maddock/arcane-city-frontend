@@ -86,6 +86,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
             end_at: vals.end_at,
             primary_link: vals.primary_link,
             ticket_link: vals.ticket_link,
+            event_type_id: vals.event_type_id ? Number(vals.event_type_id) : undefined,
         })
     });
 
