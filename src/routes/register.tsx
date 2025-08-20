@@ -73,32 +73,34 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-4">
-      <h2 className="text-xl font-bold">Register</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
-          {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          {errors.password && <div className="text-red-500 text-sm">{errors.password}</div>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm">Confirm Password</Label>
-          <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-          {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword}</div>}
-        </div>
-        {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
-        <Button type="submit" className="w-full">Register</Button>
-      </form>
+    <div className="min-h-[calc(100vh-4rem)] xl:min-h-screen w-full bg-white dark:bg-black transition-colors flex items-start xl:items-center">
+      <div className="w-full max-w-md mx-auto p-6 xl:p-8 space-y-6">
+        <h2 className="text-3xl font-bold tracking-tight">Register</h2>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+            {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            {errors.password && <div className="text-red-500 text-sm">{errors.password}</div>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm">Confirm Password</Label>
+            <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword}</div>}
+          </div>
+          {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
+          <Button type="submit" className="w-full">Register</Button>
+        </form>
+      </div>
     </div>
   );
 };
