@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { authService } from '../services/auth.service';
 import { Link as EntityLink } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/components/ui/dialog';
-import { Link2 as LinkIcon, Pencil, Plus, Loader2, ExternalLink } from 'lucide-react';
+import { Link2 as LinkIcon, Pencil, Plus, Loader2, ExternalLink, Trash2 } from 'lucide-react';
 
 interface ApiError {
     response?: {
@@ -43,6 +44,12 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                 return [];
             }
         },
+    });
+
+    const { data: user } = useQuery({
+        queryKey: ['currentUser'],
+        queryFn: authService.getCurrentUser,
+        enabled: authService.isAuthenticated(),
     });
 
     const [editing, setEditing] = useState<EntityLink | null>(null);
@@ -92,6 +99,23 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
         },
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: async (linkId: number) => {
+            await api.delete(`/entities/${entityId}/links/${linkId}`);
+        },
+        onSuccess: () => {
+            refetch();
+        },
+        onError: (error: ApiError) => {
+            console.error('Error deleting link:', error);
+            if (error.response?.data?.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                alert('Failed to delete link. Please try again.');
+            }
+        },
+    });
+
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editing) return;
@@ -109,6 +133,12 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
             return;
         }
         createMutation.mutate(creating);
+    };
+
+    const handleDelete = (linkId: number) => {
+        if (window.confirm('Are you sure you want to delete this link?')) {
+            deleteMutation.mutate(linkId);
+        }
     };
 
     if (isLoading) {
@@ -260,18 +290,29 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                     )}
                                 </div>
                             </div>
-                            {canEdit && (
+                            {(canEdit || (user && link.created_by === user.id)) && (
                                 <div className="flex gap-2">
-                                    <button
-                                        className="text-gray-600 hover:text-gray-900"
-                                        onClick={() => {
-                                            setEditing(link);
-                                            setIsEditOpen(true);
-                                        }}
-                                        aria-label="Edit link"
-                                    >
-                                        <Pencil className="h-4 w-4" />
-                                    </button>
+                                    {canEdit && (
+                                        <button
+                                            className="text-gray-600 hover:text-gray-900"
+                                            onClick={() => {
+                                                setEditing(link);
+                                                setIsEditOpen(true);
+                                            }}
+                                            aria-label="Edit link"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                    {user && link.created_by === user.id && (
+                                        <button
+                                            className="text-red-600 hover:text-red-900"
+                                            onClick={() => handleDelete(link.id)}
+                                            aria-label="Delete link"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </li>
