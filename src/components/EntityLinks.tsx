@@ -15,6 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from '@/components/ui/dialog';
 import { Link2 as LinkIcon, Pencil, Plus, Loader2, ExternalLink, Trash2 } from 'lucide-react';
 
@@ -55,6 +56,8 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
     const [editing, setEditing] = useState<EntityLink | null>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [deleting, setDeleting] = useState<EntityLink | null>(null);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [creating, setCreating] = useState<Partial<EntityLink>>({
         title: '',
         text: '',
@@ -105,6 +108,8 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
         },
         onSuccess: () => {
             refetch();
+            setIsDeleteOpen(false);
+            setDeleting(null);
         },
         onError: (error: ApiError) => {
             console.error('Error deleting link:', error);
@@ -135,11 +140,7 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
         createMutation.mutate(creating);
     };
 
-    const handleDelete = (linkId: number) => {
-        if (window.confirm('Are you sure you want to delete this link?')) {
-            deleteMutation.mutate(linkId);
-        }
-    };
+    // Deletion handled via confirmation dialog
 
     if (isLoading) {
         return (
@@ -283,14 +284,14 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                         {link.text || link.url}
                                         <ExternalLink className="h-3 w-3" />
                                     </a>
-                                    {link.is_primary && (
+                                    {!!link.is_primary && (
                                         <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-0.5">
                                             Primary
                                         </span>
                                     )}
                                 </div>
                             </div>
-                            {(canEdit || (user && link.created_by === user.id)) && (
+                            {canEdit && (
                                 <div className="flex gap-2">
                                     {canEdit && (
                                         <button
@@ -304,10 +305,13 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                             <Pencil className="h-4 w-4" />
                                         </button>
                                     )}
-                                    {user && link.created_by === user.id && (
+                                    {user && (
                                         <button
                                             className="text-red-600 hover:text-red-900"
-                                            onClick={() => handleDelete(link.id)}
+                                            onClick={() => {
+                                                setDeleting(link);
+                                                setIsDeleteOpen(true);
+                                            }}
                                             aria-label="Delete link"
                                         >
                                             <Trash2 className="h-4 w-4" />
@@ -326,11 +330,11 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit} className="space-y-4 mt-2">
                             <div className="space-y-2">
-                                <Label htmlFor="create-link-title">Title</Label>
+                                <Label htmlFor="create-link-text">Text</Label>
                                 <Input
-                                    id="create-link-title"
-                                    value={creating.title ?? ''}
-                                    onChange={(e) => setCreating({ ...creating, title: e.target.value })}
+                                    id="create-link-text"
+                                    value={creating.text ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, text: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -342,13 +346,13 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                     required
                                 />
                             </div>
+
                             <div className="space-y-2">
-                                <Label htmlFor="create-link-text">Text</Label>
-                                <Textarea
-                                    id="create-link-text"
-                                    value={creating.text ?? ''}
-                                    onChange={(e) => setCreating({ ...creating, text: e.target.value })}
-                                    rows={3}
+                                <Label htmlFor="create-link-title">Title</Label>
+                                <Input
+                                    id="create-link-title"
+                                    value={creating.title ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, title: e.target.value })}
                                 />
                             </div>
                             <div className="flex items-center gap-2">
@@ -434,6 +438,36 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                 </DialogFooter>
                             </form>
                         )}
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Link</DialogTitle>
+                            <DialogDescription>
+                                Are you sure you want to delete "{deleting?.text || deleting?.title || deleting?.url}"? This action cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                disabled={deleteMutation.isPending}
+                                onClick={() => deleting && deleteMutation.mutate(deleting.id)}
+                            >
+                                {deleteMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    'Delete'
+                                )}
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </CardContent>
