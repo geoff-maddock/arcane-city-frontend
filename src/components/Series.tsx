@@ -47,8 +47,7 @@ export default function Series() {
         },
         occurrence_type: '',
         occurrence_week: '',
-        occurrence_day: '',
-        occurrence_repeat: ''
+        occurrence_day: ''
     });
 
     const [page, setPage] = useState(1);
@@ -94,7 +93,6 @@ export default function Series() {
             occurrence_type: '',
             occurrence_week: '',
             occurrence_day: '',
-            occurrence_repeat: ''
         });
     };
 

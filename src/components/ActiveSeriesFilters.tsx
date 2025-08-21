@@ -47,10 +47,6 @@ export function ActiveSeriesFilters({ filters, onRemoveFilter }: ActiveSeriesFil
             activeFilters.push({ key: 'occurrence_day', label: `Occurrence Day: ${filters.occurrence_day}` });
         }
 
-        if (filters.occurrence_repeat) {
-            activeFilters.push({ key: 'occurrence_repeat', label: `Occurrence Repeat: ${filters.occurrence_repeat}` });
-        }
-
         if (filters.founded_at) {
             if (filters.founded_at.start || filters.founded_at.end) {
                 const dateRange = [];

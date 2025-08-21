@@ -46,7 +46,6 @@ export interface SeriesFilters {
     occurrence_type: string;
     occurrence_week: string;
     occurrence_day: string;
-    occurrence_repeat: string;
 }
 
 export interface SeriesFiltersProps {
@@ -61,7 +60,6 @@ export interface SeriesFiltersProps {
         occurrence_type: string;
         occurrence_week: string;
         occurrence_day: string;
-        occurrence_repeat: string;
     };
     onFilterChange: (filters: SeriesFiltersProps['filters']) => void;
 }
