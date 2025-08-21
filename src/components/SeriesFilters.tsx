@@ -1,15 +1,9 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon, Search, MapPin, Users, X } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { Calendar as Search, MapPin, Users } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useSearchOptions } from '@/hooks/useSearchOptions';
+
 
 interface DateRange {
     start?: string;
@@ -19,37 +13,30 @@ interface DateRange {
 interface SeriesFiltersProps {
     filters: {
         name: string;
-        entity: string;
-        event_type: string;
         venue: string;
         promoter: string;
+        entity: string;
+        event_type: string;
         tag: string;
-        created_at?: DateRange;
+        founded_at?: DateRange;
+        occurrence_type: string;
+        occurrence_week: string;
+        occurrence_day: string;
     };
     onFilterChange: (filters: SeriesFiltersProps['filters']) => void;
 }
 
 export default function SeriesFilters({ filters, onFilterChange }: SeriesFiltersProps) {
-    const handleDateChange = (field: 'start' | 'end', value: Date | null) => {
-        onFilterChange({
-            ...filters,
-            created_at: {
-                ...filters.created_at,
-                [field]: value ? value.toISOString() : undefined
-            }
-        });
-    };
-
-    const handleClearDates = () => {
-        onFilterChange({
-            ...filters,
-            created_at: undefined
-        });
-    };
+    // Cached, alphabetized event types for the series type filter
+    const { data: eventTypeOptions, isLoading: loadingTypes } = useSearchOptions('event-types', '', {}, { limit: '100', sort: 'name', direction: 'asc' });
+    // Cached, alphabetized occurrence lookups
+    const { data: occurrenceTypeOptions, isLoading: loadingOccTypes } = useSearchOptions('occurrence-types', '', {}, { limit: '100', sort: 'id', direction: 'asc' });
+    const { data: occurrenceWeekOptions, isLoading: loadingOccWeeks } = useSearchOptions('occurrence-weeks', '', {}, { limit: '100', sort: 'id', direction: 'asc' });
+    const { data: occurrenceDayOptions, isLoading: loadingOccDays } = useSearchOptions('occurrence-days', '', {}, { limit: '100', sort: 'id', direction: 'asc' });
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-6 ">
                 <div className="space-y-2">
                     <Label htmlFor="name">Series Name</Label>
                     <div className="relative">
@@ -62,6 +49,57 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                             onChange={(e) => onFilterChange({ ...filters, name: e.target.value })}
                         />
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="venue">Venue</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="venue"
+                            placeholder="Filter by venue..."
+                            className="pl-9"
+                            value={filters.venue}
+                            onChange={(e) => onFilterChange({ ...filters, venue: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="promoter">Promoter</Label>
+                    <div className="relative">
+                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="promoter"
+                            placeholder="Filter by promoter..."
+                            className="pl-9"
+                            value={filters.promoter}
+                            onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="event_type">Type</Label>
+                    <Select
+                        value={filters.event_type || ''}
+                        onValueChange={(value) =>
+                            onFilterChange({ ...filters, event_type: value === '__ALL__' ? '' : value })
+                        }
+                        disabled={loadingTypes}
+                    >
+                        <SelectTrigger id="event_type">
+                            <SelectValue placeholder={loadingTypes ? 'Loading types...' : 'All types'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__ALL__">All types</SelectItem>
+                            {eventTypeOptions?.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.name}>
+                                    {opt.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -80,20 +118,6 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
 
 
                 <div className="space-y-2">
-                    <Label htmlFor="event_type">Type</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="event_type"
-                            placeholder="Filter by series type..."
-                            className="pl-9"
-                            value={filters.event_type}
-                            onChange={(e) => onFilterChange({ ...filters, event_type: e.target.value })}
-                        />
-                    </div>
-                </div>
-
-                <div className="space-y-2">
                     <Label htmlFor="tag">Tag</Label>
                     <div className="relative">
                         <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -107,109 +131,74 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <div className="h-6 flex items-center justify-between">
-                        <Label>Date Range</Label>
-                        {(filters.created_at?.start || filters.created_at?.end) && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleClearDates}
-                                className="h-6 px-2 text-gray-500 hover:text-gray-900"
-                            >
-                                Clear dates
-                                <X className="ml-1 h-4 w-4" />
-                            </Button>
-                        )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div className="min-w-0">
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !filters.created_at?.start && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-                                        <span className="truncate">
-                                            {filters.created_at?.start
-                                                ? format(new Date(filters.created_at.start), "PPP")
-                                                : "From date"}
-                                        </span>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={filters.created_at?.start ? new Date(filters.created_at.start) : undefined}
-                                        onSelect={(date) => handleDateChange('start', date ?? null)}
-                                        initialFocus
-                                    />
-                                    {filters.created_at?.start && (
-                                        <div className="border-t p-3">
-                                            <Input
-                                                type="time"
-                                                value={format(new Date(filters.created_at.start), "HH:mm")}
-                                                onChange={(e) => {
-                                                    const date = filters.created_at?.start ? new Date(filters.created_at.start) : new Date();
-                                                    const [hours, minutes] = e.target.value.split(':');
-                                                    date.setHours(parseInt(hours), parseInt(minutes));
-                                                    handleDateChange('start', date);
-                                                }}
-                                            />
-                                        </div>
-                                    )}
-                                </PopoverContent>
-                            </Popover>
-                        </div>
 
-                        <div className="min-w-0">
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !filters.created_at?.end && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-                                        <span className="truncate">
-                                            {filters.created_at?.end
-                                                ? format(new Date(filters.created_at.end), "PPP")
-                                                : "To date"}
-                                        </span>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={filters.created_at?.end ? new Date(filters.created_at.end) : undefined}
-                                        onSelect={(date) => handleDateChange('end', date ?? null)}
-                                        initialFocus
-                                    />
-                                    {filters.created_at?.end && (
-                                        <div className="border-t p-3">
-                                            <Input
-                                                type="time"
-                                                value={format(new Date(filters.created_at.end), "HH:mm")}
-                                                onChange={(e) => {
-                                                    const date = filters.created_at?.end ? new Date(filters.created_at.end) : new Date();
-                                                    const [hours, minutes] = e.target.value.split(':');
-                                                    date.setHours(parseInt(hours), parseInt(minutes));
-                                                    handleDateChange('end', date);
-                                                }}
-                                            />
-                                        </div>
-                                    )}
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                    </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+
+                <div className="space-y-2">
+                    <Label htmlFor="occurrence_type">Occurrence Type</Label>
+                    <Select
+                        value={filters.occurrence_type || ''}
+                        onValueChange={(value) => onFilterChange({ ...filters, occurrence_type: value === '__ALL__' ? '' : value })}
+                        disabled={loadingOccTypes}
+                    >
+                        <SelectTrigger id="occurrence_type">
+                            <SelectValue placeholder={loadingOccTypes ? 'Loading types...' : 'All types'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__ALL__">All types</SelectItem>
+                            {occurrenceTypeOptions?.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.name}>
+                                    {opt.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="occurrence_week">Occurrence Week</Label>
+                    <Select
+                        value={filters.occurrence_week || ''}
+                        onValueChange={(value) => onFilterChange({ ...filters, occurrence_week: value === '__ALL__' ? '' : value })}
+                        disabled={loadingOccWeeks}
+                    >
+                        <SelectTrigger id="occurrence_week">
+                            <SelectValue placeholder={loadingOccWeeks ? 'Loading weeks...' : 'All weeks'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__ALL__">All weeks</SelectItem>
+                            {occurrenceWeekOptions?.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.name}>
+                                    {opt.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="occurrence_day">Occurrence Day</Label>
+                    <Select
+                        value={filters.occurrence_day || ''}
+                        onValueChange={(value) => onFilterChange({ ...filters, occurrence_day: value === '__ALL__' ? '' : value })}
+                        disabled={loadingOccDays}
+                    >
+                        <SelectTrigger id="occurrence_day">
+                            <SelectValue placeholder={loadingOccDays ? 'Loading days...' : 'All days'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__ALL__">All days</SelectItem>
+                            {occurrenceDayOptions?.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.name}>
+                                    {opt.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
             </div>
         </div>
     );

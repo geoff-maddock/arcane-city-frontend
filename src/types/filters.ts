@@ -43,6 +43,9 @@ export interface SeriesFilters {
     event_type: string;
     tag: string;
     founded_at?: DateRange;
+    occurrence_type: string;
+    occurrence_week: string;
+    occurrence_day: string;
 }
 
 export interface SeriesFiltersProps {
@@ -54,6 +57,9 @@ export interface SeriesFiltersProps {
         entity: string;
         tag: string;
         founded_at?: DateRange;
+        occurrence_type: string;
+        occurrence_week: string;
+        occurrence_day: string;
     };
     onFilterChange: (filters: SeriesFiltersProps['filters']) => void;
 }

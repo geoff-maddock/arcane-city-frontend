@@ -14,6 +14,9 @@ export const SeriesFilterContext = createContext<SeriesFilterContextProps>({
         entity: '',
         venue: '',
         promoter: '',
+        occurrence_type: '',
+        occurrence_week: '',
+        occurrence_day: '',
         founded_at: {
             start: '',
             end: undefined
