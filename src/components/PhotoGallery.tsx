@@ -126,16 +126,18 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
                                         src={photo.path}
                                         alt={`Photo ${idx + 1}`}
                                         className="w-32 h-32 object-cover rounded shadow hover:scale-105 transition-transform"
+                                        loading="lazy"
+                                        decoding="async"
                                     />
                                 </button>
                                 {user && photo.created_by === user.id && photo.direct === true && (
 
-                                    <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+                                    <div className="absolute top-1 right-1 flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
 
                                         <button
                                             onClick={() => handleTogglePrimary(photo)}
                                             aria-label={photo.is_primary ? 'Unset Primary Photo' : 'Set Primary Photo'}
-                                            className="bg-white/70 p-1 rounded hover:bg-white"
+                                            className="bg-white/70 p-2 rounded hover:bg-white"
                                             type="button"
                                         >
                                             <Star
@@ -147,7 +149,7 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
                                         <button
                                             onClick={() => handleDelete(photo)}
                                             aria-label="Delete Photo"
-                                            className="bg-white/70 p-1 rounded hover:bg-white"
+                                            className="bg-white/70 p-2 rounded hover:bg-white"
                                             type="button"
                                         >
                                             <Trash2 className="h-4 w-4 text-red-500" />
