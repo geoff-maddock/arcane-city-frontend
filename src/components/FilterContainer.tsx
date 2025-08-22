@@ -61,7 +61,7 @@ export function FilterContainer({
                     <FilterToggleButton
                         filtersVisible={filtersVisible}
                         onToggle={onToggleFilters}
-                        className="mb-4"
+                        className="mb-2"
                     />
 
                     {/* Show active filters when collapsed */}
