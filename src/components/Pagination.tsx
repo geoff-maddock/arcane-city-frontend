@@ -166,6 +166,19 @@ export function Pagination({
                             <span className="text-sm text-gray-700 mx-2">
                                 Page {currentPage} of {totalPages}
                             </span>
+                            <Select
+                                value={String(currentPage)}
+                                onValueChange={(v) => onPageChange(Number(v))}
+                            >
+                                <SelectTrigger className="w-[96px]">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                        <SelectItem key={p} value={String(p)}>{p}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <Button
