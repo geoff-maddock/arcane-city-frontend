@@ -7,7 +7,8 @@ Object.defineProperty(window, 'import.meta', {
     env: {
       VITE_API_URL: 'http://test.api',
       VITE_API_USERNAME: 'test-user',
-      VITE_API_PASSWORD: 'test-pass'
+      VITE_API_PASSWORD: 'test-pass',
+      VITE_RECAPTCHA_SITE_KEY: 'test-recaptcha-key'
     }
   }
 });

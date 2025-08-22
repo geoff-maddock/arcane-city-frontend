@@ -7,12 +7,14 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { formatApiError } from '../lib/utils';
+import { useRecaptcha } from '../hooks/useRecaptcha';
 
 interface FieldErrors {
   name?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
+  recaptcha?: string;
   general?: string;
 }
 
@@ -23,6 +25,8 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { executeRecaptchaAction } = useRecaptcha();
 
   const validate = (): FieldErrors => {
     const validationErrors: FieldErrors = {};
@@ -53,9 +57,20 @@ const Register: React.FC = () => {
       setErrors(validationErrors);
       return;
     }
+    
     setErrors({});
+    setIsSubmitting(true);
+    
     try {
-      await userService.createUser({ name, email, password });
+      // Execute reCAPTCHA
+      const recaptchaToken = await executeRecaptchaAction('register');
+      if (!recaptchaToken) {
+        setErrors({ recaptcha: 'reCAPTCHA verification failed. Please try again.' });
+        setIsSubmitting(false);
+        return;
+      }
+
+      await userService.createUser({ name, email, password, recaptchaToken });
       navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
@@ -66,9 +81,11 @@ const Register: React.FC = () => {
         } else {
           setErrors({ general: axiosErr.response.data?.message || formatApiError(err) });
         }
-        return;
+      } else {
+        setErrors({ general: formatApiError(err) });
       }
-      setErrors({ general: formatApiError(err) });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -97,8 +114,11 @@ const Register: React.FC = () => {
             <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword}</div>}
           </div>
+          {errors.recaptcha && <div className="text-red-500 text-sm">{errors.recaptcha}</div>}
           {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
-          <Button type="submit" className="w-full">Register</Button>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Registering...' : 'Register'}
+          </Button>
         </form>
       </div>
     </div>
@@ -110,3 +130,5 @@ export const RegisterRoute = createRoute({
   path: '/register',
   component: Register,
 });
+
+export { Register };
