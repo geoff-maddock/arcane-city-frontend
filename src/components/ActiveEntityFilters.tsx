@@ -21,24 +21,24 @@ export function ActiveEntityFilters({ filters, onRemoveFilter }: ActiveEntityFil
         if (filters.role) {
             activeFilters.push({ key: 'role', label: `Role: ${filters.role}` });
         }
-        if (filters.status) {
-            activeFilters.push({ key: 'status', label: `Status: ${filters.status}` });
+        if (filters.entity_status) {
+            activeFilters.push({ key: 'entity_status', label: `Status: ${filters.entity_status}` });
         }
         if (filters.tag) {
             activeFilters.push({ key: 'tag', label: `Tag: ${filters.tag}` });
         }
-        if (filters.created_at) {
-            if (filters.created_at.start || filters.created_at.end) {
+        if (filters.started_at) {
+            if (filters.started_at.start || filters.started_at.end) {
                 const dateRange = [];
-                if (filters.created_at.start) {
-                    const startDate = new Date(filters.created_at.start).toLocaleDateString();
+                if (filters.started_at.start) {
+                    const startDate = new Date(filters.started_at.start).toLocaleDateString();
                     dateRange.push(`from ${startDate}`);
                 }
-                if (filters.created_at.end) {
-                    const endDate = new Date(filters.created_at.end).toLocaleDateString();
+                if (filters.started_at.end) {
+                    const endDate = new Date(filters.started_at.end).toLocaleDateString();
                     dateRange.push(`to ${endDate}`);
                 }
-                activeFilters.push({ key: 'created_at', label: `Date: ${dateRange.join(' ')}` });
+                activeFilters.push({ key: 'started_at', label: `Date: ${dateRange.join(' ')}` });
             }
         }
 

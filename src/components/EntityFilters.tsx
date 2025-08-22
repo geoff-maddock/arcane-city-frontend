@@ -21,9 +21,10 @@ interface EntityFiltersProps {
         name: string;
         entity_type: string;
         role: string;
-        status: string;
+        entity_status: string;
         tag: string;
         created_at?: DateRange;
+        started_at?: DateRange;
     };
     onFilterChange: (filters: EntityFiltersProps['filters']) => void;
 }
@@ -32,8 +33,8 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
     const handleDateChange = (field: 'start' | 'end', value: Date | null) => {
         onFilterChange({
             ...filters,
-            created_at: {
-                ...filters.created_at,
+            started_at: {
+                ...filters.started_at,
                 [field]: value ? value.toISOString() : undefined
             }
         });
@@ -42,7 +43,7 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
     const handleClearDates = () => {
         onFilterChange({
             ...filters,
-            created_at: undefined
+            started_at: undefined
         });
     };
 
@@ -106,23 +107,23 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
+                    <Label htmlFor="entity_status">Status</Label>
                     <div className="relative">
                         <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                         <Input
-                            id="status"
+                            id="entity_status"
                             placeholder="Filter by status..."
                             className="pl-9"
-                            value={filters.status}
-                            onChange={(e) => onFilterChange({ ...filters, status: e.target.value })}
+                            value={filters.entity_status}
+                            onChange={(e) => onFilterChange({ ...filters, entity_status: e.target.value })}
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2">
                     <div className="h-6 flex items-center justify-between">
-                        <Label>Date Range</Label>
-                        {(filters.created_at?.start || filters.created_at?.end) && (
+                        <Label>Started Date Range</Label>
+                        {(filters.started_at?.start || filters.started_at?.end) && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -142,13 +143,13 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
                                         variant="outline"
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
-                                            !filters.created_at?.start && "text-muted-foreground"
+                                            !filters.started_at?.start && "text-muted-foreground"
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
                                         <span className="truncate">
-                                            {filters.created_at?.start
-                                                ? format(new Date(filters.created_at.start), "PPP")
+                                            {filters.started_at?.start
+                                                ? format(new Date(filters.started_at.start), "PPP")
                                                 : "From date"}
                                         </span>
                                     </Button>
@@ -156,17 +157,17 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={filters.created_at?.start ? new Date(filters.created_at.start) : undefined}
+                                        selected={filters.started_at?.start ? new Date(filters.started_at.start) : undefined}
                                         onSelect={(date) => handleDateChange('start', date ?? null)}
                                         initialFocus
                                     />
-                                    {filters.created_at?.start && (
+                                    {filters.started_at?.start && (
                                         <div className="border-t p-3">
                                             <Input
                                                 type="time"
-                                                value={format(new Date(filters.created_at.start), "HH:mm")}
+                                                value={format(new Date(filters.started_at.start), "HH:mm")}
                                                 onChange={(e) => {
-                                                    const date = filters.created_at?.start ? new Date(filters.created_at.start) : new Date();
+                                                    const date = filters.started_at?.start ? new Date(filters.started_at.start) : new Date();
                                                     const [hours, minutes] = e.target.value.split(':');
                                                     date.setHours(parseInt(hours), parseInt(minutes));
                                                     handleDateChange('start', date);
@@ -185,13 +186,13 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
                                         variant="outline"
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
-                                            !filters.created_at?.end && "text-muted-foreground"
+                                            !filters.started_at?.end && "text-muted-foreground"
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
                                         <span className="truncate">
-                                            {filters.created_at?.end
-                                                ? format(new Date(filters.created_at.end), "PPP")
+                                            {filters.started_at?.end
+                                                ? format(new Date(filters.started_at.end), "PPP")
                                                 : "To date"}
                                         </span>
                                     </Button>
@@ -199,17 +200,17 @@ export default function EntityFilters({ filters, onFilterChange }: EntityFilters
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={filters.created_at?.end ? new Date(filters.created_at.end) : undefined}
+                                        selected={filters.started_at?.end ? new Date(filters.started_at.end) : undefined}
                                         onSelect={(date) => handleDateChange('end', date ?? null)}
                                         initialFocus
                                     />
-                                    {filters.created_at?.end && (
+                                    {filters.started_at?.end && (
                                         <div className="border-t p-3">
                                             <Input
                                                 type="time"
-                                                value={format(new Date(filters.created_at.end), "HH:mm")}
+                                                value={format(new Date(filters.started_at.end), "HH:mm")}
                                                 onChange={(e) => {
-                                                    const date = filters.created_at?.end ? new Date(filters.created_at.end) : new Date();
+                                                    const date = filters.started_at?.end ? new Date(filters.started_at.end) : new Date();
                                                     const [hours, minutes] = e.target.value.split(':');
                                                     date.setHours(parseInt(hours), parseInt(minutes));
                                                     handleDateChange('end', date);

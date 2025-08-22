@@ -39,9 +39,13 @@ export default function Entities() {
         name: '',
         entity_type: '',
         role: '',
-        status: '',
+        entity_status: '',
         tag: '',
         created_at: {
+            start: undefined,
+            end: undefined
+        },
+        started_at: {
             start: undefined,
             end: undefined
         }
@@ -101,9 +105,9 @@ export default function Entities() {
             name: '',
             entity_type: '',
             role: '',
-            status: '',
+            entity_status: '',
             tag: '',
-            created_at: {
+            started_at: {
                 start: undefined,
                 end: undefined
             }

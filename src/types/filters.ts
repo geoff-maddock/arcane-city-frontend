@@ -2,9 +2,10 @@ export interface EntityFilters {
     name: string;
     entity_type: string;
     role: string;
-    status: string;
+    entity_status: string;
     tag: string;
     created_at?: DateRange;
+    started_at?: DateRange;
 }
 
 export interface EventFilters {
