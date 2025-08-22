@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTags } from '../hooks/useTags';
 import TagFilters from './TagFilters';
 import { Pagination } from './Pagination';
@@ -46,6 +46,11 @@ export default function Tags() {
         sort,
         direction,
     });
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [filters]);
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);

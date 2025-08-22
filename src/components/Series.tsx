@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSeries } from '../hooks/useSeries';
 import SeriesCard from './SeriesCard';
 import SeriesFilter from './SeriesFilters';
@@ -62,6 +62,11 @@ export default function Series() {
         sort,
         direction
     });
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [filters]);
 
     const handleRemoveFilter = (key: keyof SeriesFilters) => {
         setFilters(prev => {
