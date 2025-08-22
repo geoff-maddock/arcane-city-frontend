@@ -41,7 +41,7 @@ export function Pagination({
 }: PaginationProps) {
 
     return (
-        <div className="flex flex-col gap-4 md:gap-0 border-t py-3 md:px-6">
+        <div className="flex flex-col gap-4 md:gap-0 border-t py-3 md:px-6 !mt-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center justify-between md:justify-start gap-4">
 
