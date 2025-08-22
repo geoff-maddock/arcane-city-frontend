@@ -63,7 +63,7 @@ const Radar: React.FC = () => {
                     {loadingAttending ? (
                         <div className="text-center py-8">Loading your events...</div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
                             {attendingEvents?.map((event, index) => (
                                 <EventCardCondensed
                                     key={event.id}
@@ -93,7 +93,7 @@ const Radar: React.FC = () => {
                     {loadingRecommended ? (
                         <div className="text-center py-8">Finding recommendations...</div>
                     ) : hasRecommendedEvents ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
                             {recommendedEvents?.map((event, index) => (
                                 <EventCardCondensed
                                     key={event.id}
@@ -159,7 +159,7 @@ const Radar: React.FC = () => {
                 {loadingRecent ? (
                     <div className="text-center py-8">Loading recent events...</div>
                 ) : recentEvents.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
                         {recentEvents.map((event, index) => (
                             <EventCardCondensed
                                 key={event.id}

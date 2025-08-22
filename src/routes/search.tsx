@@ -309,7 +309,7 @@ const Search: React.FC = () => {
             {eventCount ? (
               <section id="events">
                 <h2 className="text-2xl font-semibold mb-4">Events ({eventCount} of {eventTotal})</h2>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {events.map((ev) => (
                     <EventCardCondensed
                       key={ev.id}
@@ -330,7 +330,7 @@ const Search: React.FC = () => {
             {entityCount ? (
               <section id="entities">
                 <h2 className="text-2xl font-semibold mb-4">Entities ({entityCount} of {entityTotal})</h2>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {entityResults.map((en) => (
                     <EntityCardCondensed
                       key={en.id}
@@ -351,7 +351,7 @@ const Search: React.FC = () => {
             {seriesCount ? (
               <section id="series">
                 <h2 className="text-2xl font-semibold mb-4">Series ({seriesCount} of {seriesTotal})</h2>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {seriesResults.map((se) => (
                     <SeriesCardCondensed
                       key={se.id}
