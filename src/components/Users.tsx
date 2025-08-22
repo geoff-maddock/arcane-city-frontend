@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUsers } from '../hooks/useUsers';
 import UserFilters from './UserFilters';
 import UserCard from './UserCard';
@@ -34,6 +34,11 @@ export default function Users() {
         sort,
         direction,
     });
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [filters]);
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);

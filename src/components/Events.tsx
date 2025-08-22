@@ -81,6 +81,11 @@ export default function Events() {
         direction
     });
 
+    // Reset pagination when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [filters]);
+
     const handleRemoveFilter = (key: keyof EventFilters) => {
         setFilters(prev => {
             if (key === 'start_at') {

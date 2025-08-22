@@ -76,6 +76,11 @@ export default function Entities() {
         direction
     });
 
+    // Reset pagination when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [filters]);
+
     const handleRemoveFilter = (key: keyof EntityFilters) => {
         setFilters(prev => {
             if (key === 'created_at') {
