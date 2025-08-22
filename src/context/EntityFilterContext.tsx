@@ -11,9 +11,9 @@ export const EntityFilterContext = createContext<EntityFilterContextProps>({
         name: '',
         entity_type: '',
         role: '',
-        status: '',
+        entity_status: '',
         tag: '',
-        created_at: {
+        started_at: {
             start: '',
             end: undefined
         }

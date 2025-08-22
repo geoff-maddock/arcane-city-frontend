@@ -13,10 +13,10 @@ interface EntityFilters {
     entity_type?: string;
     role?: string;
     tag?: string;
-    status?: string;
+    entity_status?: string;
     description?: string;
     created_at?: DateRange;
-    start_at?: DateRange;
+    started_at?: DateRange;
 }
 
 interface UseEntitiesParams {
@@ -39,12 +39,12 @@ export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name
             if (filters?.entity_type) params.append('filters[entity_type]', filters.entity_type);
             if (filters?.role) params.append('filters[role]', filters.role);
             if (filters?.tag) params.append('filters[tag]', toKebabCase(filters.tag));
-            if (filters?.status) params.append('filters[status]', filters.status);
+            if (filters?.entity_status) params.append('filters[entity_status]', filters.entity_status);
             if (filters?.description) params.append('filters[description]', filters.description);
             if (filters?.created_at?.start) params.append('filters[created_at][start]', filters.created_at.start);
             if (filters?.created_at?.end) params.append('filters[created_at][end]', filters.created_at.end);
-            if (filters?.start_at?.start) params.append('filters[start_at][start]', filters.start_at.start);
-            if (filters?.start_at?.end) params.append('filters[start_at][end]', filters.start_at.end);
+            if (filters?.started_at?.start) params.append('filters[started_at][start]', filters.started_at.start);
+            if (filters?.started_at?.end) params.append('filters[started_at][end]', filters.started_at.end);
             if (sort) params.append('sort', sort);
             if (direction) params.append('direction', direction);
 
