@@ -215,10 +215,10 @@ export default function EventDetail({ slug }: { slug: string }) {
                         <div className="space-y-6">
                             <div>
                                 <div className="flex items-start justify-between">
-                                    <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
+                                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">{event.name}</h1>
                                     <div className="flex items-center gap-2">
                                         {user && (
-                                            <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'}>
+                                            <button onClick={handleAttendToggle} aria-label={attending ? 'Unattend' : 'Attend'} className="p-2 rounded-md hover:bg-gray-100">
                                                 <Star
                                                     className={`h-6 w-6 ${attending ? 'text-yellow-500' : 'text-gray-400'}`}
                                                     fill={attending ? 'currentColor' : 'none'}
@@ -361,6 +361,8 @@ export default function EventDetail({ slug }: { slug: string }) {
                                     src={event.primary_photo || placeHolderImage}
                                     alt={event.name}
                                     className="object-cover w-full h-full"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
 

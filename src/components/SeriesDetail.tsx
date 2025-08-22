@@ -151,10 +151,10 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                         <div className="space-y-6">
                             <div>
                                 <div className="flex items-start justify-between">
-                                    <h1 className="text-4xl font-bold text-gray-900 mb-4">{series.name}</h1>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">{series.name}</h1>
                                     {user && (
                                         <div className="flex items-center gap-2">
-                                            <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'}>
+                        <button onClick={handleFollowToggle} aria-label={following ? 'Unfollow' : 'Follow'} className="p-2 rounded-md hover:bg-gray-100">
                                                 <Star className={`h-5 w-5 ${following ? 'text-yellow-500' : 'text-gray-400'}`} fill={following ? 'currentColor' : 'none'} />
                                             </button>
                                             {user.id === series.created_by && (
@@ -243,6 +243,8 @@ export default function SeriesDetail({ slug }: { slug: string }) {
                                     src={series.primary_photo || placeHolderImage}
                                     alt={series.name}
                                     className="object-cover w-full h-full"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
 
