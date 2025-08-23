@@ -1,6 +1,5 @@
 import { useBlogs } from '../hooks/useBlogs';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatDateTime } from '../lib/utils';
 import { sanitizeHTML } from '../lib/sanitize';
@@ -10,8 +9,8 @@ export default function Blogs() {
 
     if (error) {
         return (
-            <div className="bg-background text-foreground min-h-screen p-4">
-                <div className="mx-auto px-6 py-8 max-w-[2400px]">
+            <div className="min-h-[calc(100vh-4rem)] xl:min-h-screen w-full bg-white dark:bg-black transition-colors">
+                <div className="max-w-3xl mx-auto p-6 xl:p-8 space-y-6">
                     <Alert variant="destructive">
                         <AlertDescription>
                             There was an error loading blogs. Please try again later.
@@ -31,33 +30,27 @@ export default function Blogs() {
     }
 
     return (
-        <div className="bg-background text-foreground min-h-screen p-4">
-            <div className="mx-auto px-6 py-8 max-w-[2400px] space-y-8">
-                <div className="flex flex-col space-y-2">
-                    <h1 className="text-4xl font-bold tracking-tight text-gray-900">Blogs</h1>
-                    <p className="text-lg text-gray-500">Latest posts</p>
-                </div>
-
+        <div className="min-h-[calc(100vh-4rem)] xl:min-h-screen w-full bg-white dark:bg-black transition-colors">
+            <div className="max-w-3xl mx-auto p-6 xl:p-8 space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight">Blogs</h1>
+                
                 {data?.data && data.data.length > 0 ? (
                     data.data.map((blog) => (
-                        <Card key={blog.id} className="border-gray-100">
-                            <CardContent className="prose max-w-none p-6">
-                                <h2 className="mb-2">{blog.name}</h2>
-                                <p className="text-sm text-gray-500 mb-4">{formatDateTime(blog.created_at)}</p>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: sanitizeHTML(blog.body ? blog.body.replace(/\n/g, '<br />') : ''),
-                                    }}
-                                />
-                            </CardContent>
-                        </Card>
+                        <div key={blog.id} className="space-y-4">
+                            <h2 className="text-2xl font-semibold">{blog.name}</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{formatDateTime(blog.created_at)}</p>
+                            <div
+                                className="prose dark:prose-invert max-w-none"
+                                dangerouslySetInnerHTML={{
+                                    __html: sanitizeHTML(blog.body ? blog.body.replace(/\n/g, '<br />') : ''),
+                                }}
+                            />
+                        </div>
                     ))
                 ) : (
-                    <Card className="border-gray-100">
-                        <CardContent className="flex h-96 items-center justify-center text-gray-500">
-                            No blogs found.
-                        </CardContent>
-                    </Card>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-12">
+                        No blogs found.
+                    </p>
                 )}
             </div>
         </div>
