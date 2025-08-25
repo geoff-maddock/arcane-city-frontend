@@ -4,11 +4,12 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
+  'g-recaptcha-response'?: string | null;
 }
 
 export const userService = {
   async createUser(payload: CreateUserRequest) {
-    const { data } = await api.post('/users', payload);
+    const { data } = await api.post('/register', payload);
     return data;
   },
   async sendPasswordResetEmail(email: string) {

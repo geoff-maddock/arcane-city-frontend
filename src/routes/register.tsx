@@ -7,12 +7,14 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { formatApiError } from '../lib/utils';
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface FieldErrors {
   name?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
+  recaptcha?: string;
   general?: string;
 }
 
@@ -43,7 +45,19 @@ const Register: React.FC = () => {
     if (password !== confirmPassword) {
       validationErrors.confirmPassword = 'Passwords do not match';
     }
+    // reCAPTCHA must be completed
+    if (!recaptchaToken) {
+      validationErrors.recaptcha = 'Please complete the reCAPTCHA';
+    }
     return validationErrors;
+  };
+
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+
+  const handleRecaptchaChange = (value: string | null) => {
+    setRecaptchaToken(value);
+    // Clear any existing recaptcha error once user completes it
+    setErrors((prev) => ({ ...prev, recaptcha: undefined }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +69,8 @@ const Register: React.FC = () => {
     }
     setErrors({});
     try {
-      await userService.createUser({ name, email, password });
+      // Note: If backend expects recaptchaToken, extend the payload accordingly.
+      await userService.createUser({ name, email, password, 'g-recaptcha-response': recaptchaToken });
       navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
@@ -97,6 +112,12 @@ const Register: React.FC = () => {
             <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword}</div>}
           </div>
+          <ReCAPTCHA
+            sitekey={import.meta.env.VITE_RECAPTCHA_SITEKEY}
+            onChange={handleRecaptchaChange}
+            onExpired={() => setRecaptchaToken(null)}
+          />
+          {errors.recaptcha && <div className="text-red-500 text-sm">{errors.recaptcha}</div>}
           {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
           <Button type="submit" className="w-full">Register</Button>
         </form>
