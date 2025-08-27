@@ -56,7 +56,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center h-full p-4 ${className}`} onClick={handleMenuClick}>
+    <div className={`flex flex-col items-center h-full p-4 ${className}`} onClick={handleMenuClick}>
       <Link to="/" className="text-center mb-1">
         <h1 className=" xl:block text-2xl font-bold text-center hover:underline">Arcane City</h1>
         <p className=" xl:block text-xs text-gray-500 dark:text-gray-400 text-center">pittsburgh events guide</p>
@@ -81,7 +81,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
       </form>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
 
-      <nav className="flex flex-col gap-2 items-center">
+      <nav className="flex flex-col gap-2 items-start">
         {user && (
           <Link to="/radar" className="flex items-center gap-2 hover:underline">
             <HiCalendar />
@@ -176,7 +176,7 @@ const MenuBar: React.FC = () => {
   return (
     <>
       {/* Mobile Menu */}
-      <div className="xl:hidden fixed top-0 left-0 w-full p-4 flex items-center justify-between bg-background border-b">
+      <div className="xl:hidden fixed top-0 left-0 w-full p-4 flex items-center justify-between bg-background border-b z-50">
         <div className="flex items-center">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
