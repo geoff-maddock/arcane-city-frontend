@@ -11,6 +11,7 @@ import { useNavigate } from '@tanstack/react-router';
 import EventFilter from './EventFilters';
 import { useFilterToggle } from '../hooks/useFilterToggle';
 import { FilterContainer } from './FilterContainer';
+import { useDebounce } from '../hooks/useDebounce';
 
 
 const locales = {
@@ -52,11 +53,14 @@ const Calendar: React.FC = () => {
     is_benefit: undefined
   });
 
+  // Debounce the filters to avoid excessive API calls while user is typing
+  const debouncedFilters = useDebounce(filters, 300);
+
   const navigate = useNavigate();
 
   const { data: events, isLoading, isError } = useCalendarEvents({
     currentDate: date,
-    filters
+    filters: debouncedFilters
   });
 
   const formattedEvents = React.useMemo(() => {
@@ -72,9 +76,6 @@ const Calendar: React.FC = () => {
       resource: event
     }));
   }, [events]);
-
-  if (isLoading) return <div>Loading events...</div>;
-  if (isError) return <div>Error loading events</div>;
 
   const handleViewChange = (newView: View): void => {
     setView(newView);
@@ -150,6 +151,16 @@ const Calendar: React.FC = () => {
           onFilterChange={setFilters} 
         />
       </FilterContainer>
+      
+      {isLoading && (
+        <div className="text-center py-8">Loading events...</div>
+      )}
+      
+      {isError && (
+        <div className="text-center py-8 text-red-600">
+          Error loading events. The calendar interface is still available for testing filters.
+        </div>
+      )}
       
       <FullCalendar
         localizer={localizer}

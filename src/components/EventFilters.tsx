@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Calendar as CalendarIcon, Search, MapPin, Users, X, DollarSign } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -240,23 +241,20 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
 
                 {/* Benefit Event Filter */}
                 <div className="space-y-2">
-                    <Label htmlFor="is_benefit">Event Type</Label>
-                    <Select
-                        value={filters.is_benefit === undefined ? 'all' : filters.is_benefit.toString()}
-                        onValueChange={(value) => onFilterChange({ 
-                            ...filters, 
-                            is_benefit: value === 'all' ? undefined : value === 'true' 
-                        })}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="All events" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All events</SelectItem>
-                            <SelectItem value="true">Benefit events</SelectItem>
-                            <SelectItem value="false">Regular events</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <Label htmlFor="is_benefit">Benefit</Label>
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="is_benefit"
+                            checked={filters.is_benefit === true}
+                            onCheckedChange={(checked) => onFilterChange({ 
+                                ...filters, 
+                                is_benefit: checked ? true : undefined 
+                            })}
+                        />
+                        <Label htmlFor="is_benefit" className="text-sm text-gray-600">
+                            Show only benefit events
+                        </Label>
+                    </div>
                 </div>
 
 
