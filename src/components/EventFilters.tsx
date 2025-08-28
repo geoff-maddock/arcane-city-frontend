@@ -33,7 +33,7 @@ interface EventFiltersProps {
         door_price_min?: string;
         door_price_max?: string;
         min_age?: string;
-        is_benefit?: boolean;
+        is_benefit?: string;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
@@ -245,10 +245,10 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     <div className="flex items-center space-x-2">
                         <Switch
                             id="is_benefit"
-                            checked={filters.is_benefit === true}
-                            onCheckedChange={(checked) => onFilterChange({ 
-                                ...filters, 
-                                is_benefit: checked ? true : undefined 
+                            checked={filters.is_benefit === "1"}
+                            onCheckedChange={(checked) => onFilterChange({
+                                ...filters,
+                                is_benefit: checked ? "1" : undefined
                             })}
                         />
                         <Label htmlFor="is_benefit" className="text-sm text-gray-600">

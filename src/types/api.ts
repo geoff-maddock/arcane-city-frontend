@@ -50,7 +50,7 @@ export interface UseEventsParams {
         door_price_min?: string;
         door_price_max?: string;
         min_age?: string;
-        is_benefit?: boolean;
+        is_benefit?: string;
         created_at?: {
             start?: string;
             end?: string;

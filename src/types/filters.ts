@@ -21,7 +21,7 @@ export interface EventFilters {
     door_price_min?: string;
     door_price_max?: string;
     min_age?: string;
-    is_benefit?: boolean;
+    is_benefit?: string;
 }
 
 interface DateRange {
@@ -43,7 +43,7 @@ export interface EventFiltersProps {
         door_price_min?: string;
         door_price_max?: string;
         min_age?: string;
-        is_benefit?: boolean;
+        is_benefit?: string;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
