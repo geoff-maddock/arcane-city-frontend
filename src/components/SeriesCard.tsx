@@ -160,17 +160,23 @@ const SeriesCard = ({ series, allImages, imageIndex }: SeriesCardProps) => {
               )}
 
               <div className="flex items-center text-sm text-gray-500">
-                {series.next_start_at ? (
+                {series.next_start_at && series.occurrence_type && series.occurrence_type.name !== 'No Schedule' ? (
                   <>
                     <CalendarDays className="mr-2 h-5 w-5" />
                     <span>{formatDate(series.next_start_at)}</span>
                   </>
-                ) : (
+                ) : series.next_event && series.occurrence_type && series.occurrence_type.name === 'No Schedule' ? (
                   <>
                     <CalendarDays className="mr-2 h-5 w-5" />
-                    <span>No upcoming events scheduled</span>
+                    <span>{formatDate(series.next_event.start_at)}</span>
                   </>
-                )}
+                ) :
+                  (
+                    <>
+                      <CalendarDays className="mr-2 h-5 w-5" />
+                      <span>No upcoming events scheduled</span>
+                    </>
+                  )}
               </div>
 
               {series.venue && (

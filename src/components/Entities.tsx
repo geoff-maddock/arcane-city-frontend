@@ -70,7 +70,7 @@ export default function Entities() {
     // Replace useState with useLocalStorage
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('entitiesPerPage', 25);
     const [sort, setSort] = useState('created_at');
-    const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
+    const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
 
     const { data, isLoading, error } = useEntities({
         filters,
