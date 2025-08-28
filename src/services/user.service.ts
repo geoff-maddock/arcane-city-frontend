@@ -4,6 +4,7 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
+  recaptchaToken?: string;
 }
 
 export const userService = {
