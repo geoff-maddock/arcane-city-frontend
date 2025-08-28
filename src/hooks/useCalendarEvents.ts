@@ -34,6 +34,12 @@ export const useCalendarEvents = ({ currentDate, filters }: UseCalendarEventsPar
             if (filters?.tag) params.append('filters[tag]', toKebabCase(filters.tag));
             if (filters?.entity) params.append('filters[related]', filters.entity);
             if (filters?.event_type) params.append('filters[event_type]', toKebabCase(filters.event_type));
+            if (filters?.presale_price_min) params.append('filters[presale_price][min]', filters.presale_price_min);
+            if (filters?.presale_price_max) params.append('filters[presale_price][max]', filters.presale_price_max);
+            if (filters?.door_price_min) params.append('filters[door_price][min]', filters.door_price_min);
+            if (filters?.door_price_max) params.append('filters[door_price][max]', filters.door_price_max);
+            if (filters?.min_age) params.append('filters[min_age]', filters.min_age);
+            if (filters?.is_benefit !== undefined) params.append('filters[is_benefit]', filters.is_benefit.toString());
 
             // Sort by start date
             params.append('sort', 'start_at');

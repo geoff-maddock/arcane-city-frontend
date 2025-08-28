@@ -6,7 +6,11 @@ import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { Event } from '../types/api';
+import { EventFilters } from '../types/filters';
 import { useNavigate } from '@tanstack/react-router';
+import EventFilter from './EventFilters';
+import { useFilterToggle } from '../hooks/useFilterToggle';
+import { FilterContainer } from './FilterContainer';
 
 
 const locales = {
@@ -31,11 +35,28 @@ interface CalendarEvent {
 const Calendar: React.FC = () => {
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
+  const { filtersVisible, toggleFilters } = useFilterToggle();
+
+  const [filters, setFilters] = useState<EventFilters>({
+    name: '',
+    venue: '',
+    promoter: '',
+    entity: '',
+    event_type: '',
+    tag: '',
+    presale_price_min: '',
+    presale_price_max: '',
+    door_price_min: '',
+    door_price_max: '',
+    min_age: '',
+    is_benefit: undefined
+  });
 
   const navigate = useNavigate();
 
   const { data: events, isLoading, isError } = useCalendarEvents({
-    currentDate: date
+    currentDate: date,
+    filters
   });
 
   const formattedEvents = React.useMemo(() => {
@@ -88,8 +109,48 @@ const Calendar: React.FC = () => {
   };
 
 
+  const hasActiveFilters = Boolean(
+    filters.name || 
+    filters.venue || 
+    filters.promoter || 
+    filters.entity || 
+    filters.event_type || 
+    filters.tag ||
+    filters.presale_price_min ||
+    filters.presale_price_max ||
+    filters.door_price_min ||
+    filters.door_price_max ||
+    filters.min_age ||
+    filters.is_benefit !== undefined
+  );
+
   return (
     <div className="calendar-container p-4">
+      <FilterContainer
+        filtersVisible={filtersVisible}
+        onToggleFilters={toggleFilters}
+        hasActiveFilters={hasActiveFilters}
+        onClearAllFilters={() => setFilters({
+          name: '',
+          venue: '',
+          promoter: '',
+          entity: '',
+          event_type: '',
+          tag: '',
+          presale_price_min: '',
+          presale_price_max: '',
+          door_price_min: '',
+          door_price_max: '',
+          min_age: '',
+          is_benefit: undefined
+        })}
+      >
+        <EventFilter 
+          filters={filters} 
+          onFilterChange={setFilters} 
+        />
+      </FilterContainer>
+      
       <FullCalendar
         localizer={localizer}
         events={formattedEvents}

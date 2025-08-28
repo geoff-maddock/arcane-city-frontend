@@ -45,6 +45,12 @@ export interface UseEventsParams {
         tag?: string;
         series?: string;
         description?: string;
+        presale_price_min?: string;
+        presale_price_max?: string;
+        door_price_min?: string;
+        door_price_max?: string;
+        min_age?: string;
+        is_benefit?: boolean;
         created_at?: {
             start?: string;
             end?: string;

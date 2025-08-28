@@ -2,7 +2,8 @@ import { endOfWeek, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay,
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon, Search, MapPin, Users, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar as CalendarIcon, Search, MapPin, Users, X, DollarSign } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import {
     Popover,
@@ -26,6 +27,12 @@ interface EventFiltersProps {
         entity: string;
         tag: string;
         start_at?: DateRange;
+        presale_price_min?: string;
+        presale_price_max?: string;
+        door_price_min?: string;
+        door_price_max?: string;
+        min_age?: string;
+        is_benefit?: boolean;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
@@ -91,7 +98,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 <div className="space-y-2">
                     <Label htmlFor="name">Event Name</Label>
                     <div className="relative">
@@ -147,6 +154,109 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             onChange={(e) => onFilterChange({ ...filters, tag: e.target.value })}
                         />
                     </div>
+                </div>
+
+                {/* Price Range Filters */}
+                <div className="space-y-2">
+                    <Label htmlFor="presale_price_min">Presale Price</Label>
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Input
+                                id="presale_price_min"
+                                placeholder="Min"
+                                type="number"
+                                step="0.01"
+                                className="pl-9"
+                                value={filters.presale_price_min || ''}
+                                onChange={(e) => onFilterChange({ ...filters, presale_price_min: e.target.value })}
+                            />
+                        </div>
+                        <div className="relative flex-1">
+                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Input
+                                id="presale_price_max"
+                                placeholder="Max"
+                                type="number"
+                                step="0.01"
+                                className="pl-9"
+                                value={filters.presale_price_max || ''}
+                                onChange={(e) => onFilterChange({ ...filters, presale_price_max: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="door_price_min">Door Price</Label>
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Input
+                                id="door_price_min"
+                                placeholder="Min"
+                                type="number"
+                                step="0.01"
+                                className="pl-9"
+                                value={filters.door_price_min || ''}
+                                onChange={(e) => onFilterChange({ ...filters, door_price_min: e.target.value })}
+                            />
+                        </div>
+                        <div className="relative flex-1">
+                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Input
+                                id="door_price_max"
+                                placeholder="Max"
+                                type="number"
+                                step="0.01"
+                                className="pl-9"
+                                value={filters.door_price_max || ''}
+                                onChange={(e) => onFilterChange({ ...filters, door_price_max: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Age Restriction Filter */}
+                <div className="space-y-2">
+                    <Label htmlFor="min_age">Age Restriction</Label>
+                    <Select
+                        value={filters.min_age || 'all'}
+                        onValueChange={(value) => onFilterChange({ ...filters, min_age: value === 'all' ? '' : value })}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Any age" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Any age</SelectItem>
+                            <SelectItem value="0">All Ages</SelectItem>
+                            <SelectItem value="13">13+</SelectItem>
+                            <SelectItem value="16">16+</SelectItem>
+                            <SelectItem value="18">18+</SelectItem>
+                            <SelectItem value="21">21+</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Benefit Event Filter */}
+                <div className="space-y-2">
+                    <Label htmlFor="is_benefit">Event Type</Label>
+                    <Select
+                        value={filters.is_benefit === undefined ? 'all' : filters.is_benefit.toString()}
+                        onValueChange={(value) => onFilterChange({ 
+                            ...filters, 
+                            is_benefit: value === 'all' ? undefined : value === 'true' 
+                        })}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="All events" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All events</SelectItem>
+                            <SelectItem value="true">Benefit events</SelectItem>
+                            <SelectItem value="false">Regular events</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
 

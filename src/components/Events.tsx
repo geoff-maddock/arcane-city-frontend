@@ -53,7 +53,13 @@ export default function Events() {
         start_at: {
             start: getTodayStart(),
             end: undefined
-        }
+        },
+        presale_price_min: '',
+        presale_price_max: '',
+        door_price_min: '',
+        door_price_max: '',
+        min_age: '',
+        is_benefit: undefined
     });
 
     useEffect(() => {
