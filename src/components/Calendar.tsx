@@ -45,8 +45,6 @@ const Calendar: React.FC = () => {
     entity: '',
     event_type: '',
     tag: '',
-    presale_price_min: '',
-    presale_price_max: '',
     door_price_min: '',
     door_price_max: '',
     min_age: '',
@@ -111,14 +109,12 @@ const Calendar: React.FC = () => {
 
 
   const hasActiveFilters = Boolean(
-    filters.name || 
-    filters.venue || 
-    filters.promoter || 
-    filters.entity || 
-    filters.event_type || 
+    filters.name ||
+    filters.venue ||
+    filters.promoter ||
+    filters.entity ||
+    filters.event_type ||
     filters.tag ||
-    filters.presale_price_min ||
-    filters.presale_price_max ||
     filters.door_price_min ||
     filters.door_price_max ||
     filters.min_age ||
@@ -138,30 +134,28 @@ const Calendar: React.FC = () => {
           entity: '',
           event_type: '',
           tag: '',
-          presale_price_min: '',
-          presale_price_max: '',
           door_price_min: '',
           door_price_max: '',
           min_age: '',
           is_benefit: undefined
         })}
       >
-        <EventFilter 
-          filters={filters} 
-          onFilterChange={setFilters} 
+        <EventFilter
+          filters={filters}
+          onFilterChange={setFilters}
         />
       </FilterContainer>
-      
+
       {isLoading && (
         <div className="text-center py-8">Loading events...</div>
       )}
-      
+
       {isError && (
         <div className="text-center py-8 text-red-600">
           Error loading events. The calendar interface is still available for testing filters.
         </div>
       )}
-      
+
       <FullCalendar
         localizer={localizer}
         events={formattedEvents}
@@ -173,7 +167,9 @@ const Calendar: React.FC = () => {
         onNavigate={handleDateChange}
         onSelectEvent={handleSelectEvent}
         eventPropGetter={eventStyleGetter}
-        style={{ height: 800 }}
+        popup
+        popupOffset={{ x: 10, y: 10 }}
+        style={{ height: 'calc(100vh - 120px)' }}
       />
     </div>
   );

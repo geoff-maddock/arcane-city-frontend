@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import animate from "tailwindcss-animate"
+import plugin from "tailwindcss/plugin"
 
 export default {
 	darkMode: ["class"],
@@ -77,5 +78,17 @@ export default {
 			},
 		},
 	},
-	plugins: [animate],
+	plugins: [
+		animate,
+		// Style the react-big-calendar toolbar label (Month Year) globally
+		plugin(({ addComponents }) => {
+			addComponents({
+				".calendar-container .rbc-toolbar .rbc-toolbar-label": {
+					fontSize: "1.5rem", // ~text-2xl
+					fontWeight: "700",
+					lineHeight: "1.2",
+				},
+			});
+		}),
+	],
 }
