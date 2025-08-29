@@ -6,7 +6,12 @@ import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { Event } from '../types/api';
+import { EventFilters } from '../types/filters';
 import { useNavigate } from '@tanstack/react-router';
+import EventFilter from './EventFilters';
+import { useFilterToggle } from '../hooks/useFilterToggle';
+import { FilterContainer } from './FilterContainer';
+import { useDebounce } from '../hooks/useDebounce';
 
 
 const locales = {
@@ -31,11 +36,29 @@ interface CalendarEvent {
 const Calendar: React.FC = () => {
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
+  const { filtersVisible, toggleFilters } = useFilterToggle();
+
+  const [filters, setFilters] = useState<EventFilters>({
+    name: '',
+    venue: '',
+    promoter: '',
+    entity: '',
+    event_type: '',
+    tag: '',
+    door_price_min: '',
+    door_price_max: '',
+    min_age: '',
+    is_benefit: undefined
+  });
+
+  // Debounce the filters to avoid excessive API calls while user is typing
+  const debouncedFilters = useDebounce(filters, 300);
 
   const navigate = useNavigate();
 
   const { data: events, isLoading, isError } = useCalendarEvents({
-    currentDate: date
+    currentDate: date,
+    filters: debouncedFilters
   });
 
   const formattedEvents = React.useMemo(() => {
@@ -51,9 +74,6 @@ const Calendar: React.FC = () => {
       resource: event
     }));
   }, [events]);
-
-  if (isLoading) return <div>Loading events...</div>;
-  if (isError) return <div>Error loading events</div>;
 
   const handleViewChange = (newView: View): void => {
     setView(newView);
@@ -88,8 +108,54 @@ const Calendar: React.FC = () => {
   };
 
 
+  const hasActiveFilters = Boolean(
+    filters.name ||
+    filters.venue ||
+    filters.promoter ||
+    filters.entity ||
+    filters.event_type ||
+    filters.tag ||
+    filters.door_price_min ||
+    filters.door_price_max ||
+    filters.min_age ||
+    filters.is_benefit !== undefined
+  );
+
   return (
     <div className="calendar-container p-4">
+      <FilterContainer
+        filtersVisible={filtersVisible}
+        onToggleFilters={toggleFilters}
+        hasActiveFilters={hasActiveFilters}
+        onClearAllFilters={() => setFilters({
+          name: '',
+          venue: '',
+          promoter: '',
+          entity: '',
+          event_type: '',
+          tag: '',
+          door_price_min: '',
+          door_price_max: '',
+          min_age: '',
+          is_benefit: undefined
+        })}
+      >
+        <EventFilter
+          filters={filters}
+          onFilterChange={setFilters}
+        />
+      </FilterContainer>
+
+      {isLoading && (
+        <div className="text-center py-8">Loading events...</div>
+      )}
+
+      {isError && (
+        <div className="text-center py-8 text-red-600">
+          Error loading events. The calendar interface is still available for testing filters.
+        </div>
+      )}
+
       <FullCalendar
         localizer={localizer}
         events={formattedEvents}
@@ -101,7 +167,9 @@ const Calendar: React.FC = () => {
         onNavigate={handleDateChange}
         onSelectEvent={handleSelectEvent}
         eventPropGetter={eventStyleGetter}
-        style={{ height: 800 }}
+        popup
+        popupOffset={{ x: 10, y: 10 }}
+        style={{ height: 'calc(100vh - 120px)' }}
       />
     </div>
   );

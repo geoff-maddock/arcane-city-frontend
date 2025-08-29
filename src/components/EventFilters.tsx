@@ -2,7 +2,9 @@ import { endOfWeek, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay,
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon, Search, MapPin, Users, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Calendar as CalendarIcon, Search, MapPin, Users, X, DollarSign } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import {
     Popover,
@@ -26,6 +28,12 @@ interface EventFiltersProps {
         entity: string;
         tag: string;
         start_at?: DateRange;
+        presale_price_min?: string;
+        presale_price_max?: string;
+        door_price_min?: string;
+        door_price_max?: string;
+        min_age?: string;
+        is_benefit?: string;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
@@ -91,7 +99,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 <div className="space-y-2">
                     <Label htmlFor="name">Event Name</Label>
                     <div className="relative">
@@ -102,6 +110,34 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             className="pl-9"
                             value={filters.name}
                             onChange={(e) => onFilterChange({ ...filters, name: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="venue">Venue</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="venue"
+                            placeholder="Filter by venue..."
+                            className="pl-9"
+                            value={filters.venue}
+                            onChange={(e) => onFilterChange({ ...filters, venue: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="promoter">Promoter</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="promoter"
+                            placeholder="Filter by promoter..."
+                            className="pl-9"
+                            value={filters.promoter}
+                            onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
                         />
                     </div>
                 </div>
@@ -149,8 +185,77 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     </div>
                 </div>
 
-
                 <div className="space-y-2">
+                    <Label htmlFor="door_price_min">Door Price</Label>
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Input
+                                id="door_price_min"
+                                placeholder="Min"
+                                type="number"
+                                step="0.01"
+                                className="pl-9"
+                                value={filters.door_price_min || ''}
+                                onChange={(e) => onFilterChange({ ...filters, door_price_min: e.target.value })}
+                            />
+                        </div>
+                        <div className="relative flex-1">
+                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Input
+                                id="door_price_max"
+                                placeholder="Max"
+                                type="number"
+                                step="0.01"
+                                className="pl-9"
+                                value={filters.door_price_max || ''}
+                                onChange={(e) => onFilterChange({ ...filters, door_price_max: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Age Restriction Filter */}
+                <div className="space-y-2">
+                    <Label htmlFor="min_age">Age Restriction</Label>
+                    <Select
+                        value={filters.min_age || 'all'}
+                        onValueChange={(value) => onFilterChange({ ...filters, min_age: value === 'all' ? '' : value })}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Any age" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Any age</SelectItem>
+                            <SelectItem value="0">All Ages</SelectItem>
+                            <SelectItem value="13">13+</SelectItem>
+                            <SelectItem value="16">16+</SelectItem>
+                            <SelectItem value="18">18+</SelectItem>
+                            <SelectItem value="21">21+</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Benefit Event Filter */}
+                <div className="space-y-2">
+                    <Label htmlFor="is_benefit">Benefit</Label>
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="is_benefit"
+                            checked={filters.is_benefit === "1"}
+                            onCheckedChange={(checked) => onFilterChange({
+                                ...filters,
+                                is_benefit: checked ? "1" : undefined
+                            })}
+                        />
+                        <Label htmlFor="is_benefit" className="text-sm text-gray-600">
+                            Show only benefit events
+                        </Label>
+                    </div>
+                </div>
+
+
+                <div className="space-y-2 md:col-span-2">
                     <div className="h-6 flex items-center justify-between">
                         <Label>Date Range</Label>
                         {(filters.start_at?.start || filters.start_at?.end) && (

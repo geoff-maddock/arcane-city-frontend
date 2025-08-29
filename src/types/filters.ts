@@ -16,6 +16,12 @@ export interface EventFilters {
     event_type: string;
     tag: string;
     start_at?: DateRange;
+    presale_price_min?: string;
+    presale_price_max?: string;
+    door_price_min?: string;
+    door_price_max?: string;
+    min_age?: string;
+    is_benefit?: string;
 }
 
 interface DateRange {
@@ -32,8 +38,14 @@ export interface EventFiltersProps {
         entity: string;
         tag: string;
         start_at?: DateRange;
+        presale_price_min?: string;
+        presale_price_max?: string;
+        door_price_min?: string;
+        door_price_max?: string;
+        min_age?: string;
+        is_benefit?: string;
     };
-    onFilterChange: (filters: SeriesFiltersProps['filters']) => void;
+    onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
 
 export interface SeriesFilters {
