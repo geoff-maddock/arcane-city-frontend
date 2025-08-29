@@ -115,6 +115,34 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                 </div>
 
                 <div className="space-y-2">
+                    <Label htmlFor="venue">Venue</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="venue"
+                            placeholder="Filter by venue..."
+                            className="pl-9"
+                            value={filters.venue}
+                            onChange={(e) => onFilterChange({ ...filters, venue: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="promoter">Promoter</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="promoter"
+                            placeholder="Filter by promoter..."
+                            className="pl-9"
+                            value={filters.promoter}
+                            onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
                     <Label htmlFor="entity">Entity</Label>
                     <div className="relative">
                         <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -154,37 +182,6 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             value={filters.tag}
                             onChange={(e) => onFilterChange({ ...filters, tag: e.target.value })}
                         />
-                    </div>
-                </div>
-
-                {/* Price Range Filters */}
-                <div className="space-y-2">
-                    <Label htmlFor="presale_price_min">Presale Price</Label>
-                    <div className="flex gap-2">
-                        <div className="relative flex-1">
-                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                            <Input
-                                id="presale_price_min"
-                                placeholder="Min"
-                                type="number"
-                                step="0.01"
-                                className="pl-9"
-                                value={filters.presale_price_min || ''}
-                                onChange={(e) => onFilterChange({ ...filters, presale_price_min: e.target.value })}
-                            />
-                        </div>
-                        <div className="relative flex-1">
-                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                            <Input
-                                id="presale_price_max"
-                                placeholder="Max"
-                                type="number"
-                                step="0.01"
-                                className="pl-9"
-                                value={filters.presale_price_max || ''}
-                                onChange={(e) => onFilterChange({ ...filters, presale_price_max: e.target.value })}
-                            />
-                        </div>
                     </div>
                 </div>
 
@@ -258,7 +255,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                 </div>
 
 
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                     <div className="h-6 flex items-center justify-between">
                         <Label>Date Range</Label>
                         {(filters.start_at?.start || filters.start_at?.end) && (
