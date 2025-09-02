@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { api } from '../lib/api';
-import { MapPin, Star, Target } from 'lucide-react';
+import { MapPin, Star, Target, Music, Loader2 } from 'lucide-react';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { EntityTypeIcon } from './EntityTypeIcon';
@@ -10,6 +10,9 @@ import { SocialLinks } from './SocialLinks';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
+import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
+import { useMediaPlayerToggle } from '../hooks/useMediaPlayerToggle';
+import { sanitizeEmbed } from '../lib/sanitize';
 
 
 interface EntityCardProps {
@@ -20,6 +23,12 @@ interface EntityCardProps {
 
 const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const navigate = useNavigate();
+    const { mediaPlayersEnabled } = useMediaPlayerToggle();
+    const { embeds, loading: embedsLoading, error: embedsError } = useMinimalEmbeds({
+        resourceType: 'entities',
+        slug: entity.slug,
+        enabled: mediaPlayersEnabled
+    });
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
         queryFn: authService.getCurrentUser,
@@ -179,6 +188,44 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     {entity.tags.length > 0 && (
                         <div className="space-y-2">
                             <TagBadges tags={entity.tags} indexPath="/entities" />
+                        </div>
+                    )}
+                    
+                    {/* Slim Audio Embeds Section */}
+                    {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Music className="h-4 w-4" />
+                                <span className="font-medium">Audio</span>
+                            </div>
+                            <div className="space-y-2">
+                                {embeds.map((embed, index) => {
+                                    const safe = sanitizeEmbed(embed);
+                                    return (
+                                        <div key={index} className="rounded-md overflow-hidden bg-gray-50 dark:bg-gray-800">
+                                            <div
+                                                dangerouslySetInnerHTML={{ __html: safe }}
+                                                className="w-full [&_iframe]:max-h-20 [&_iframe]:min-h-20"
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Loading state for embeds */}
+                    {mediaPlayersEnabled && embedsLoading && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Loading audio...</span>
+                        </div>
+                    )}
+
+                    {/* Error state for embeds */}
+                    {mediaPlayersEnabled && embedsError && !embedsLoading && (
+                        <div className="text-red-500 text-xs">
+                            Error loading audio content.
                         </div>
                     )}
                 </div>
