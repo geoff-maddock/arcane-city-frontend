@@ -3,7 +3,7 @@ import { api } from '../lib/api';
 import { Event } from '../types/api';
 import { formatDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Loader2, Music, CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
+import { Loader2, CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
 import { AgeRestriction } from './AgeRestriction';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';

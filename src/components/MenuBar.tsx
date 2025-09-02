@@ -160,18 +160,20 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           </Button>
         </>
       )}
-      <Button onClick={toggleTheme} data-testid="theme-toggle" className="mb-2 flex items-center gap-2">
-        {theme === 'light' ? <HiMoon /> : <HiSun />}
-        <span className="hidden xl:inline">
-          Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
-        </span>
-      </Button>
-      <Button onClick={toggleMediaPlayers} data-testid="media-player-toggle" className="mt-auto flex items-center gap-2">
-        {mediaPlayersEnabled ? <HiVolumeUp /> : <HiVolumeOff />}
-        <span className="hidden xl:inline">
-          {mediaPlayersEnabled ? 'Disable' : 'Enable'} Media Players
-        </span>
-      </Button>
+      <div className="mt-auto w-full flex flex-col items-center gap-2">
+        <Button onClick={toggleTheme} data-testid="theme-toggle" className="flex items-center gap-2">
+          {theme === 'light' ? <HiMoon /> : <HiSun />}
+          <span className="hidden xl:inline">
+            Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
+          </span>
+        </Button>
+        <Button onClick={toggleMediaPlayers} data-testid="media-player-toggle" className="flex items-center gap-2">
+          {mediaPlayersEnabled ? <HiVolumeUp /> : <HiVolumeOff />}
+          <span className="hidden xl:inline">
+            {mediaPlayersEnabled ? 'Disable' : 'Enable'} Media Players
+          </span>
+        </Button>
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { api } from '../lib/api';
-import { MapPin, Star, Target, Music, Loader2 } from 'lucide-react';
+import { MapPin, Star, Target, Loader2 } from 'lucide-react';
 import { TagBadges } from './TagBadges';
 import { ImageLightbox } from './ImageLightbox';
 import { EntityTypeIcon } from './EntityTypeIcon';
@@ -194,10 +194,6 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     {/* Slim Audio Embeds Section */}
                     {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <Music className="h-4 w-4" />
-                                <span className="font-medium">Audio</span>
-                            </div>
                             <div className="space-y-2">
                                 {embeds.slice(0, 1).map((embed, index) => {
                                     const safe = sanitizeEmbed(embed);
