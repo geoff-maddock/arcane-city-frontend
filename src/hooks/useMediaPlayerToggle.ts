@@ -8,7 +8,7 @@ interface UseMediaPlayerToggleOptions {
     storageKey?: string;
     /**
      * The default enabled state when no stored value exists.
-     * Defaults to false to keep players disabled by default
+     * Defaults to true to keep players enabled by default
      */
     defaultEnabled?: boolean;
 }
@@ -21,7 +21,7 @@ interface UseMediaPlayerToggleOptions {
  * @returns An object containing the enabled state and toggle function
  */
 export function useMediaPlayerToggle(options: UseMediaPlayerToggleOptions = {}) {
-    const { storageKey = 'mediaPlayersEnabled', defaultEnabled = false } = options;
+    const { storageKey = 'mediaPlayersEnabled', defaultEnabled = true } = options;
 
     const [mediaPlayersEnabled, setMediaPlayersEnabled] = useState<boolean>(() => {
         try {

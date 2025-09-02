@@ -29,21 +29,21 @@ describe('useMediaPlayerToggle', () => {
         vi.clearAllMocks();
     });
 
-    it('should default to false when no stored value exists', () => {
+    it('should default to true when no stored value exists', () => {
         localStorageMock.getItem.mockReturnValue(null);
         
         const { result } = renderHook(() => useMediaPlayerToggle());
         
-        expect(result.current.mediaPlayersEnabled).toBe(false);
+        expect(result.current.mediaPlayersEnabled).toBe(true);
         expect(localStorageMock.getItem).toHaveBeenCalledWith('mediaPlayersEnabled');
     });
 
     it('should use custom default when provided', () => {
         localStorageMock.getItem.mockReturnValue(null);
         
-        const { result } = renderHook(() => useMediaPlayerToggle({ defaultEnabled: true }));
+        const { result } = renderHook(() => useMediaPlayerToggle({ defaultEnabled: false }));
         
-        expect(result.current.mediaPlayersEnabled).toBe(true);
+        expect(result.current.mediaPlayersEnabled).toBe(false);
     });
 
     it('should restore saved state from localStorage', () => {
@@ -59,14 +59,14 @@ describe('useMediaPlayerToggle', () => {
         
         const { result } = renderHook(() => useMediaPlayerToggle());
         
-        expect(result.current.mediaPlayersEnabled).toBe(false);
+        expect(result.current.mediaPlayersEnabled).toBe(true);
         
         act(() => {
             result.current.toggleMediaPlayers();
         });
         
-        expect(result.current.mediaPlayersEnabled).toBe(true);
-        expect(localStorageMock.setItem).toHaveBeenCalledWith('mediaPlayersEnabled', 'true');
+        expect(result.current.mediaPlayersEnabled).toBe(false);
+        expect(localStorageMock.setItem).toHaveBeenCalledWith('mediaPlayersEnabled', 'false');
     });
 
     it('should use custom storage key when provided', () => {
@@ -90,7 +90,7 @@ describe('useMediaPlayerToggle', () => {
         
         const { result } = renderHook(() => useMediaPlayerToggle());
         
-        expect(result.current.mediaPlayersEnabled).toBe(false);
+        expect(result.current.mediaPlayersEnabled).toBe(true);
         expect(consoleSpy).toHaveBeenCalledWith(
             'Failed to parse mediaPlayersEnabled from localStorage:',
             expect.any(Error)
