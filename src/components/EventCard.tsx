@@ -279,23 +279,19 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             />
 
             <TagBadges tags={event.tags} onClick={handleTagClick} />
-            
+
             {/* Slim Audio Embeds Section */}
             {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Music className="h-4 w-4" />
-                  <span className="font-medium">Audio</span>
-                </div>
                 <div className="space-y-2">
                   {embeds.slice(0, 1).map((embed, index) => {
                     const safe = sanitizeEmbed(embed);
                     const isSoundCloud = /player\.soundcloud\.com|w\.soundcloud\.com/i.test(embed);
                     return (
-                      <div key={index} className="rounded-md overflow-hidden bg-gray-50 dark:bg-gray-800">
+                      <div key={index} className="rounded-md bg-gray-50 dark:bg-gray-800">
                         <div
                           dangerouslySetInnerHTML={{ __html: safe }}
-                          className={`w-full ${!isSoundCloud ? '[&_iframe]:max-h-20 [&_iframe]:min-h-20' : ''}`}
+                          className={`w-full ${!isSoundCloud ? '[&_iframe]:max-h-20 [&_iframe]:min-h-10' : ''}`}
                         />
                       </div>
                     );

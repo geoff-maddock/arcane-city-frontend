@@ -190,7 +190,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                             <TagBadges tags={entity.tags} indexPath="/entities" />
                         </div>
                     )}
-                    
+
                     {/* Slim Audio Embeds Section */}
                     {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
                         <div className="space-y-2">
@@ -203,10 +203,10 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                                     const safe = sanitizeEmbed(embed);
                                     const isSoundCloud = /player\.soundcloud\.com|w\.soundcloud\.com/i.test(embed);
                                     return (
-                                        <div key={index} className="rounded-md overflow-hidden bg-gray-50 dark:bg-gray-800">
+                                        <div key={index} className="rounded-md bg-gray-50 dark:bg-gray-800">
                                             <div
                                                 dangerouslySetInnerHTML={{ __html: safe }}
-                                                className={`w-full ${!isSoundCloud ? '[&_iframe]:max-h-20 [&_iframe]:min-h-20' : ''}`}
+                                                className={`w-full ${!isSoundCloud ? '[&_iframe]:max-h-20 [&_iframe]:min-h-10' : ''}`}
                                             />
                                         </div>
                                     );
