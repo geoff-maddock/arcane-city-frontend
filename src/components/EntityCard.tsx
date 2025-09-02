@@ -192,7 +192,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     )}
 
                     {/* Slim Audio Embeds Section */}
-                    {embeds.length > 0 && !embedsLoading && (
+                    {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
                         <div className="space-y-2">
                             <div className="space-y-2">
                                 {embeds.slice(0, 1).map((embed, index) => {
@@ -212,7 +212,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     )}
 
                     {/* Loading state for embeds */}
-                    {embedsLoading && (
+                    {mediaPlayersEnabled && embedsLoading && (
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span>Loading audio...</span>
@@ -220,7 +220,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     )}
 
                     {/* Error state for embeds */}
-                    {embedsError && !embedsLoading && (
+                    {mediaPlayersEnabled && embedsError && !embedsLoading && (
                         <div className="text-red-500 text-xs">
                             Error loading audio content.
                         </div>
