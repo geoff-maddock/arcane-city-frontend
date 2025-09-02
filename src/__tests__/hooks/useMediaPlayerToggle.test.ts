@@ -33,7 +33,6 @@ describe('useMediaPlayerToggle', () => {
         localStorageMock.getItem.mockReturnValue(null);
 
         const { result } = renderHook(() => useMediaPlayerToggle());
-
         expect(result.current.mediaPlayersEnabled).toBe(true);
         expect(localStorageMock.getItem).toHaveBeenCalledWith('mediaPlayersEnabled');
     });
@@ -89,7 +88,6 @@ describe('useMediaPlayerToggle', () => {
         const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 
         const { result } = renderHook(() => useMediaPlayerToggle());
-
         expect(result.current.mediaPlayersEnabled).toBe(true);
         expect(consoleSpy).toHaveBeenCalledWith(
             'Failed to parse mediaPlayersEnabled from localStorage:',
