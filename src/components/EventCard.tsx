@@ -281,7 +281,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             <TagBadges tags={event.tags} onClick={handleTagClick} />
 
             {/* Slim Audio Embeds Section */}
-            {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
+            {embeds.length > 0 && !embedsLoading && (
               <div className="space-y-2">
                 <div className="space-y-2">
                   {embeds.slice(0, 1).map((embed, index) => {
@@ -301,7 +301,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             )}
 
             {/* Loading state for embeds */}
-            {mediaPlayersEnabled && embedsLoading && (
+            {embedsLoading && (
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Loading audio...</span>
@@ -309,7 +309,7 @@ const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
             )}
 
             {/* Error state for embeds */}
-            {mediaPlayersEnabled && embedsError && !embedsLoading && (
+            {embedsError && !embedsLoading && (
               <div className="text-red-500 text-xs">
                 Error loading audio content.
               </div>
