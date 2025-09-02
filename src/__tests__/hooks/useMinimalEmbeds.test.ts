@@ -10,7 +10,11 @@ vi.mock('../../lib/api', () => ({
     },
 }));
 
-const mockApi = vi.mocked(api);
+type MockedApi = {
+    get: ReturnType<typeof vi.fn>;
+};
+
+const mockApi = api as unknown as MockedApi;
 
 describe('useMinimalEmbeds', () => {
     beforeEach(() => {
