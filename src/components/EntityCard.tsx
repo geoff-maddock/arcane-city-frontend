@@ -11,7 +11,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
 import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
-import { useMediaPlayerToggle } from '../hooks/useMediaPlayerToggle';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 import { sanitizeEmbed } from '../lib/sanitize';
 
 
@@ -23,7 +23,7 @@ interface EntityCardProps {
 
 const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const navigate = useNavigate();
-    const { mediaPlayersEnabled } = useMediaPlayerToggle();
+    const { mediaPlayersEnabled } = useMediaPlayerContext();
     const { embeds, loading: embedsLoading, error: embedsError } = useMinimalEmbeds({
         resourceType: 'entities',
         slug: entity.slug,

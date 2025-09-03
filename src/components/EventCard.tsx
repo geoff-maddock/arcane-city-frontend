@@ -15,7 +15,7 @@ import { EventFilterContext } from '../context/EventFilterContext';
 import { useState, useEffect } from 'react';
 import { sanitizeEmbed } from '../lib/sanitize';
 import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
-import { useMediaPlayerToggle } from '../hooks/useMediaPlayerToggle';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 
 
 interface EventCardProps {
@@ -27,7 +27,7 @@ interface EventCardProps {
 const EventCard = ({ event, allImages, imageIndex }: EventCardProps) => {
   const navigate = useNavigate();
   const { setFilters } = useContext(EventFilterContext);
-  const { mediaPlayersEnabled } = useMediaPlayerToggle();
+  const { mediaPlayersEnabled } = useMediaPlayerContext();
   const { embeds, loading: embedsLoading, error: embedsError } = useMinimalEmbeds({
     resourceType: 'events',
     slug: event.slug,

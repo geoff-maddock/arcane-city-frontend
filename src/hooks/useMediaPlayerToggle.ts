@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 
 interface UseMediaPlayerToggleOptions {
     /**
@@ -17,13 +18,15 @@ interface UseMediaPlayerToggleOptions {
  * A reusable hook for managing media player visibility state with localStorage persistence.
  * This hook provides a global toggle for showing/hiding media players across the application.
  * 
+ * @deprecated Consider using useMediaPlayerContext directly instead for better global state synchronization
  * @param options Configuration options for the hook
  * @returns An object containing the enabled state and toggle function
  */
 export function useMediaPlayerToggle(options: UseMediaPlayerToggleOptions = {}) {
     const { storageKey = 'mediaPlayersEnabled', defaultEnabled = true } = options;
-
-    const [mediaPlayersEnabled, setMediaPlayersEnabled] = useState<boolean>(() => {
+    
+    // Always initialize local state
+    const [localMediaPlayersEnabled, setLocalMediaPlayersEnabled] = useState<boolean>(() => {
         try {
             const savedState = localStorage.getItem(storageKey);
             return savedState ? JSON.parse(savedState) : defaultEnabled;
@@ -35,19 +38,30 @@ export function useMediaPlayerToggle(options: UseMediaPlayerToggleOptions = {}) 
 
     useEffect(() => {
         try {
-            localStorage.setItem(storageKey, JSON.stringify(mediaPlayersEnabled));
+            localStorage.setItem(storageKey, JSON.stringify(localMediaPlayersEnabled));
         } catch (error) {
             console.warn(`Failed to save ${storageKey} to localStorage:`, error);
         }
-    }, [mediaPlayersEnabled, storageKey]);
+    }, [localMediaPlayersEnabled, storageKey]);
 
-    const toggleMediaPlayers = () => {
-        setMediaPlayersEnabled(prev => !prev);
+    const localToggleMediaPlayers = () => {
+        setLocalMediaPlayersEnabled(prev => !prev);
     };
 
-    return {
-        mediaPlayersEnabled,
-        setMediaPlayersEnabled,
-        toggleMediaPlayers
-    };
+    // Try to use context, fallback to local state
+    try {
+        const context = useMediaPlayerContext();
+        return {
+            mediaPlayersEnabled: context.mediaPlayersEnabled,
+            setMediaPlayersEnabled: context.setMediaPlayersEnabled,
+            toggleMediaPlayers: context.toggleMediaPlayers
+        };
+    } catch {
+        // Context not available, use local state
+        return {
+            mediaPlayersEnabled: localMediaPlayersEnabled,
+            setMediaPlayersEnabled: setLocalMediaPlayersEnabled,
+            toggleMediaPlayers: localToggleMediaPlayers
+        };
+    }
 }

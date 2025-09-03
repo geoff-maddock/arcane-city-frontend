@@ -3,7 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { useMediaPlayerToggle } from '../hooks/useMediaPlayerToggle';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff } from 'react-icons/hi';
@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
-  const { mediaPlayersEnabled, toggleMediaPlayers } = useMediaPlayerToggle();
+  const { mediaPlayersEnabled, toggleMediaPlayers } = useMediaPlayerContext();
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const { data: user } = useQuery({
