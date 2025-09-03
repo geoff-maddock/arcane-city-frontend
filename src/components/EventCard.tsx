@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { api } from '../lib/api';
 import { Event } from '../types/api';
-import { formatDate, formatEventDate } from '../lib/utils';
+import { formatEventDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Loader2, CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
 import { AgeRestriction } from './AgeRestriction';
