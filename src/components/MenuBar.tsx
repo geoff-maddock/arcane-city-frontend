@@ -3,13 +3,15 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+  const { mediaPlayersEnabled, toggleMediaPlayers } = useMediaPlayerContext();
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const { data: user } = useQuery({
@@ -158,12 +160,20 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           </Button>
         </>
       )}
-      <Button onClick={toggleTheme} data-testid="theme-toggle" className="mt-auto flex items-center gap-2">
-        {theme === 'light' ? <HiMoon /> : <HiSun />}
-        <span className="hidden xl:inline">
-          Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
-        </span>
-      </Button>
+      <div className="mt-auto w-full flex flex-col items-center gap-2">
+        <Button onClick={toggleTheme} data-testid="theme-toggle" className="flex items-center gap-2">
+          {theme === 'light' ? <HiMoon /> : <HiSun />}
+          <span className="hidden xl:inline">
+            Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
+          </span>
+        </Button>
+        <Button onClick={toggleMediaPlayers} data-testid="media-player-toggle" className="flex items-center gap-2">
+          {mediaPlayersEnabled ? <HiVolumeUp /> : <HiVolumeOff />}
+          <span className="hidden xl:inline">
+            {mediaPlayersEnabled ? 'Disable' : 'Enable'} Media Players
+          </span>
+        </Button>
+      </div>
     </div>
   );
 };

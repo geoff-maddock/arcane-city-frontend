@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { RouterProvider } from '@tanstack/react-router'
 import { router } from '../router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MediaPlayerProvider } from '../context/MediaPlayerContext'
 
 // Mock the components
 vi.mock('../components/Events', () => ({
@@ -27,7 +28,9 @@ describe('Router Configuration', () => {
     it('renders Events component at root path', async () => {
         render(
             <QueryClientProvider client={client}>
-                <RouterProvider router={router} />
+                <MediaPlayerProvider>
+                    <RouterProvider router={router} />
+                </MediaPlayerProvider>
             </QueryClientProvider>
         )
 
@@ -41,7 +44,9 @@ describe('Router Configuration', () => {
 
         render(
             <QueryClientProvider client={client}>
-                <RouterProvider router={router} />
+                <MediaPlayerProvider>
+                    <RouterProvider router={router} />
+                </MediaPlayerProvider>
             </QueryClientProvider>
         )
 
@@ -55,7 +60,9 @@ describe('Router Configuration', () => {
 
         render(
             <QueryClientProvider client={client}>
-                <RouterProvider router={router} />
+                <MediaPlayerProvider>
+                    <RouterProvider router={router} />
+                </MediaPlayerProvider>
             </QueryClientProvider>
         )
 
@@ -69,7 +76,9 @@ describe('Router Configuration', () => {
 
         render(
             <QueryClientProvider client={client}>
-                <RouterProvider router={router} />
+                <MediaPlayerProvider>
+                    <RouterProvider router={router} />
+                </MediaPlayerProvider>
             </QueryClientProvider>
         )
 
@@ -83,7 +92,9 @@ describe('Router Configuration', () => {
 
         render(
             <QueryClientProvider client={client}>
-                <RouterProvider router={router} />
+                <MediaPlayerProvider>
+                    <RouterProvider router={router} />
+                </MediaPlayerProvider>
             </QueryClientProvider>
         )
 

@@ -28,6 +28,12 @@ function postProcess(clean: string): string {
         frame.removeAttribute('onload');
         frame.removeAttribute('onerror');
         frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups');
+        
+        // Add special attributes for SoundCloud iframes
+        if (/player\.soundcloud\.com|w\.soundcloud\.com/i.test(src)) {
+            frame.setAttribute('allowfullscreen', '');
+            frame.setAttribute('seamless', '');
+        }
     }
     return container.innerHTML;
 }
@@ -37,7 +43,7 @@ export function sanitizeHTML(dirty: string): string {
     const clean = DOMPurify.sanitize(dirty, {
         USE_PROFILES: { html: true },
         ADD_TAGS: ['iframe'],
-        ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'],
+        ADD_ATTR: ['allow', 'allowfullscreen', 'seamless', 'frameborder', 'scrolling'],
     }) as string;
     return postProcess(clean);
 }
