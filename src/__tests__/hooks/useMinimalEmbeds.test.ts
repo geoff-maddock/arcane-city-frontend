@@ -19,8 +19,8 @@ const mockApi = api as unknown as MockedApi;
 describe('useMinimalEmbeds', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.spyOn(console, 'log').mockImplementation(() => {});
-        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.spyOn(console, 'log').mockImplementation(() => { });
+        vi.spyOn(console, 'error').mockImplementation(() => { });
     });
 
     it('should return empty embeds when disabled', () => {
@@ -141,7 +141,7 @@ describe('useMinimalEmbeds', () => {
 
         // Clear previous calls
         mockApi.get.mockClear();
-        
+
         // Call refetch
         result.current.refetch();
 
@@ -151,7 +151,7 @@ describe('useMinimalEmbeds', () => {
     it('should update when dependencies change', async () => {
         const mockEmbeds1 = ['<iframe src="https://player.soundcloud.com/test1"></iframe>'];
         const mockEmbeds2 = ['<iframe src="https://player.soundcloud.com/test2"></iframe>'];
-        
+
         mockApi.get.mockResolvedValueOnce({ data: { data: mockEmbeds1 } });
 
         const { result, rerender } = renderHook(
@@ -168,7 +168,7 @@ describe('useMinimalEmbeds', () => {
         });
 
         expect(result.current.embeds).toEqual(mockEmbeds1);
-        
+
         // Change slug and mock new response
         mockApi.get.mockResolvedValueOnce({ data: { data: mockEmbeds2 } });
         rerender({ slug: 'test-event-2' });

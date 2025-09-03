@@ -33,7 +33,7 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
-import { formatDate } from '../lib/utils';
+import { formatEventDate } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { sanitizeHTML, sanitizeEmbed } from '../lib/sanitize';
@@ -429,7 +429,7 @@ export default function EventDetail({ slug }: { slug: string }) {
 
                                             <div className="flex items-center text-sm text-gray-500">
                                                 <CalendarDays className="mr-2 h-4 w-4" />
-                                                {formatDate(event.start_at)}
+                                                {formatEventDate(event.start_at, { timeZone: 'America/New_York', fixESTUtcBug: true })}
                                             </div>
 
                                             {event.venue && (
@@ -485,6 +485,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         <EntityBadges entities={event.entities} />
 
                                         <TagBadges tags={event.tags} />
+
                                     </div>
                                 </CardContent>
                             </Card>

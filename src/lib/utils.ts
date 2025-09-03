@@ -4,6 +4,49 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format } from "date-fns";
 
+export const EASTERN_TZ = 'America/New_York';
+
+function isDSTInZone(date: Date, timeZone: string): boolean {
+  // Detect 'EDT' vs 'EST' via Intl parts
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hour: '2-digit',
+    timeZoneName: 'short',
+  }).formatToParts(date);
+  const tzName = parts.find((p) => p.type === 'timeZoneName')?.value ?? '';
+  return /DT$/i.test(tzName); // EDT => true, EST => false
+}
+
+/**
+ * Formats an event datetime in a specific IANA zone and optionally applies a 1h DST correction
+ * for backends that computed UTC with fixed EST (-05:00) year-round.
+ */
+export function formatEventDate(
+  dateString: string,
+  opts?: { timeZone?: string; fixESTUtcBug?: boolean }
+): string {
+  const timeZone = opts?.timeZone ?? EASTERN_TZ;
+  const raw = new Date(dateString);
+
+  const corrected =
+    opts?.fixESTUtcBug && isDSTInZone(raw, timeZone)
+      ? new Date(raw.getTime() - 60 * 60 * 1000)
+      : raw;
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+    timeZone,
+  };
+
+  return new Intl.DateTimeFormat('en-US', options).format(corrected);
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
