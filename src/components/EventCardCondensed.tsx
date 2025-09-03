@@ -1,8 +1,8 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Event } from '../types/api';
-import { formatDate } from '../lib/utils';
+import { formatEventDate } from '../lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
+import { Loader2, CalendarDays, MapPin, DollarSign, Ticket, Star } from 'lucide-react';
 import { AgeRestriction } from './AgeRestriction';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
@@ -12,7 +12,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { api } from '../lib/api';
 import { EventFilterContext } from '../context/EventFilterContext';
-
+import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { sanitizeEmbed } from '../lib/sanitize';
 
 interface EventCardProps {
     event: Event;
@@ -23,6 +25,12 @@ interface EventCardProps {
 const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) => {
     const navigate = useNavigate();
     const { setFilters } = useContext(EventFilterContext);
+    const { mediaPlayersEnabled } = useMediaPlayerContext();
+    const { embeds, loading: embedsLoading, error: embedsError } = useMinimalEmbeds({
+        resourceType: 'events',
+        slug: event.slug,
+        enabled: mediaPlayersEnabled // Only fetch embeds when media players are enabled
+    });
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -178,7 +186,7 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
 
                                 <div className="flex items-center text-sm text-gray-500">
                                     <CalendarDays className="mr-2 h-4 w-4" />
-                                    {formatDate(event.start_at)}
+                                    {formatEventDate(event.start_at, { timeZone: 'America/New_York', fixESTUtcBug: true })}
                                 </div>
 
                                 {event.venue && (
@@ -240,6 +248,40 @@ const EventCardCondensed = ({ event, allImages, imageIndex }: EventCardProps) =>
                             <EntityBadges entities={event.entities} />
 
                             <TagBadges tags={event.tags} onClick={handleTagClick} />
+                            {/* Slim Audio Embeds Section */}
+                            {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
+                                <div className="space-y-2">
+                                    <div className="space-y-2">
+                                        {embeds.slice(0, 1).map((embed, index) => {
+                                            const safe = sanitizeEmbed(embed);
+                                            const isSoundCloud = /player\.soundcloud\.com|w\.soundcloud\.com/i.test(embed);
+                                            return (
+                                                <div key={index} className="rounded-md bg-gray-50 dark:bg-gray-800">
+                                                    <div
+                                                        dangerouslySetInnerHTML={{ __html: safe }}
+                                                        className={`w-full ${!isSoundCloud ? '[&_iframe]:max-h-20 [&_iframe]:min-h-10' : ''}`}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Loading state for embeds */}
+                            {mediaPlayersEnabled && embedsLoading && (
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>Loading audio...</span>
+                                </div>
+                            )}
+
+                            {/* Error state for embeds */}
+                            {mediaPlayersEnabled && embedsError && !embedsLoading && (
+                                <div className="text-red-500 text-xs">
+                                    Error loading audio content.
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </div>

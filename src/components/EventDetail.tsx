@@ -485,6 +485,7 @@ export default function EventDetail({ slug }: { slug: string }) {
                                         <EntityBadges entities={event.entities} />
 
                                         <TagBadges tags={event.tags} />
+
                                     </div>
                                 </CardContent>
                             </Card>
