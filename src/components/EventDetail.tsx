@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 // Lucide doesn't ship an Instagram brand icon; create a lightweight inline SVG component
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -33,7 +33,7 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
-import { formatEventDate } from '../lib/utils';
+import { formatEventDate, generateGoogleCalendarLink } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { sanitizeHTML, sanitizeEmbed } from '../lib/sanitize';
@@ -478,6 +478,15 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                             <Ticket className="h-5 w-5 text-gray-600 hover:text-gray-900" />
                                                         </a>
                                                     )}
+                                                    <a
+                                                        href={generateGoogleCalendarLink(event)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                                        title="Add to Google Calendar"
+                                                    >
+                                                        <CalendarPlus className="h-5 w-5 text-gray-600 hover:text-gray-900" />
+                                                    </a>
                                                 </div>
                                             )}
                                         </div>
