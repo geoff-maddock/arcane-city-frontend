@@ -24,7 +24,6 @@ interface UseMediaPlayerToggleOptions {
  */
 export function useMediaPlayerToggle(options: UseMediaPlayerToggleOptions = {}) {
     const { storageKey = 'mediaPlayersEnabled', defaultEnabled = true } = options;
-
     // Always initialize local state
     const [localMediaPlayersEnabled, setLocalMediaPlayersEnabled] = useState<boolean>(() => {
         try {
