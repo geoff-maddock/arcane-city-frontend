@@ -96,3 +96,31 @@ export function isValidDate(dateString: string): boolean {
   const date = new Date(dateString);
   return date instanceof Date && !isNaN(date.getTime());
 }
+
+// Generate Google Calendar link for an event
+export function generateGoogleCalendarLink(event: {
+  name: string;
+  description?: string;
+  start_at: string;
+  end_at?: string;
+  venue?: { name: string };
+}): string {
+  const action = 'TEMPLATE';
+  const text = encodeURIComponent(event.name);
+  
+  // Format dates to 'YYYYMMDDTHHMMSS' format
+  const startDate = new Date(event.start_at);
+  const start = format(startDate, 'yyyyMMdd\'T\'HHmmss');
+  
+  // Use end_at if available, otherwise use start_at (following the PHP pattern)
+  const endDate = event.end_at ? new Date(event.end_at) : startDate;
+  const end = format(endDate, 'yyyyMMdd\'T\'HHmmss');
+  
+  const details = encodeURIComponent(event.description || '');
+  const location = encodeURIComponent(event.venue?.name || 'Unknown');
+  const sf = 'true';
+  
+  const url = `https://www.google.com/calendar/render?action=${action}&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=${sf}&output=xml`;
+  
+  return url;
+}
