@@ -15,6 +15,7 @@ export const userService = {
     const { data } = await api.post('/user/send-password-reset-email', {
       email,
       secret: import.meta.env.VITE_API_KEY,
+      'frontend-url': import.meta.env.VITE_FRONTEND_URL,
     });
     return data;
   },
