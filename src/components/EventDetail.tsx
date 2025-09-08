@@ -430,6 +430,15 @@ export default function EventDetail({ slug }: { slug: string }) {
                                             <div className="flex items-center text-sm text-gray-500">
                                                 <CalendarDays className="mr-2 h-4 w-4" />
                                                 {formatEventDate(event.start_at, { timeZone: 'America/New_York', fixESTUtcBug: true })}
+                                                <a
+                                                    href={generateGoogleCalendarLink(event)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                                    title="Add to Google Calendar"
+                                                >
+                                                    <CalendarPlus className="h-5 w-5 text-gray-600 hover:text-gray-900" />
+                                                </a>
                                             </div>
 
                                             {event.venue && (
@@ -478,15 +487,6 @@ export default function EventDetail({ slug }: { slug: string }) {
                                                             <Ticket className="h-5 w-5 text-gray-600 hover:text-gray-900" />
                                                         </a>
                                                     )}
-                                                    <a
-                                                        href={generateGoogleCalendarLink(event)}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                                                        title="Add to Google Calendar"
-                                                    >
-                                                        <CalendarPlus className="h-5 w-5 text-gray-600 hover:text-gray-900" />
-                                                    </a>
                                                 </div>
                                             )}
                                         </div>
