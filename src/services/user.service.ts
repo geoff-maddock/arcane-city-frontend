@@ -10,6 +10,7 @@ export interface PasswordResetRequest {
   email: string;
   password: string;
   token: string;
+  secret: string;
 }
 
 export const userService = {
@@ -26,7 +27,7 @@ export const userService = {
     return data;
   },
   async resetPassword(payload: PasswordResetRequest) {
-    const { data } = await api.post('/user/password/reset', payload);
+    const { data } = await api.post('/user/reset-password', payload);
     return data;
   },
 };

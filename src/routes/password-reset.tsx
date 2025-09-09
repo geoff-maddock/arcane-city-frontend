@@ -59,6 +59,7 @@ const PasswordReset: React.FC = () => {
             await userService.resetPassword({
                 email,
                 password: values.password,
+                secret: import.meta.env.VITE_API_KEY,
                 token,
             });
             setMessage('Your password has been successfully reset. You can now log in with your new password.');
