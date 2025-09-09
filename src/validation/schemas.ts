@@ -119,6 +119,25 @@ export const tagCreateSchema: Schema = {
 };
 export const tagEditSchema = tagCreateSchema;
 
+// Password matching validator
+export const passwordMatch = (passwordField: string, message = 'Passwords do not match'): Validator => (val, all) => {
+    const password = all[passwordField] as string;
+    const confirmPassword = val as string;
+    if (!password || !confirmPassword) return undefined;
+    return password !== confirmPassword ? message : undefined;
+};
+
+// Password reset schema
+export interface PasswordResetFields { 
+    [key: string]: unknown;
+    password: string; 
+    confirmPassword: string; 
+}
+export const passwordResetSchema: Schema = {
+    password: [required(), minLength(8, 'Password must be at least 8 characters')],
+    confirmPassword: [required(), passwordMatch('password')],
+};
+
 export function collectFieldErrors(errors: Record<string, string[]>, field: string): string | null {
     if (!errors[field] || errors[field].length === 0) return null;
     return errors[field].join(' ');
