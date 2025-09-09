@@ -17,12 +17,12 @@ describe('Password Reset Route', () => {
         const history = createMemoryHistory({
             initialEntries: ['/password/reset/test-token?email=test@example.com'],
         });
-        
+
         router.update({
             history,
         });
 
-        const { getByDisplayValue, getByLabelText, getByRole } = render(
+        render(
             <div>Test will be updated when router testing is properly configured</div>
         );
 
@@ -65,12 +65,14 @@ describe('Password Reset Route', () => {
             email: 'test@example.com',
             password: 'newpassword123',
             token: 'test-token',
+            secret: 'test-secret'
         });
 
         expect(mockResetPassword).toHaveBeenCalledWith({
             email: 'test@example.com',
             password: 'newpassword123',
             token: 'test-token',
+            secret: 'test-secret'
         });
     });
 });
