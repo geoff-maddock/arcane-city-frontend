@@ -21,7 +21,7 @@ export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath =
     if (onClick) {
       onClick(name);
     } else {
-      navigate({ to: indexPath, search: { tag: name } });
+      navigate({ to: indexPath, search: { tag: name } as any });
     }
   };
 
