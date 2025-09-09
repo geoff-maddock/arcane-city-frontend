@@ -1,4 +1,4 @@
-import { render, fireEvent, waitFor } from '../test-render';
+import { render } from '../test-render';
 import { describe, it, expect, vi } from 'vitest';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { router } from '@/router';

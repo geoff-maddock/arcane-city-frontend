@@ -10,7 +10,7 @@ interface TagBadgesProps {
    * Path to the index page used when filtering by tag
    * e.g. `/events` or `/entities`
    */
-  indexPath?: string;
+  indexPath?: '/events' | '/entities';
 }
 
 export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath = '/events' }) => {
@@ -21,7 +21,8 @@ export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath =
     if (onClick) {
       onClick(name);
     } else {
-      navigate({ to: indexPath, search: { tag: name } as any });
+      // Navigate to either the events or entities index with the tag filter applied
+      navigate({ to: indexPath, search: { tag: name } });
     }
   };
 
