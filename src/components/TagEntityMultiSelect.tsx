@@ -48,7 +48,7 @@ export const TagEntityMultiSelect: React.FC<TagEntityMultiSelectProps> = ({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setQuery(value);
-        
+
         // Check if this is an exact match (likely from datalist selection)
         const exactMatch = options?.find(o => o.name === value);
         if (exactMatch && !valueIds.includes(exactMatch.id)) {
