@@ -17,6 +17,7 @@ import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
+import { truncate, SITE_NAME, DEFAULT_IMAGE } from '../lib/seo';
 import {
     Dialog,
     DialogContent,
@@ -125,6 +126,42 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
             fetchEmbeds();
         }
     }, [entity?.slug]);
+
+    // Fallback manual head update (in case TanStack head not applied for any reason)
+    useEffect(() => {
+        if (!entity) return; // safe early exit
+        try {
+            const baseTitle = entity.name;
+            document.title = `${baseTitle} | ${SITE_NAME}`;
+            const description = truncate(entity.short || entity.description) || SITE_NAME;
+            const ogImage = entity.primary_photo || DEFAULT_IMAGE;
+            const ensure = (selector: string, attr: 'content', value: string) => {
+                if (!value) return;
+                let el = document.querySelector(selector) as HTMLMetaElement | null;
+                if (!el) {
+                    el = document.createElement('meta');
+                    if (selector.startsWith('meta[name="')) {
+                        const name = selector.match(/meta\[name="(.+?)"\]/)?.[1];
+                        if (name) el.setAttribute('name', name);
+                    } else if (selector.startsWith('meta[property="')) {
+                        const prop = selector.match(/meta\[property="(.+?)"\]/)?.[1];
+                        if (prop) el.setAttribute('property', prop);
+                    }
+                    document.head.appendChild(el);
+                }
+                el.setAttribute(attr, value);
+            };
+            ensure('meta[name="description"]', 'content', description);
+            ensure('meta[property="og:title"]', 'content', baseTitle);
+            ensure('meta[property="og:description"]', 'content', description);
+            ensure('meta[property="og:image"]', 'content', ogImage);
+            ensure('meta[name="twitter:title"]', 'content', baseTitle);
+            ensure('meta[name="twitter:description"]', 'content', description);
+            ensure('meta[name="twitter:image"]', 'content', ogImage);
+        } catch {
+            // swallow
+        }
+    }, [entity]);
 
     if (isLoading) {
         return (

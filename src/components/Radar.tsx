@@ -6,6 +6,7 @@ import { useUserAttendingEvents, useUserRecommendedEvents, useRecentEvents } fro
 import { Button } from './ui/button';
 import { HiCalendar, HiOfficeBuilding, HiTag, HiExclamationCircle } from 'react-icons/hi';
 import EventCardCondensed from './EventCardCondensed';
+// SEO handled via route head()
 
 const Radar: React.FC = () => {
     const { data: user } = useQuery({
@@ -13,6 +14,8 @@ const Radar: React.FC = () => {
         queryFn: authService.getCurrentUser,
         enabled: authService.isAuthenticated(),
     });
+
+    // Head tags handled by route head(); fallback removed.
 
     const { data: attendingEventsResponse, isLoading: loadingAttending } = useUserAttendingEvents();
     const { data: recommendedEvents, isLoading: loadingRecommended } = useUserRecommendedEvents();
