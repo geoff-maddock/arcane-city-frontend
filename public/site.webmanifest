@@ -1,6 +1,26 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "id": "/",
+  "name": "Arcane City",
+  "short_name": "ArcaneCity",
+  "description": "Arcane City – event discovery and management platform for venues, artists, series, and fans.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
+  "orientation": "portrait-primary",
+  "theme_color": "#0f0f17",
+  "background_color": "#0f0f17",
+  "categories": [
+    "events",
+    "entertainment",
+    "productivity",
+    "social"
+  ],
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -15,7 +35,21 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  "protocol_handlers": [
+    {
+      "protocol": "web+arcanecity",
+      "url": "/open?resource=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "prefer_related_applications": false
 }
