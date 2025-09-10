@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createRoute, useNavigate, Link } from '@tanstack/react-router';
+import { createRoute, useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,8 +21,13 @@ interface ValidationErrors {
   [key: string]: string[];
 }
 
+interface EventCreateSearchParams {
+  duplicate?: string;
+}
+
 const EventCreate: React.FC = () => {
   const navigate = useNavigate();
+  const searchParams = useSearch({ from: '/event/create' }) as EventCreateSearchParams;
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -87,6 +92,52 @@ const EventCreate: React.FC = () => {
       }
     }
   }, [visibilityOptions, formData.visibility_id]);
+
+  // Populate form when duplicating an event
+  useEffect(() => {
+    if (searchParams.duplicate) {
+      const fetchEventData = async () => {
+        try {
+          const { data: event } = await api.get(`/events/${searchParams.duplicate}`);
+          setFormData({
+            name: `Copy of ${event.name}`,
+            slug: '',
+            short: event.short || '',
+            visibility_id: event.visibility?.id || 1,
+            description: event.description || '',
+            event_status_id: 1,
+            event_type_id: event.event_type?.id || '',
+            promoter_id: event.promoter?.id || '',
+            venue_id: event.venue?.id || '',
+            is_benefit: event.is_benefit || false,
+            presale_price: event.presale_price?.toString() || '',
+            door_price: event.door_price?.toString() || '',
+            soundcheck_at: '',
+            door_at: '',
+            start_at: '',
+            end_at: '',
+            series_id: event.series?.id || '',
+            min_age: event.min_age?.toString() || '',
+            primary_link: event.primary_link || '',
+            ticket_link: event.ticket_link || '',
+            cancelled_at: '',
+            tag_list: event.tags?.map(tag => tag.id) || [],
+            entity_list: event.entities?.map(entity => entity.id) || [],
+          });
+          setName(`Copy of ${event.name}`);
+          if (event.tags) {
+            setSelectedTags(event.tags.map(tag => ({ id: tag.id, name: tag.name })));
+          }
+          if (event.entities) {
+            setSelectedEntities(event.entities.map(entity => ({ id: entity.id, name: entity.name })));
+          }
+        } catch (error) {
+          console.error('Failed to fetch event for duplication:', error);
+        }
+      };
+      fetchEventData();
+    }
+  }, [searchParams.duplicate, setName]);
 
   useEffect(() => {
     const name = formData.name.trim();
@@ -471,6 +522,9 @@ const EventCreate: React.FC = () => {
 export const EventCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/event/create',
+  validateSearch: (search: Record<string, unknown>): EventCreateSearchParams => ({
+    duplicate: typeof search.duplicate === 'string' ? search.duplicate : undefined,
+  }),
   component: EventCreate,
 });
 

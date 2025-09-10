@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createRoute, useNavigate, Link } from '@tanstack/react-router';
+import { createRoute, useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,8 +21,13 @@ interface ValidationErrors {
   [key: string]: string[];
 }
 
+interface SeriesCreateSearchParams {
+  fromEvent?: string;
+}
+
 const SeriesCreate: React.FC = () => {
   const navigate = useNavigate();
+  const searchParams = useSearch({ from: '/series/create' }) as SeriesCreateSearchParams;
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -85,6 +90,50 @@ const SeriesCreate: React.FC = () => {
       }
     }
   }, [visibilityOptions, formData.visibility_id]);
+
+  // Populate form when creating series from an event
+  useEffect(() => {
+    if (searchParams.fromEvent) {
+      const fetchEventData = async () => {
+        try {
+          const { data: event } = await api.get(`/events/${searchParams.fromEvent}`);
+          setFormData({
+            name: `${event.name} Series`,
+            slug: '',
+            short: event.short || '',
+            visibility_id: event.visibility?.id || 1,
+            description: event.description || '',
+            event_type_id: event.event_type?.id || '',
+            promoter_id: event.promoter?.id || '',
+            venue_id: event.venue?.id || '',
+            is_benefit: event.is_benefit || false,
+            presale_price: event.presale_price?.toString() || '',
+            door_price: event.door_price?.toString() || '',
+            start_at: '',
+            end_at: '',
+            min_age: event.min_age?.toString() || '',
+            primary_link: event.primary_link || '',
+            ticket_link: event.ticket_link || '',
+            tag_list: event.tags?.map(tag => tag.id) || [],
+            entity_list: event.entities?.map(entity => entity.id) || [],
+            occurrence_type_id: '',
+            occurrence_week_id: '',
+            occurrence_day_id: '',
+          });
+          setName(`${event.name} Series`);
+          if (event.tags) {
+            setSelectedTags(event.tags.map(tag => ({ id: tag.id, name: tag.name })));
+          }
+          if (event.entities) {
+            setSelectedEntities(event.entities.map(entity => ({ id: entity.id, name: entity.name })));
+          }
+        } catch (error) {
+          console.error('Failed to fetch event for series creation:', error);
+        }
+      };
+      fetchEventData();
+    }
+  }, [searchParams.fromEvent, setName]);
 
   useEffect(() => {
     const name = formData.name.trim();
@@ -495,6 +544,9 @@ const SeriesCreate: React.FC = () => {
 export const SeriesCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/series/create',
+  validateSearch: (search: Record<string, unknown>): SeriesCreateSearchParams => ({
+    fromEvent: typeof search.fromEvent === 'string' ? search.fromEvent : undefined,
+  }),
   component: SeriesCreate,
 });
 
