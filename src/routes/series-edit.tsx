@@ -68,6 +68,8 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
     const { data: tagOptions } = useSearchOptions('tags', tagQuery);
     const { data: entityOptions } = useSearchOptions('entities', entityQuery);
+    // Shared form field classes (light + dark)
+    const fieldClasses = 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400';
     const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
         initialValues: formData,
         schema: seriesEditSchema,
@@ -194,12 +196,12 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} />
+                    <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} className={fieldClasses} />
                     {renderError('name')}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="slug">Slug</Label>
-                    <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} />
+                    <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} className={fieldClasses} />
                     {renderError('slug')}
                 </div>
                 <div className="space-y-2">
@@ -207,7 +209,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                     <textarea
                         id="short"
                         name="short"
-                        className="w-full border rounded p-2"
+                        className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
                         value={formData.short}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -220,7 +222,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         id="description"
                         name="description"
                         rows={6}
-                        className="w-full border rounded p-2"
+                        className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
                         value={formData.description}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -235,7 +237,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.occurrence_type_id ? formData.occurrence_type_id.toString() : 'none'}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_type_id: value === 'none' ? '' : Number(value) }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select occurrence type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -255,7 +257,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.occurrence_week_id ? formData.occurrence_week_id.toString() : 'none'}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_week_id: value === 'none' ? '' : Number(value) }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select occurrence week" />
                             </SelectTrigger>
                             <SelectContent>
@@ -275,7 +277,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.occurrence_day_id ? formData.occurrence_day_id.toString() : 'none'}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_day_id: value === 'none' ? '' : Number(value) }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select occurrence day" />
                             </SelectTrigger>
                             <SelectContent>
@@ -297,7 +299,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.visibility_id.toString()}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, visibility_id: Number(value) }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select visibility" />
                             </SelectTrigger>
                             <SelectContent>
@@ -357,6 +359,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.presale_price}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={fieldClasses}
                         />
                         {renderError('presale_price')}
                     </div>
@@ -370,6 +373,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.door_price}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={fieldClasses}
                         />
                         {renderError('door_price')}
                     </div>
@@ -390,7 +394,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.min_age ? formData.min_age.toString() : 'none'}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value === 'none' ? '' : value }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select minimum age" />
                             </SelectTrigger>
                             <SelectContent>
@@ -412,6 +416,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.start_at}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={fieldClasses}
                         />
                         {renderError('start_at')}
                     </div>
@@ -424,6 +429,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.end_at}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={fieldClasses}
                         />
                         {renderError('end_at')}
                     </div>
@@ -439,6 +445,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.primary_link}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={fieldClasses}
                         />
                         {renderError('primary_link')}
                     </div>
@@ -450,6 +457,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             value={formData.ticket_link}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={fieldClasses}
                         />
                         {renderError('ticket_link')}
                     </div>

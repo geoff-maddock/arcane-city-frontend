@@ -78,6 +78,9 @@ const EventCreate: React.FC = () => {
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
   const [duplicateEvent, setDuplicateEvent] = useState<{ name: string; slug: string } | null>(null);
 
+  // Shared form field classes (light + dark) for consistent contrast
+  const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
+
   // Set default visibility to "Public" when options are loaded
   useEffect(() => {
     if (visibilityOptions && visibilityOptions.length > 0) {
@@ -193,7 +196,7 @@ const EventCreate: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
           <div className="flex items-center gap-2">
-            <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} />
+            <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} className={fieldClasses} />
             {nameCheck === 'unique' && <CheckCircle className="text-green-500" />}
             {nameCheck === 'duplicate' && <XCircle className="text-red-500" />}
           </div>
@@ -213,7 +216,7 @@ const EventCreate: React.FC = () => {
         </div>
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} />
+          <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} className={fieldClasses} />
           {renderError('slug')}
         </div>
         <div className="space-y-2">
@@ -221,7 +224,7 @@ const EventCreate: React.FC = () => {
           <textarea
             id="short"
             name="short"
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
             value={formData.short}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -234,7 +237,7 @@ const EventCreate: React.FC = () => {
             id="description"
             name="description"
             rows={6}
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
             value={formData.description}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -248,7 +251,7 @@ const EventCreate: React.FC = () => {
               value={formData.visibility_id.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, visibility_id: Number(value) }))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                 <SelectValue placeholder="Select visibility" />
               </SelectTrigger>
               <SelectContent>
@@ -316,6 +319,7 @@ const EventCreate: React.FC = () => {
               value={formData.presale_price}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('presale_price')}
           </div>
@@ -329,6 +333,7 @@ const EventCreate: React.FC = () => {
               value={formData.door_price}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('door_price')}
           </div>
@@ -349,7 +354,7 @@ const EventCreate: React.FC = () => {
               value={formData.min_age.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value }))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                 <SelectValue placeholder="Select minimum age" />
               </SelectTrigger>
               <SelectContent>
@@ -369,6 +374,7 @@ const EventCreate: React.FC = () => {
               value={formData.door_at}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('door_at')}
           </div>
@@ -382,6 +388,7 @@ const EventCreate: React.FC = () => {
               value={formData.start_at}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('start_at')}
           </div>
@@ -394,6 +401,7 @@ const EventCreate: React.FC = () => {
               value={formData.end_at}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('end_at')}
           </div>
@@ -421,6 +429,7 @@ const EventCreate: React.FC = () => {
               value={formData.primary_link}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('primary_link')}
           </div>
@@ -432,6 +441,7 @@ const EventCreate: React.FC = () => {
               value={formData.ticket_link}
               onChange={handleChange}
               onBlur={handleBlur}
+              className={fieldClasses}
             />
             {renderError('ticket_link')}
           </div>

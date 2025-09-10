@@ -58,6 +58,9 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [generalError, setGeneralError] = useState('');
 
+    // Shared form field classes (light + dark) for consistent contrast
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
+
     useEffect(() => {
         if (entity) {
             setFormData({
@@ -154,23 +157,23 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input id="name" name="name" value={name} onChange={handleChange} />
+                        <Input id="name" name="name" value={name} onChange={handleChange} className={fieldClasses} />
                         {renderError('name')}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="slug">Slug</Label>
-                        <Input id="slug" name="slug" value={slug} onChange={handleChange} />
+                        <Input id="slug" name="slug" value={slug} onChange={handleChange} className={fieldClasses} />
                         {renderError('slug')}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="short">Short Description</Label>
-                        <Input id="short" name="short" value={formData.short} onChange={handleChange} />
+                        <Input id="short" name="short" value={formData.short} onChange={handleChange} className={fieldClasses} />
                         {renderError('short')}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="visibility_id">Visibility</Label>
                         <Select value={String(formData.visibility_id)} onValueChange={(val) => setFormData((p) => ({ ...p, visibility_id: Number(val) }))}>
-                            <SelectTrigger id="visibility_id">
+                            <SelectTrigger id="visibility_id" className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue>{visibilityOptions?.find(o => o.id === Number(formData.visibility_id))?.name}</SelectValue>
                             </SelectTrigger>
                             <SelectContent>
@@ -191,7 +194,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        className="w-full border rounded p-2"
+                        className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
                     />
                     {renderError('description')}
                 </div>
@@ -235,12 +238,12 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="facebook_username">Facebook Username</Label>
-                        <Input id="facebook_username" name="facebook_username" value={formData.facebook_username} onChange={handleChange} placeholder="facebook_username" />
+                        <Input id="facebook_username" name="facebook_username" value={formData.facebook_username} onChange={handleChange} placeholder="facebook_username" className={fieldClasses} />
                         {renderError('facebook_username')}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="instagram_username">Instagram Username</Label>
-                        <Input id="instagram_username" name="instagram_username" value={formData.instagram_username} onChange={handleChange} placeholder="instagram_username" />
+                        <Input id="instagram_username" name="instagram_username" value={formData.instagram_username} onChange={handleChange} placeholder="instagram_username" className={fieldClasses} />
                         {renderError('instagram_username')}
                     </div>
                 </div>

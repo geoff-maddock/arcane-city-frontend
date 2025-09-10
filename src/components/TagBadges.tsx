@@ -32,13 +32,13 @@ export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath =
         <Badge
           key={tag.id}
           variant="secondary"
-          className="bg-gray-100 text-gray-800 hover:bg-gray-200 cursor-pointer flex items-center gap-1"
+          className="bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 cursor-pointer flex items-center gap-1 transition-colors border border-gray-200 dark:border-slate-600"
         >
           <span onClick={() => handleNameClick(tag.name)}>{tag.name}</span>
           <Link
             to="/tags/$slug"
             params={{ slug: tag.slug ?? tag.name }}
-            className="ml-1 text-gray-500 hover:text-gray-700"
+            className="ml-1 text-gray-500 hover:text-gray-700 dark:text-slate-300 dark:hover:text-white"
             onClick={e => e.stopPropagation()}
           >
             <LinkIcon className="h-3 w-3" />
