@@ -121,15 +121,15 @@ const EventCreate: React.FC = () => {
             primary_link: event.primary_link || '',
             ticket_link: event.ticket_link || '',
             cancelled_at: '',
-            tag_list: event.tags?.map(tag => tag.id) || [],
-            entity_list: event.entities?.map(entity => entity.id) || [],
+            tag_list: event.tags?.map((tag: any) => tag.id) || [],
+            entity_list: event.entities?.map((entity: any) => entity.id) || [],
           });
           setName(`Copy of ${event.name}`);
           if (event.tags) {
-            setSelectedTags(event.tags.map(tag => ({ id: tag.id, name: tag.name })));
+            setSelectedTags(event.tags.map((tag: any) => ({ id: tag.id, name: tag.name })));
           }
           if (event.entities) {
-            setSelectedEntities(event.entities.map(entity => ({ id: entity.id, name: entity.name })));
+            setSelectedEntities(event.entities.map((entity: any) => ({ id: entity.id, name: entity.name })));
           }
         } catch (error) {
           console.error('Failed to fetch event for duplication:', error);
