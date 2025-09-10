@@ -35,6 +35,8 @@ const TagCreate: React.FC = () => {
     })
   });
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
+  // Shared field classes for dark mode consistency
+  const fieldClasses = 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400';
   const [duplicateTag, setDuplicateTag] = useState<{ name: string; slug: string } | null>(null);
 
   useEffect(() => {
@@ -142,7 +144,7 @@ const TagCreate: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} />
+          <Input id="name" name="name" value={name} onChange={handleChange} onBlur={handleBlur} className={fieldClasses} />
           {nameCheck === 'unique' && <p className="text-green-600 text-xs">Unique</p>}
           {nameCheck === 'duplicate' && duplicateTag && (
             <p className="text-red-600 text-xs">Duplicate tag exists: <Link to="/tags/$slug" params={{ slug: duplicateTag.slug }} className="underline">{duplicateTag.name}</Link></p>
@@ -151,14 +153,14 @@ const TagCreate: React.FC = () => {
         </div>
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} />
+          <Input id="slug" name="slug" value={slug} onChange={handleChange} onBlur={handleBlur} className={fieldClasses} />
           {nameCheck === 'unique' && <p className="text-green-600 text-xs">Unique</p>}
           {nameCheck === 'duplicate' && duplicateTag && <p className="text-red-600 text-xs">Slug in use</p>}
           {renderError('slug')}
         </div>
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
-          <Textarea id="description" name="description" value={formData.description} onChange={handleChange} onBlur={handleBlur} />
+          <Textarea id="description" name="description" value={formData.description} onChange={handleChange} onBlur={handleBlur} className="bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" />
           {renderError('description')}
         </div>
         <div className="space-y-2">
@@ -169,7 +171,7 @@ const TagCreate: React.FC = () => {
               setFormData(p => ({ ...p, tag_type_id: Number(v) }))
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
               <SelectValue placeholder="Select a tag type" />
             </SelectTrigger>
             <SelectContent>

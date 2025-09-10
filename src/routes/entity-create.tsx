@@ -50,6 +50,9 @@ const EntityCreate: React.FC = () => {
     const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
     const [duplicateEntity, setDuplicateEntity] = useState<{ name: string; slug: string } | null>(null);
 
+    // Shared form field classes (light + dark) for consistent contrast
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
+
     // Set default visibility to "Public" when options are loaded
     useEffect(() => {
         if (visibilityOptions && visibilityOptions.length > 0) {
@@ -161,7 +164,7 @@ const EntityCreate: React.FC = () => {
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <div className="flex items-center gap-2">
-                        <Input id="name" name="name" value={name} onChange={handleChange} />
+                        <Input id="name" name="name" value={name} onChange={handleChange} className={fieldClasses} />
                         {nameCheck === 'unique' && <CheckCircle className="text-green-500" />}
                         {nameCheck === 'duplicate' && <XCircle className="text-red-500" />}
                     </div>
@@ -181,7 +184,7 @@ const EntityCreate: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="slug">Slug</Label>
-                    <Input id="slug" name="slug" value={slug} onChange={handleChange} />
+                    <Input id="slug" name="slug" value={slug} onChange={handleChange} className={fieldClasses} />
                     {renderError('slug')}
                 </div>
                 <div className="space-y-2">
@@ -189,7 +192,7 @@ const EntityCreate: React.FC = () => {
                     <textarea
                         id="short"
                         name="short"
-                        className="w-full border rounded p-2"
+                        className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
                         value={formData.short}
                         onChange={handleChange}
                     />
@@ -201,7 +204,7 @@ const EntityCreate: React.FC = () => {
                         id="description"
                         name="description"
                         rows={6}
-                        className="w-full border rounded p-2"
+                        className="w-full border rounded p-2 bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400"
                         value={formData.description}
                         onChange={handleChange}
                     />
@@ -214,7 +217,7 @@ const EntityCreate: React.FC = () => {
                             value={formData.visibility_id.toString()}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, visibility_id: Number(value) }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select visibility" />
                             </SelectTrigger>
                             <SelectContent>
@@ -246,7 +249,7 @@ const EntityCreate: React.FC = () => {
                             value={formData.entity_status_id.toString()}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, entity_status_id: Number(value) }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -282,6 +285,7 @@ const EntityCreate: React.FC = () => {
                             type="datetime-local"
                             value={formData.started_at}
                             onChange={handleChange}
+                            className={fieldClasses}
                         />
                         {renderError('started_at')}
                     </div>
@@ -293,6 +297,7 @@ const EntityCreate: React.FC = () => {
                             value={formData.facebook_username}
                             onChange={handleChange}
                             placeholder="facebook_username"
+                            className={fieldClasses}
                         />
                         {renderError('facebook_username')}
                     </div>
@@ -304,6 +309,7 @@ const EntityCreate: React.FC = () => {
                             value={formData.instagram_username}
                             onChange={handleChange}
                             placeholder="instagram_username"
+                            className={fieldClasses}
                         />
                         {renderError('instagram_username')}
                     </div>
