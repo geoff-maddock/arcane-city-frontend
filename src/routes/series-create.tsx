@@ -16,6 +16,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import { seriesCreateSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import type { Tag, EntityResponse } from '@/types/api';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -114,18 +115,18 @@ const SeriesCreate: React.FC = () => {
             min_age: event.min_age?.toString() || '',
             primary_link: event.primary_link || '',
             ticket_link: event.ticket_link || '',
-            tag_list: event.tags?.map((tag: any) => tag.id) || [],
-            entity_list: event.entities?.map((entity: any) => entity.id) || [],
+            tag_list: event.tags?.map((tag: Tag) => tag.id) || [],
+            entity_list: event.entities?.map((entity: EntityResponse) => entity.id) || [],
             occurrence_type_id: '',
             occurrence_week_id: '',
             occurrence_day_id: '',
           });
           setName(`${event.name} Series`);
           if (event.tags) {
-            setSelectedTags(event.tags.map((tag: any) => ({ id: tag.id, name: tag.name })));
+            setSelectedTags(event.tags.map((tag: Tag) => ({ id: tag.id, name: tag.name })));
           }
           if (event.entities) {
-            setSelectedEntities(event.entities.map((entity: any) => ({ id: entity.id, name: entity.name })));
+            setSelectedEntities(event.entities.map((entity: EntityResponse) => ({ id: entity.id, name: entity.name })));
           }
         } catch (error) {
           console.error('Failed to fetch event for series creation:', error);
