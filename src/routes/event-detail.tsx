@@ -35,8 +35,8 @@ export const EventDetailRoute = createRoute({
         };
     },
     component: function EventDetailWrapper() {
-    const params = EventDetailRoute.useParams();
-    const event = EventDetailRoute.useLoaderData() as Event;
-    return <EventDetail slug={params.slug} initialEvent={event} />;
+        const params = EventDetailRoute.useParams();
+        const event = EventDetailRoute.useLoaderData() as Event;
+        return <EventDetail slug={params.slug} initialEvent={event} />;
     },
 });

@@ -41,7 +41,7 @@ import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
-// SEO handled at route level
+import EventStructuredData from './EventStructuredData';
 
 
 export default function EventDetail({ slug, initialEvent }: { slug: string; initialEvent?: Event }) {
@@ -197,6 +197,9 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
 
     return (
         <div className="min-h-screen">
+            {/* Google Event Structured Data for SEO */}
+            <EventStructuredData event={event} />
+
             <div className="mx-auto px-6 py-8 max-w-[2400px]">
                 <div className="space-y-6">
                     <div className="flex items-center gap-4">
