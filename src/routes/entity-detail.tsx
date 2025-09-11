@@ -21,7 +21,7 @@ export const EntityDetailRoute = createRoute({
         const description = truncate(entity.short || entity.description) || SITE_NAME;
         const ogImage = entity.primary_photo || DEFAULT_IMAGE;
         return {
-            title: `${baseTitle} | ${SITE_NAME}`,
+            title: `${baseTitle} • ${SITE_NAME}`,
             meta: [
                 { name: 'description', content: description },
                 { property: 'og:title', content: baseTitle },
