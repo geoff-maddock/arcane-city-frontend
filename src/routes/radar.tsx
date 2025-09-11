@@ -21,8 +21,8 @@ export const RadarRoute = createRoute({
         // Build current absolute URL in the client; SSR fallback to site root
         const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/radar';
         return {
-            title: `Radar • ${SITE_NAME}`,
             meta: [
+                { title: `Radar • ${SITE_NAME}` },
                 { property: 'og:url', content: url },
                 { property: 'og:type', content: 'website' },
                 { property: 'og:title', content: `Radar | ${SITE_NAME}` },
