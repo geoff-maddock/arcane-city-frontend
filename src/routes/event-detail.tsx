@@ -22,8 +22,8 @@ export const EventDetailRoute = createRoute({
         const description = truncate(event.short || event.description) || SITE_NAME;
         const ogImage = buildOgImage(event) || DEFAULT_IMAGE;
         return {
-            title: `${title} • ${SITE_NAME}`,
             meta: [
+                { title: `${title} • ${SITE_NAME}` },
                 { name: 'description', content: description },
                 { property: 'og:title', content: title },
                 { property: 'og:description', content: description },

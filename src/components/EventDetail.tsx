@@ -41,7 +41,7 @@ import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
-import { buildEventTitle, truncate, buildOgImage, SITE_NAME, DEFAULT_IMAGE } from '../lib/seo';
+// SEO handled at route level
 
 
 export default function EventDetail({ slug }: { slug: string }) {
@@ -173,42 +173,6 @@ export default function EventDetail({ slug }: { slug: string }) {
         }
     }, [event?.slug]);
 
-
-    // Fallback manual head update (in case TanStack head not applied for any reason)
-    useEffect(() => {
-        if (!event) return; // safe early exit inside effect
-        try {
-            const baseTitle = buildEventTitle(event);
-            document.title = `${baseTitle} | ${SITE_NAME}`;
-            const description = truncate(event.short || event.description) || SITE_NAME;
-            const ogImage = buildOgImage(event) || DEFAULT_IMAGE;
-            const ensure = (selector: string, attr: 'content', value: string) => {
-                if (!value) return;
-                let el = document.querySelector(selector) as HTMLMetaElement | null;
-                if (!el) {
-                    el = document.createElement('meta');
-                    if (selector.startsWith('meta[name="')) {
-                        const name = selector.match(/meta\[name="(.+?)"\]/)?.[1];
-                        if (name) el.setAttribute('name', name);
-                    } else if (selector.startsWith('meta[property="')) {
-                        const prop = selector.match(/meta\[property="(.+?)"\]/)?.[1];
-                        if (prop) el.setAttribute('property', prop);
-                    }
-                    document.head.appendChild(el);
-                }
-                el.setAttribute(attr, value);
-            };
-            ensure('meta[name="description"]', 'content', description);
-            ensure('meta[property="og:title"]', 'content', baseTitle);
-            ensure('meta[property="og:description"]', 'content', description);
-            ensure('meta[property="og:image"]', 'content', ogImage);
-            ensure('meta[name="twitter:title"]', 'content', baseTitle);
-            ensure('meta[name="twitter:description"]', 'content', description);
-            ensure('meta[name="twitter:image"]', 'content', ogImage);
-        } catch {
-            // swallow
-        }
-    }, [event]);
 
     if (isLoading) {
         return (
