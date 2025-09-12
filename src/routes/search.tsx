@@ -13,6 +13,7 @@ import EntityCardCondensed from '../components/EntityCardCondensed';
 import SeriesCardCondensed from '../components/SeriesCardCondensed';
 import TagCard from '../components/TagCard';
 import type { Event, Entity, Series, Tag } from '../types/api';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ParsedQuery {
   name: string;
@@ -398,5 +399,20 @@ export const SearchRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/search',
   component: Search,
+  head: () => {
+    // Build current absolute URL in the client; SSR fallback to site root
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/search';
+    return {
+      meta: [
+        { title: `Search • ${SITE_NAME}` },
+        { property: 'og:url', content: `${url}` },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: `Search • ${SITE_NAME}` },
+        { property: 'og:image', content: DEFAULT_IMAGE },
+        { property: 'og:description', content: `Search results for events, entities, series, and tags in Pittsburgh.` },
+        { name: 'description', content: `Search results for events, entities, series, and tags in Pittsburgh.` },
+      ],
+    };
+  },
 });
 
