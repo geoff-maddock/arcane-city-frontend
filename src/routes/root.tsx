@@ -21,7 +21,7 @@ export const rootRoute = createRootRoute({
     component: RootLayout,
     head: () => ({
         meta: [
-            { title: SITE_NAME },
+            { title: `Pittsburgh Events Guide • ${SITE_NAME}` },
             { charSet: 'utf-8' },
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },
             { name: 'description', content: SITE_DESCRIPTION },

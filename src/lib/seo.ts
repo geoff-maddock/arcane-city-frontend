@@ -1,5 +1,5 @@
 // Centralized SEO helpers & defaults
-import type { Event, Series, EntityResponse } from '../types/api';
+import type { Event, Series, EntityResponse, Tag } from '../types/api';
 import { formatEventDate } from './utils';
 
 export const SITE_NAME = 'Arcane City';
@@ -44,6 +44,20 @@ export function buildSeriesTitle(series: Series): string {
         const venue = series.venue as EntityResponse; // typed
         const venueName = venue.name || 'No venue specified';
         format += ' at ' + venueName;
+    }
+
+    return format;
+}
+
+// Build a Tag title mirroring legacy PHP getTitleFormat implementation.
+// Logic:
+//  base: name
+//  if description present -> append " - {description}"
+export function buildTagTitle(tag: Tag): string {
+    let format = tag.name;
+
+    if (tag.description) {
+        format += ' - ' + tag.description;
     }
 
     return format;

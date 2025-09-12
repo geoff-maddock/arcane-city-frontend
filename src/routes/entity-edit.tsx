@@ -14,6 +14,7 @@ import { Entity } from '../types/api';
 import { useQuery } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -287,6 +288,22 @@ export const EntityEditRoute = createRoute({
     component: function EntityEditWrapper() {
         const params = EntityEditRoute.useParams();
         return <EntityEdit entitySlug={params.entitySlug} />;
+    },
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/entity/$entitySlug/edit';
+
+        return {
+            meta: [
+                { title: `Entity Edit • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Entity Edit • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Edit an entity in the Pittsburgh Events Guide.` },
+                { name: 'description', content: `Edit an entity in the Pittsburgh Events Guide.` },
+            ],
+        };
     },
 });
 

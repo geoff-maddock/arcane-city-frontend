@@ -17,6 +17,7 @@ import { useSlug } from '@/hooks/useSlug';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { tagEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ServerValidationErrors { [key: string]: string[]; }
 
@@ -227,6 +228,22 @@ export const TagEditRoute = createRoute({
   component: function TagEditWrapper() {
     const params = TagEditRoute.useParams();
     return <TagEdit slug={params.slug} />;
+  },
+  head: () => {
+    // Build current absolute URL in the client; SSR fallback to site root
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/tag/$slug/edit';
+
+    return {
+      meta: [
+        { title: `Tag Edit • ${SITE_NAME}` },
+        { property: 'og:url', content: `${url}` },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: `Tag Edit • ${SITE_NAME}` },
+        { property: 'og:image', content: DEFAULT_IMAGE },
+        { property: 'og:description', content: `Edit a tag in the Pittsburgh Events Guide.` },
+        { name: 'description', content: `Edit a tag in the Pittsburgh Events Guide.` },
+      ],
+    };
   },
 });
 

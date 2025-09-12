@@ -15,6 +15,7 @@ import { tagCreateSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { authService } from '../services/auth.service';
 import { useTagTypes } from '../hooks/useTagTypes';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 
 const TagCreate: React.FC = () => {
@@ -194,5 +195,20 @@ export const TagCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/tag/create',
   component: TagCreate,
+  head: () => {
+    // Build current absolute URL in the client; SSR fallback to site root
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/tag/create';
+    return {
+      meta: [
+        { title: `Tag Create • ${SITE_NAME}` },
+        { property: 'og:url', content: `${url}` },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: `Tag Create • ${SITE_NAME}` },
+        { property: 'og:image', content: DEFAULT_IMAGE },
+        { property: 'og:description', content: `Create a new tag in the Pittsburgh Events Guide.` },
+        { name: 'description', content: `Create a new tag in the Pittsburgh Events Guide.` },
+      ],
+    };
+  },
 });
 

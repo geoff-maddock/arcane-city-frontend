@@ -16,6 +16,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import { eventCreateSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -482,5 +483,20 @@ export const EventCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/event/create',
   component: EventCreate,
+  head: () => {
+    // Build current absolute URL in the client; SSR fallback to site root
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/event/create';
+    return {
+      meta: [
+        { title: `Event Create • ${SITE_NAME}` },
+        { property: 'og:url', content: `${url}` },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: `Event Create • ${SITE_NAME}` },
+        { property: 'og:image', content: DEFAULT_IMAGE },
+        { property: 'og:description', content: `Create a new event in the Pittsburgh Events Guide.` },
+        { name: 'description', content: `Create a new event in the Pittsburgh Events Guide.` },
+      ],
+    };
+  },
 });
 

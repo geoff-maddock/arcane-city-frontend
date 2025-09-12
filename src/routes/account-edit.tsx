@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -57,6 +58,9 @@ const AccountEdit: React.FC = () => {
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [generalError, setGeneralError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Shared form field classes (light + dark) for consistent contrast
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
 
     useEffect(() => {
         if (user) {
@@ -188,6 +192,7 @@ const AccountEdit: React.FC = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
+                                className={fieldClasses}
                             />
                             {renderError('name')}
                         </div>
@@ -200,6 +205,7 @@ const AccountEdit: React.FC = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                className={fieldClasses}
                             />
                             {renderError('email')}
                         </div>
@@ -217,6 +223,7 @@ const AccountEdit: React.FC = () => {
                                 name="profile.first_name"
                                 value={formData.profile.first_name}
                                 onChange={handleChange}
+                                className={fieldClasses}
                             />
                             {renderError('profile.first_name')}
                         </div>
@@ -227,6 +234,7 @@ const AccountEdit: React.FC = () => {
                                 name="profile.last_name"
                                 value={formData.profile.last_name}
                                 onChange={handleChange}
+                                className={fieldClasses}
                             />
                             {renderError('profile.last_name')}
                         </div>
@@ -237,6 +245,7 @@ const AccountEdit: React.FC = () => {
                                 name="profile.alias"
                                 value={formData.profile.alias}
                                 onChange={handleChange}
+                                className={fieldClasses}
                             />
                             {renderError('profile.alias')}
                         </div>
@@ -247,6 +256,7 @@ const AccountEdit: React.FC = () => {
                                 name="profile.location"
                                 value={formData.profile.location}
                                 onChange={handleChange}
+                                className={fieldClasses}
                             />
                             {renderError('profile.location')}
                         </div>
@@ -260,6 +270,7 @@ const AccountEdit: React.FC = () => {
                             value={formData.profile.bio}
                             onChange={handleChange}
                             rows={4}
+                            className={fieldClasses}
                         />
                         {renderError('profile.bio')}
                     </div>
@@ -273,6 +284,7 @@ const AccountEdit: React.FC = () => {
                                 value={formData.profile.facebook_username}
                                 onChange={handleChange}
                                 placeholder="username"
+                                className={fieldClasses}
                             />
                             {renderError('profile.facebook_username')}
                         </div>
@@ -284,6 +296,7 @@ const AccountEdit: React.FC = () => {
                                 value={formData.profile.twitter_username}
                                 onChange={handleChange}
                                 placeholder="username"
+                                className={fieldClasses}
                             />
                             {renderError('profile.twitter_username')}
                         </div>
@@ -295,6 +308,7 @@ const AccountEdit: React.FC = () => {
                                 value={formData.profile.instagram_username}
                                 onChange={handleChange}
                                 placeholder="username"
+                                className={fieldClasses}
                             />
                             {renderError('profile.instagram_username')}
                         </div>
@@ -308,6 +322,7 @@ const AccountEdit: React.FC = () => {
                             value={formData.profile.default_theme}
                             onChange={handleChange}
                             placeholder="e.g., dark, light"
+                            className={fieldClasses}
                         />
                         {renderError('profile.default_theme')}
                     </div>
@@ -377,6 +392,22 @@ export const AccountEditRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/account/edit',
     component: AccountEdit,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/account/edit';
+
+        return {
+            meta: [
+                { title: `Account Edit • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Account Edit • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Edit your account settings in the Pittsburgh Events Guide.` },
+                { name: 'description', content: `Edit your account settings in the Pittsburgh Events Guide.` },
+            ],
+        };
+    },
 });
 
 export default AccountEdit;

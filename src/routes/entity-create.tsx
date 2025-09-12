@@ -13,6 +13,7 @@ import { useSlug } from '@/hooks/useSlug';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -352,4 +353,19 @@ export const EntityCreateRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/entity/create',
     component: EntityCreate,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/entity/create';
+        return {
+            meta: [
+                { title: `Entity Create • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Entity Create • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Create a new entity in the Pittsburgh Events Guide.` },
+                { name: 'description', content: `Create a new entity in the Pittsburgh Events Guide.` },
+            ],
+        };
+    },
 });
