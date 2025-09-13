@@ -18,9 +18,9 @@ export const SeriesDetailRoute = createRoute({
     path: '/series/$slug',
     loader: async ({ params }) => loadSeries(params.slug),
     component: function SeriesDetailWrapper() {
-    const params = SeriesDetailRoute.useParams();
-    const series = SeriesDetailRoute.useLoaderData() as Series;
-    return <SeriesDetail slug={params.slug} initialSeries={series} />;
+        const params = SeriesDetailRoute.useParams();
+        const series = SeriesDetailRoute.useLoaderData() as Series;
+        return <SeriesDetail slug={params.slug} initialSeries={series} />;
     },
     head: ({ loaderData }) => {
         const series = loaderData as Series;
