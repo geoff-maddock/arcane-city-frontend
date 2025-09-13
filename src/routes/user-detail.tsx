@@ -2,7 +2,7 @@ import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import UserDetail from '../components/UserDetail';
 import { SITE_NAME, DEFAULT_IMAGE } from '../lib/seo';
-import { User } from '@/types/api';
+import type { User } from '@/types/auth';
 import { api } from '@/lib/api';
 
 
@@ -21,7 +21,8 @@ export const UserDetailRoute = createRoute({
     },
     component: function UserDetailWrapper() {
         const params = UserDetailRoute.useParams();
-        return <UserDetail id={params.id} />;
+        const user = UserDetailRoute.useLoaderData() as User;
+        return <UserDetail id={params.id} initialUser={user} />;
     },
     head: ({ loaderData }) => {
         const user = loaderData as User;

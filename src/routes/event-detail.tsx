@@ -35,8 +35,8 @@ export const EventDetailRoute = createRoute({
         };
     },
     component: function EventDetailWrapper() {
-        const params = EventDetailRoute.useParams();
-        // EventDetail still handles its own fetching; could be optimized later to use loaderData.
-        return <EventDetail slug={params.slug} />;
+    const params = EventDetailRoute.useParams();
+    const event = EventDetailRoute.useLoaderData() as Event;
+    return <EventDetail slug={params.slug} initialEvent={event} />;
     },
 });

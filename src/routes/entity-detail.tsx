@@ -37,6 +37,7 @@ export const EntityDetailRoute = createRoute({
     },
     component: function EntityDetailWrapper() {
         const params = EntityDetailRoute.useParams();
-        return <EntityDetail entitySlug={params.entitySlug} />;
+        const entity = EntityDetailRoute.useLoaderData() as Entity;
+        return <EntityDetail entitySlug={params.entitySlug} initialEntity={entity} />;
     },
 });

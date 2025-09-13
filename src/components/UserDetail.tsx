@@ -6,13 +6,16 @@ import type { User } from '../types/auth';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
-export default function UserDetail({ id }: { id: string }) {
+export default function UserDetail({ id, initialUser }: { id: string; initialUser?: User }) {
     const { data: user, isLoading, error } = useQuery<User>({
         queryKey: ['user', id],
         queryFn: async () => {
             const { data } = await api.get<User>(`/users/${id}`);
             return data;
         },
+        // Seed cache with loader-provided data to avoid duplicate refetch and show content immediately
+        initialData: initialUser,
+        staleTime: 5 * 60 * 1000, // 5 minutes
     });
 
     if (isLoading) {

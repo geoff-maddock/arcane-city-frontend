@@ -44,7 +44,7 @@ import { TagBadges } from './TagBadges';
 // SEO handled at route level
 
 
-export default function EventDetail({ slug }: { slug: string }) {
+export default function EventDetail({ slug, initialEvent }: { slug: string; initialEvent?: Event }) {
     const navigate = useNavigate();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const [embeds, setEmbeds] = useState<string[]>([]);
@@ -145,6 +145,8 @@ export default function EventDetail({ slug }: { slug: string }) {
             const { data } = await api.get<Event>(`/events/${slug}`);
             return data;
         },
+        initialData: initialEvent,
+        staleTime: 60_000,
     });
 
     useEffect(() => {
