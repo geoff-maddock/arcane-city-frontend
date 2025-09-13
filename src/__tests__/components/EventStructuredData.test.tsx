@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import EventStructuredData from '../../components/EventStructuredData';
-import { Event, EntityResponse, EntityType, EventType } from '../../types/api';
+import { Event, EntityResponse } from '../../types/api';
 
 // Mock event data for testing
 const mockEvent: Event = {
@@ -47,12 +47,12 @@ const mockEntities: EntityResponse[] = [
 describe('EventStructuredData', () => {
     it('renders structured data script tag with basic event information', () => {
         const { container } = render(<EventStructuredData event={mockEvent} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         expect(script).toBeInTheDocument();
-        
+
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData['@context']).toBe('https://schema.org');
         expect(structuredData['@type']).toBe('Event');
         expect(structuredData.name).toBe('Test Concert');
@@ -65,10 +65,10 @@ describe('EventStructuredData', () => {
 
     it('includes image when primary photo is available', () => {
         const { container } = render(<EventStructuredData event={mockEvent} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.image).toEqual(['https://example.com/photo.jpg']);
     });
 
@@ -77,12 +77,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             venue: mockVenue
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithVenue} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.location).toEqual({
             '@type': 'Place',
             name: 'Test Venue'
@@ -91,10 +91,10 @@ describe('EventStructuredData', () => {
 
     it('includes offers with ticket link when available', () => {
         const { container } = render(<EventStructuredData event={mockEvent} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.offers).toEqual({
             '@type': 'Offer',
             url: 'https://example.com/tickets',
@@ -109,21 +109,26 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             ticket_link: undefined
         };
-        
+
         // Mock window.location.origin
-        const originalLocation = window.location;
-        delete (window as any).location;
-        window.location = { ...originalLocation, origin: 'https://example.com' };
-        
+        const originalOrigin = window.location.origin;
+        Object.defineProperty(window.location, 'origin', {
+            configurable: true,
+            value: 'https://example.com'
+        });
+
         const { container } = render(<EventStructuredData event={eventWithoutTicketLink} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.offers.url).toBe('https://example.com/events/test-concert');
-        
-        // Restore window.location
-        window.location = originalLocation;
+
+        // Restore window.location.origin
+        Object.defineProperty(window.location, 'origin', {
+            configurable: true,
+            value: originalOrigin
+        });
     });
 
     it('includes performers when entities are available', () => {
@@ -131,12 +136,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             entities: mockEntities
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithEntities} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.performer).toEqual([
             {
                 '@type': 'PerformingGroup',
@@ -151,10 +156,10 @@ describe('EventStructuredData', () => {
 
     it('falls back to event name as performer when no entities', () => {
         const { container } = render(<EventStructuredData event={mockEvent} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.performer).toEqual([
             {
                 '@type': 'PerformingGroup',
@@ -168,12 +173,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             promoter: mockPromoter
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithPromoter} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.organizer).toEqual({
             '@type': 'Organization',
             name: 'Test Promoter'
@@ -185,12 +190,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             venue: mockVenue
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithVenueOnly} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.organizer).toEqual({
             '@type': 'Organization',
             name: 'Test Venue'
@@ -202,12 +207,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             end_at: undefined
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithoutEndDate} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.endDate).toBeUndefined();
         expect(structuredData.startDate).toBe('2024-03-15T20:00:00.000Z');
     });
@@ -217,12 +222,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             description: undefined
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithoutDescription} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.description).toBeUndefined();
     });
 
@@ -231,12 +236,12 @@ describe('EventStructuredData', () => {
             ...mockEvent,
             primary_photo: undefined
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithoutPhoto} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.image).toBeUndefined();
     });
 
@@ -246,12 +251,12 @@ describe('EventStructuredData', () => {
             door_price: undefined,
             presale_price: undefined
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithoutPrice} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.offers.price).toBe('0');
     });
 
@@ -261,17 +266,17 @@ describe('EventStructuredData', () => {
             name: `Band ${i + 1}`,
             slug: `band-${i + 1}`
         }));
-        
+
         const eventWithManyEntities = {
             ...mockEvent,
             entities: manyEntities
         };
-        
+
         const { container } = render(<EventStructuredData event={eventWithManyEntities} />);
-        
+
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
-        
+
         expect(structuredData.performer).toHaveLength(10);
         expect(structuredData.performer[0].name).toBe('Band 1');
         expect(structuredData.performer[9].name).toBe('Band 10');

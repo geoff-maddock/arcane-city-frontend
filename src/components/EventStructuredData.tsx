@@ -44,10 +44,10 @@ export default function EventStructuredData({ event }: EventStructuredDataProps)
     const structuredData: StructuredDataBase = buildEventStructuredData(event);
 
     return (
-        <script 
+        <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ 
-                __html: JSON.stringify(structuredData, null, 2) 
+            dangerouslySetInnerHTML={{
+                __html: JSON.stringify(structuredData, null, 2)
             }}
         />
     );
