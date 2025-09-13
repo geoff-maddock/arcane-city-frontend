@@ -5,6 +5,7 @@ import EventDetail from '../components/EventDetail';
 import { api } from '../lib/api';
 import type { Event } from '../types/api';
 import { buildEventTitle, truncate, buildOgImage, SITE_NAME, DEFAULT_IMAGE } from '../lib/seo';
+import { buildEventStructuredData } from '../lib/structuredData';
 
 // Loader fetches event so head() can build meta tags.
 async function loadEvent(slug: string): Promise<Event> {
@@ -21,6 +22,7 @@ export const EventDetailRoute = createRoute({
         const title = buildEventTitle(event);
         const description = truncate(event.short || event.description) || SITE_NAME;
         const ogImage = buildOgImage(event) || DEFAULT_IMAGE;
+        const structuredData = buildEventStructuredData(event);
         return {
             meta: [
                 { title: `${title} • ${SITE_NAME}` },
@@ -31,6 +33,12 @@ export const EventDetailRoute = createRoute({
                 { name: 'twitter:title', content: title },
                 { name: 'twitter:description', content: description },
                 { name: 'twitter:image', content: ogImage },
+            ],
+            scripts: [
+                {
+                    type: 'application/ld+json',
+                    children: JSON.stringify(structuredData),
+                },
             ],
         };
     },
