@@ -5,6 +5,7 @@ import { authService } from '../services/auth.service';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -60,4 +61,19 @@ export const LoginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
   component: Login,
+  head: () => {
+    // Build current absolute URL in the client; SSR fallback to site root
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/login';
+    return {
+      meta: [
+        { title: `Login • ${SITE_NAME}` },
+        { property: 'og:url', content: `${url}` },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: `Login • ${SITE_NAME}` },
+        { property: 'og:image', content: DEFAULT_IMAGE },
+        { property: 'og:description', content: `Login to your account on the Pittsburgh Events Guide.` },
+        { name: 'description', content: `Login to your account on the Pittsburgh Events Guide.` },
+      ],
+    };
+  },
 });

@@ -7,6 +7,7 @@ import { Label } from '../components/ui/label';
 import { userService } from '../services/user.service';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { passwordResetSchema, type PasswordResetFields } from '../validation/schemas';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface PasswordResetSearchParams {
     email?: string;
@@ -185,4 +186,19 @@ export const PasswordResetRoute = createRoute({
         email: typeof search.email === 'string' ? search.email : undefined,
     }),
     component: PasswordReset,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/password/reset';
+        return {
+            meta: [
+                { title: `Password Reset • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Password Reset • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Enter your new password to reset your account password.` },
+                { name: 'description', content: `Enter your new password to reset your account password.` },
+            ],
+        };
+    },
 });

@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { formatApiError } from '../lib/utils';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface FieldErrors {
   name?: string;
@@ -109,4 +110,19 @@ export const RegisterRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
   component: Register,
+  head: () => {
+    // Build current absolute URL in the client; SSR fallback to site root
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/register';
+    return {
+      meta: [
+        { title: `Register • ${SITE_NAME}` },
+        { property: 'og:url', content: `${url}` },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: `Register • ${SITE_NAME}` },
+        { property: 'og:image', content: DEFAULT_IMAGE },
+        { property: 'og:description', content: `Register a new account on the Pittsburgh Events Guide.` },
+        { name: 'description', content: `Register a new account on the Pittsburgh Events Guide.` },
+      ],
+    };
+  },
 });

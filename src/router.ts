@@ -33,6 +33,7 @@ import { HelpRoute } from './routes/help';
 import { RadarRoute } from './routes/radar';
 import { authService } from './services/auth.service';
 import { SearchRoute } from './routes/search';
+import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
 
 // Create routes
 const indexRoute = createRoute({
@@ -52,36 +53,126 @@ const eventRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/events',
     component: Events,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/events';
+        return {
+            meta: [
+                { title: `Events • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Events • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `A list of events in Pittsburgh.` },
+                { name: 'description', content: `A list of events in Pittsburgh.` },
+            ],
+        };
+    },
 });
 
 const entityRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/entities',
     component: Entities,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/entities';
+        return {
+            meta: [
+                { title: `Entities • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Entities • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `A list of entities such as bands, venues, promoters, artists, djs in Pittsburgh.` },
+                { name: 'description', content: `A list of entities such as bands, venues, promoters, artists, djs in Pittsburgh.` },
+            ],
+        };
+    },
 });
 
 const seriesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/series',
     component: Series,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/series';
+        return {
+            meta: [
+                { title: `Series • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Series • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `A list of regularly occurring event series in Pittsburgh.` },
+                { name: 'description', content: `A list of regularly occurring event series in Pittsburgh.` },
+            ],
+        };
+    },
 });
 
 const tagRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/tags',
     component: Tags,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/tags';
+        return {
+            meta: [
+                { title: `Tags • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Tags • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `A list of keyword tags used to categorize events and entities in Pittsburgh.` },
+                { name: 'description', content: `A list of keyword tags used to categorize events and entities in Pittsburgh.` },
+            ],
+        };
+    },
 });
 
 const accountRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/account',
     component: Account,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/account';
+        return {
+            meta: [
+                { title: `Account • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Account • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Manage your account settings and preferences.` },
+                { name: 'description', content: `Manage your account settings and preferences.` },
+            ],
+        };
+    },
 });
 
 const calendarRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/calendar',
     component: Calendar,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/calendar';
+        return {
+            meta: [
+                { title: `Calendar • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Calendar • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `A calendar of events happening in Pittsburgh.` },
+                { name: 'description', content: `A calendar of events happening in Pittsburgh.` },
+            ],
+        };
+    },
 });
 
 // Build route tree

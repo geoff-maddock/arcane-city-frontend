@@ -27,7 +27,7 @@ import { SeriesFilterContext } from '../context/SeriesFilterContext';
 import { useContext } from 'react';
 import SeriesEvents from './SeriesEvents';
 
-export default function SeriesDetail({ slug }: { slug: string }) {
+export default function SeriesDetail({ slug, initialSeries }: { slug: string; initialSeries?: Series }) {
     const navigate = useNavigate();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -107,6 +107,8 @@ export default function SeriesDetail({ slug }: { slug: string }) {
             const { data } = await api.get<Series>(`/series/${slug}`);
             return data;
         },
+        initialData: initialSeries,
+        staleTime: 60_000,
     });
 
     if (isLoading) {

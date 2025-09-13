@@ -17,6 +17,7 @@ import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
+// SEO handled at route level
 import {
     Dialog,
     DialogContent,
@@ -31,7 +32,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 
-export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
+export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug: string; initialEntity?: Entity }) {
     const navigate = useNavigate();
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
@@ -45,6 +46,10 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
             const { data } = await api.get<Entity>(`/entities/${entitySlug}`);
             return data;
         },
+        // Seed from route loader to avoid duplicate network request
+        initialData: initialEntity,
+        // Consider the data fresh briefly to prevent immediate refetch on mount
+        staleTime: 60_000,
     });
 
     const { data: user } = useQuery({
@@ -125,6 +130,7 @@ export default function EntityDetail({ entitySlug }: { entitySlug: string }) {
             fetchEmbeds();
         }
     }, [entity?.slug]);
+
 
     if (isLoading) {
         return (

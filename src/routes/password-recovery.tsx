@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { userService } from '../services/user.service';
+import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 const PasswordRecovery: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -102,4 +103,19 @@ export const PasswordRecoveryRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/password-recovery',
     component: PasswordRecovery,
+    head: () => {
+        // Build current absolute URL in the client; SSR fallback to site root
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/password-recovery';
+        return {
+            meta: [
+                { title: `Password Recovery • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Password Recovery • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Enter your email address to receive a password recovery link.` },
+                { name: 'description', content: `Enter your email address to receive a password recovery link.` },
+            ],
+        };
+    },
 });
