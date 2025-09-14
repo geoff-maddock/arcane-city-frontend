@@ -25,6 +25,7 @@ interface StructuredDataBase {
         price: string;
         priceCurrency: string;
         availability: string;
+        validFrom: string;
     };
     performer?: Array<{
         "@type": string;

@@ -26,6 +26,9 @@ export interface Event {
     created_by?: number;
     updated_by?: number;
     series?: Series;
+    created_at: string;
+    updated_at: string;
+    canceled_at?: string;
 }
 
 export interface VisibilityResponse {
@@ -83,6 +86,7 @@ export interface EntityResponse {
     facebook_username?: string;
     twitter_username?: string;
     instagram_username?: string;
+    primary_location?: Location;
 }
 
 export interface Location {
