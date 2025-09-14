@@ -16,7 +16,9 @@ const mockEvent: Event = {
     door_price: 25,
     presale_price: 20,
     ticket_link: 'https://example.com/tickets',
-    primary_photo: 'https://example.com/photo.jpg'
+    primary_photo: 'https://example.com/photo.jpg',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
 };
 
 const mockVenue: EntityResponse = {
