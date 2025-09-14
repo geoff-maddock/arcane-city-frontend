@@ -110,25 +110,13 @@ describe('EventStructuredData', () => {
             ticket_link: undefined
         };
 
-        // Mock window.location.origin
-        const originalOrigin = window.location.origin;
-        Object.defineProperty(window.location, 'origin', {
-            configurable: true,
-            value: 'https://example.com'
-        });
-
         const { container } = render(<EventStructuredData event={eventWithoutTicketLink} />);
 
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
 
-        expect(structuredData.offers.url).toBe('https://example.com/events/test-concert');
-
-        // Restore window.location.origin
-        Object.defineProperty(window.location, 'origin', {
-            configurable: true,
-            value: originalOrigin
-        });
+        const expectedUrl = `${window.location.origin}/events/test-concert`;
+        expect(structuredData.offers.url).toBe(expectedUrl);
     });
 
     it('includes performers when entities are available', () => {

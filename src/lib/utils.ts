@@ -107,20 +107,31 @@ export function generateGoogleCalendarLink(event: {
 }): string {
   const action = 'TEMPLATE';
   const text = encodeURIComponent(event.name);
-  
-  // Format dates to 'YYYYMMDDTHHMMSS' format
+
+  // Helper: format date to 'YYYYMMDDTHHMMSS' in UTC to avoid local TZ differences
+  const toGoogleUtc = (d: Date) => {
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const mm = String(d.getUTCMinutes()).padStart(2, '0');
+    const ss = String(d.getUTCSeconds()).padStart(2, '0');
+    return `${y}${m}${day}T${hh}${mm}${ss}`;
+  };
+
+  // Format dates to UTC 'YYYYMMDDTHHMMSS'
   const startDate = new Date(event.start_at);
-  const start = format(startDate, 'yyyyMMdd\'T\'HHmmss');
-  
+  const start = toGoogleUtc(startDate);
+
   // Use end_at if available, otherwise use start_at (following the PHP pattern)
   const endDate = event.end_at ? new Date(event.end_at) : startDate;
-  const end = format(endDate, 'yyyyMMdd\'T\'HHmmss');
-  
+  const end = toGoogleUtc(endDate);
+
   const details = encodeURIComponent(event.description || '');
   const location = encodeURIComponent(event.venue?.name || 'Unknown');
   const sf = 'true';
-  
+
   const url = `https://www.google.com/calendar/render?action=${action}&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=${sf}&output=xml`;
-  
+
   return url;
 }
