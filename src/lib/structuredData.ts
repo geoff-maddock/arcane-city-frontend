@@ -12,6 +12,17 @@ interface StructuredDataBase {
     location?: {
         "@type": string;
         name: string;
+        address?: {
+            "@type": string;
+            streetAddress?: string;
+            addressLocality?: string;
+            addressRegion?: string;
+            postalCode?: string;
+            addressCountry?: {
+                "@type": string;
+                name: string;
+            };
+        };
     };
     description?: string;
     offers: {
@@ -20,6 +31,7 @@ interface StructuredDataBase {
         price: string;
         priceCurrency: string;
         availability: string;
+        validFrom: string;
     };
     performer?: Array<{
         "@type": string;
@@ -52,6 +64,7 @@ export function buildEventStructuredData(event: Event, origin?: string): Structu
             price: event.door_price?.toString() || "0",
             priceCurrency: "USD",
             availability: "https://schema.org/InStock",
+            validFrom: toISO(event.created_at),
         },
     };
 
@@ -63,6 +76,21 @@ export function buildEventStructuredData(event: Event, origin?: string): Structu
             "@type": "Place",
             name: event.venue.name,
         };
+
+        if (event.venue.primary_location) {
+            const loc = event.venue.primary_location;
+            structuredData.location.address = {
+                "@type": "PostalAddress",
+                streetAddress: loc.address_one,
+                addressLocality: loc.city,
+                addressRegion: loc.state,
+                postalCode: loc.postcode,
+                addressCountry: {
+                    "@type": "Country",
+                    name: loc.country ? loc.country : "USA",
+                },
+            };
+        }
     }
 
     if (event.description) structuredData.description = event.description;

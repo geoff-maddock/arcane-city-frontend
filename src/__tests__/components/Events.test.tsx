@@ -81,7 +81,9 @@ describe('Events Component', () => {
                 primary_photo_thumbnail: 'thumb1.jpg',
                 start_at: '2023-01-01T00:00:00Z',
                 attending: 0,
-                like: 0
+                like: 0,
+                created_at: '2022-12-01T00:00:00Z',
+                updated_at: '2022-12-15T00:00:00Z'
             },
             {
                 id: 2,
@@ -91,7 +93,9 @@ describe('Events Component', () => {
                 primary_photo_thumbnail: 'thumb2.jpg',
                 start_at: '2023-01-02T00:00:00Z',
                 attending: 0,
-                like: 0
+                like: 0,
+                created_at: '2022-12-02T00:00:00Z',
+                updated_at: '2022-12-16T00:00:00Z'
             }
         ],
         last_page: 2,
