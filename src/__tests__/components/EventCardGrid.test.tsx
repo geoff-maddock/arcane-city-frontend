@@ -39,6 +39,16 @@ const mockEvent: Event = {
         id: 1,
         name: 'Test Venue',
         slug: 'test-venue',
+        primary_location: {
+            id: 1,
+            slug: 'test-location',
+            name: 'Test Location',
+            address_one: '123 Test St',
+            city: 'Test City',
+            state: 'TS',
+            postcode: '12345',
+            country: 'Testland',
+        }
     },
     event_type: {
         id: 1,
@@ -64,6 +74,8 @@ const mockEvent: Event = {
     attendees: [],
     attending: 0,
     like: 0,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
 };
 
 const mockAllImages = [
