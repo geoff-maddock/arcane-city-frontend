@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RouterProvider } from '@tanstack/react-router'
@@ -13,7 +12,6 @@ function App() {
       <MediaPlayerProvider>
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={false} />
-        <Analytics />
       </MediaPlayerProvider>
     </QueryClientProvider>
   )
