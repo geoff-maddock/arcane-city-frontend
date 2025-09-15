@@ -147,7 +147,8 @@ describe('Events Component', () => {
 
         // Check for main components
         expect(screen.getByText('Event Listings')).toBeInTheDocument()
-        expect(screen.getByTestId('event-filters')).toBeInTheDocument()
+        // Filters should be hidden by default
+        expect(screen.queryByTestId('event-filters')).not.toBeInTheDocument()
 
         // Check that events are rendered
         await waitFor(() => {
@@ -203,10 +204,16 @@ describe('Events Component', () => {
 
         render(<Events />)
 
-        // Filters should be visible by default
+        // Filters should be hidden by default
+        expect(screen.queryByTestId('event-filters')).not.toBeInTheDocument()
+
+        // Click the toggle button to show filters
+        fireEvent.click(screen.getByText(/show filters/i))
+
+        // Filters should now be visible
         expect(screen.getByTestId('event-filters')).toBeInTheDocument()
 
-        // Click the toggle button
+        // Click the toggle button again to hide filters
         fireEvent.click(screen.getByText(/hide filters/i))
 
         // Filters should be hidden
@@ -253,6 +260,9 @@ describe('Events Component', () => {
             })
 
             render(<Events />)
+
+            // First show the filters since they're hidden by default
+            fireEvent.click(screen.getByText(/show filters/i))
 
             // Click the button to trigger the filter change
             fireEvent.click(screen.getByTestId('update-filters-button'))
