@@ -75,6 +75,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         className="w-full mt-2 px-2 hidden xl:block"
       >
         <Input
+          id="search-input"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search"
