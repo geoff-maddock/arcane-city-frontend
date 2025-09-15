@@ -49,9 +49,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
     const navigate = useNavigate();
     const { mediaPlayersEnabled } = useMediaPlayerContext();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
-    const [embeds, setEmbeds] = useState<string[]>([]);
-    const [embedsLoading, setEmbedsLoading] = useState(false);
-    const [embedsError, setEmbedsError] = useState<Error | null>(null);
+    // Embeds now handled via React Query below; these legacy states removed.
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [instagramDialogOpen, setInstagramDialogOpen] = useState(false);
@@ -157,30 +155,22 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         }
     }, [user, event?.attendees]);
 
-    // Fetch event embeds after the event detail is loaded
-    useEffect(() => {
-        if (event?.slug && mediaPlayersEnabled) {
-            const fetchEmbeds = async () => {
-                setEmbedsLoading(true);
-                try {
-                    const response = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
-                    console.log('Fetched embeds:', response.data.data, 'Length:', response.data.data.length);
-                    setEmbeds(response.data.data);
-                } catch (err) {
-                    console.error('Error fetching embeds:', err);
-                    setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
-                } finally {
-                    setEmbedsLoading(false);
-                }
-            };
-            fetchEmbeds();
-        } else if (!mediaPlayersEnabled) {
-            // Clear embeds when media players are disabled
-            setEmbeds([]);
-            setEmbedsLoading(false);
-            setEmbedsError(null);
-        }
-    }, [event?.slug, mediaPlayersEnabled]);
+    // React Query: fetch embeds when media players enabled & event slug available
+    const {
+        data: embeds = [],
+        isLoading: embedsLoading,
+        error: embedsError,
+    } = useQuery<string[], Error>({
+        queryKey: ['eventEmbeds', event?.slug],
+        queryFn: async () => {
+            if (!event?.slug) return [];
+            const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
+            return data.data;
+        },
+        enabled: !!event?.slug && mediaPlayersEnabled,
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
 
     if (isLoading) {
