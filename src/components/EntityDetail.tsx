@@ -17,6 +17,7 @@ import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 // SEO handled at route level
 import {
     Dialog,
@@ -34,6 +35,7 @@ import {
 
 export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug: string; initialEntity?: Entity }) {
     const navigate = useNavigate();
+    const { mediaPlayersEnabled } = useMediaPlayerContext();
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
@@ -113,7 +115,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
 
     // Fetch event embeds after the entity detail is loaded
     useEffect(() => {
-        if (entity?.slug) {
+        if (entity?.slug && mediaPlayersEnabled) {
             const fetchEmbeds = async () => {
                 setEmbedsLoading(true);
                 try {
@@ -128,8 +130,13 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                 }
             };
             fetchEmbeds();
+        } else if (!mediaPlayersEnabled) {
+            // Clear embeds when media players are disabled
+            setEmbeds([]);
+            setEmbedsLoading(false);
+            setEmbedsError(null);
         }
-    }, [entity?.slug]);
+    }, [entity?.slug, mediaPlayersEnabled]);
 
 
     if (isLoading) {
@@ -365,7 +372,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                             )}
 
                             {/* Audio Embeds Section */}
-                            {embeds.length > 0 && !embedsLoading && (
+                            {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
                                 <Card>
                                     <CardContent className="p-6 space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
@@ -390,7 +397,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                             )}
 
                             {/* Loading state for embeds */}
-                            {embedsLoading && (
+                            {mediaPlayersEnabled && embedsLoading && (
                                 <div className="flex items-center justify-center py-6">
                                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                                     <span className="ml-2 text-gray-600">Loading audio...</span>
@@ -398,7 +405,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                             )}
 
                             {/* Error state for embeds */}
-                            {embedsError && !embedsLoading && (
+                            {mediaPlayersEnabled && embedsError && !embedsLoading && (
                                 <div className="text-red-500 text-sm">
                                     Error loading audio content. Please try again later.
                                 </div>

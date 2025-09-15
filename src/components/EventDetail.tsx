@@ -41,11 +41,13 @@ import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 // Structured data is injected via the route head() now
 
 
 export default function EventDetail({ slug, initialEvent }: { slug: string; initialEvent?: Event }) {
     const navigate = useNavigate();
+    const { mediaPlayersEnabled } = useMediaPlayerContext();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
@@ -157,7 +159,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
 
     // Fetch event embeds after the event detail is loaded
     useEffect(() => {
-        if (event?.slug) {
+        if (event?.slug && mediaPlayersEnabled) {
             const fetchEmbeds = async () => {
                 setEmbedsLoading(true);
                 try {
@@ -172,8 +174,13 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                 }
             };
             fetchEmbeds();
+        } else if (!mediaPlayersEnabled) {
+            // Clear embeds when media players are disabled
+            setEmbeds([]);
+            setEmbedsLoading(false);
+            setEmbedsError(null);
         }
-    }, [event?.slug]);
+    }, [event?.slug, mediaPlayersEnabled]);
 
 
     if (isLoading) {
@@ -512,7 +519,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                 onPrimaryUpdate={refetch}
                             />
                             {/* Audio Embeds Section */}
-                            {embeds.length > 0 && !embedsLoading && (
+                            {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
                                 <Card>
                                     <CardContent className="p-6 space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
@@ -537,7 +544,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             )}
 
                             {/* Loading state for embeds */}
-                            {embedsLoading && (
+                            {mediaPlayersEnabled && embedsLoading && (
                                 <div className="flex items-center justify-center py-6">
                                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                                     <span className="ml-2 text-gray-600">Loading audio...</span>
@@ -545,7 +552,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             )}
 
                             {/* Error state for embeds */}
-                            {embedsError && !embedsLoading && (
+                            {mediaPlayersEnabled && embedsError && !embedsLoading && (
                                 <div className="text-red-500 text-sm">
                                     Error loading audio content. Please try again later.
                                 </div>
