@@ -41,15 +41,15 @@ import PhotoGallery from './PhotoGallery';
 import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
+import { useMediaPlayerContext } from '../context/MediaPlayerContext';
 // Structured data is injected via the route head() now
 
 
 export default function EventDetail({ slug, initialEvent }: { slug: string; initialEvent?: Event }) {
     const navigate = useNavigate();
+    const { mediaPlayersEnabled } = useMediaPlayerContext();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
-    const [embeds, setEmbeds] = useState<string[]>([]);
-    const [embedsLoading, setEmbedsLoading] = useState(false);
-    const [embedsError, setEmbedsError] = useState<Error | null>(null);
+    // Embeds now handled via React Query below; these legacy states removed.
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [instagramDialogOpen, setInstagramDialogOpen] = useState(false);
@@ -155,25 +155,22 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         }
     }, [user, event?.attendees]);
 
-    // Fetch event embeds after the event detail is loaded
-    useEffect(() => {
-        if (event?.slug) {
-            const fetchEmbeds = async () => {
-                setEmbedsLoading(true);
-                try {
-                    const response = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
-                    console.log('Fetched embeds:', response.data.data, 'Length:', response.data.data.length);
-                    setEmbeds(response.data.data);
-                } catch (err) {
-                    console.error('Error fetching embeds:', err);
-                    setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
-                } finally {
-                    setEmbedsLoading(false);
-                }
-            };
-            fetchEmbeds();
-        }
-    }, [event?.slug]);
+    // React Query: fetch embeds when media players enabled & event slug available
+    const {
+        data: embeds = [],
+        isLoading: embedsLoading,
+        error: embedsError,
+    } = useQuery<string[], Error>({
+        queryKey: ['eventEmbeds', event?.slug],
+        queryFn: async () => {
+            if (!event?.slug) return [];
+            const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
+            return data.data;
+        },
+        enabled: !!event?.slug && mediaPlayersEnabled,
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
 
     if (isLoading) {
@@ -512,7 +509,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                 onPrimaryUpdate={refetch}
                             />
                             {/* Audio Embeds Section */}
-                            {embeds.length > 0 && !embedsLoading && (
+                            {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
                                 <Card>
                                     <CardContent className="p-6 space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
@@ -537,7 +534,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             )}
 
                             {/* Loading state for embeds */}
-                            {embedsLoading && (
+                            {mediaPlayersEnabled && embedsLoading && (
                                 <div className="flex items-center justify-center py-6">
                                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                                     <span className="ml-2 text-gray-600">Loading audio...</span>
@@ -545,7 +542,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             )}
 
                             {/* Error state for embeds */}
-                            {embedsError && !embedsLoading && (
+                            {mediaPlayersEnabled && embedsError && !embedsLoading && (
                                 <div className="text-red-500 text-sm">
                                     Error loading audio content. Please try again later.
                                 </div>
