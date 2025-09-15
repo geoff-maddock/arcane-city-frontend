@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "composite": true,
+        "skipLibCheck": true,
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": [
+            "node"
+        ]
+    },
+    "include": [
+        "vite.config.ts",
+        "vitest.config.ts",
+        "scripts/**/*.ts",
+        "scripts/**/*.js"
+    ]
+}
