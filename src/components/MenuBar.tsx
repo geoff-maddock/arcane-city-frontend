@@ -216,6 +216,7 @@ const MenuBar: React.FC = () => {
           className="px-2"
         >
           <Input
+            id="search-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
