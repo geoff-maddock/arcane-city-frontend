@@ -39,7 +39,7 @@ describe('useFilterToggle', () => {
     it('should initialize with default visible state when no stored value exists', () => {
         const { result } = renderHook(() => useFilterToggle());
 
-        expect(result.current.filtersVisible).toBe(true);
+        expect(result.current.filtersVisible).toBe(false);
     });
 
     it('should initialize with custom default visible state', () => {
@@ -67,12 +67,6 @@ describe('useFilterToggle', () => {
     it('should toggle filter visibility', () => {
         const { result } = renderHook(() => useFilterToggle());
 
-        expect(result.current.filtersVisible).toBe(true);
-
-        act(() => {
-            result.current.toggleFilters();
-        });
-
         expect(result.current.filtersVisible).toBe(false);
 
         act(() => {
@@ -80,6 +74,12 @@ describe('useFilterToggle', () => {
         });
 
         expect(result.current.filtersVisible).toBe(true);
+
+        act(() => {
+            result.current.toggleFilters();
+        });
+
+        expect(result.current.filtersVisible).toBe(false);
     });
 
     it('should persist state changes to localStorage', () => {
@@ -89,13 +89,13 @@ describe('useFilterToggle', () => {
             result.current.toggleFilters();
         });
 
-        expect(localStorageMock.getItem('filtersVisible')).toBe('false');
+        expect(localStorageMock.getItem('filtersVisible')).toBe('true');
 
         act(() => {
             result.current.toggleFilters();
         });
 
-        expect(localStorageMock.getItem('filtersVisible')).toBe('true');
+        expect(localStorageMock.getItem('filtersVisible')).toBe('false');
     });
 
     it('should handle localStorage parse errors gracefully', () => {
@@ -103,7 +103,7 @@ describe('useFilterToggle', () => {
 
         const { result } = renderHook(() => useFilterToggle());
 
-        expect(result.current.filtersVisible).toBe(true);
+        expect(result.current.filtersVisible).toBe(false);
         expect(consoleSpy).toHaveBeenCalledWith(
             'Failed to parse filtersVisible from localStorage:',
             expect.any(Error)
@@ -135,12 +135,6 @@ describe('useFilterToggle', () => {
     it('should allow manual state setting', () => {
         const { result } = renderHook(() => useFilterToggle());
 
-        expect(result.current.filtersVisible).toBe(true);
-
-        act(() => {
-            result.current.setFiltersVisible(false);
-        });
-
         expect(result.current.filtersVisible).toBe(false);
 
         act(() => {
@@ -148,5 +142,11 @@ describe('useFilterToggle', () => {
         });
 
         expect(result.current.filtersVisible).toBe(true);
+
+        act(() => {
+            result.current.setFiltersVisible(false);
+        });
+
+        expect(result.current.filtersVisible).toBe(false);
     });
 });

@@ -8,7 +8,7 @@ interface UseFilterToggleOptions {
     storageKey?: string;
     /**
      * The default visibility state when no stored value exists.
-     * Defaults to true
+     * Defaults to false
      */
     defaultVisible?: boolean;
 }
@@ -20,7 +20,7 @@ interface UseFilterToggleOptions {
  * @returns An object containing the visibility state and toggle function
  */
 export function useFilterToggle(options: UseFilterToggleOptions = {}) {
-    const { storageKey = 'filtersVisible', defaultVisible = true } = options;
+    const { storageKey = 'filtersVisible', defaultVisible = false } = options;
 
     const [filtersVisible, setFiltersVisible] = useState<boolean>(() => {
         try {
