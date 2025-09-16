@@ -82,7 +82,7 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
     const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
 
     return (
-    <Card className="group overflow-hidden transition-all hover:shadow-md">
+        <Card className="group overflow-hidden transition-all hover:shadow-md">
             {/* Move image outside padded content so it touches card edges like EventCard */}
             <div className="thumbnail">
                 <ImageLightbox
