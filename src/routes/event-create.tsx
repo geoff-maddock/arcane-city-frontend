@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createRoute, useNavigate, Link } from '@tanstack/react-router';
+import { createRoute, useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +17,8 @@ import { eventCreateSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useQuery } from '@tanstack/react-query';
+import type { Event } from '../types/api';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -24,6 +26,20 @@ interface ValidationErrors {
 
 const EventCreate: React.FC = () => {
   const navigate = useNavigate();
+  const { duplicate } = useSearch({ from: '/event/create' }) as { duplicate?: string };
+  
+  // Fetch event data for duplication if duplicate slug is provided
+  const { data: duplicateEvent } = useQuery<Event | null>({
+    queryKey: ['event', duplicate],
+    queryFn: async () => {
+      if (!duplicate) return null;
+      const { data } = await api.get<Event>(`/events/${duplicate}`);
+      return data;
+    },
+    enabled: !!duplicate,
+    staleTime: 60_000,
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -77,7 +93,7 @@ const EventCreate: React.FC = () => {
     })
   });
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
-  const [duplicateEvent, setDuplicateEvent] = useState<{ name: string; slug: string } | null>(null);
+  const [duplicateEventState, setDuplicateEventState] = useState<{ name: string; slug: string } | null>(null);
 
   // Shared form field classes (light + dark) for consistent contrast
   const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
@@ -92,12 +108,58 @@ const EventCreate: React.FC = () => {
     }
   }, [visibilityOptions, formData.visibility_id]);
 
+  // Pre-populate form data when duplicating an event
+  useEffect(() => {
+    if (duplicateEvent && duplicate) {
+      // Create new name and slug for the duplicate
+      const duplicateName = `${duplicateEvent.name} - Copy`;
+      const duplicateSlug = `${duplicateEvent.slug}-copy`;
+      
+      setFormData(prev => ({
+        ...prev,
+        name: duplicateName,
+        slug: duplicateSlug,
+        short: duplicateEvent.short || '',
+        description: duplicateEvent.description || '',
+        event_type_id: duplicateEvent.event_type?.id || '',
+        promoter_id: duplicateEvent.promoter?.id || '',
+        venue_id: duplicateEvent.venue?.id || '',
+        is_benefit: duplicateEvent.is_benefit || false,
+        presale_price: duplicateEvent.presale_price ? duplicateEvent.presale_price.toString() : '',
+        door_price: duplicateEvent.door_price ? duplicateEvent.door_price.toString() : '',
+        min_age: duplicateEvent.min_age ? duplicateEvent.min_age.toString() : '',
+        ticket_link: duplicateEvent.ticket_link || '',
+        tag_list: duplicateEvent.tags?.map(tag => tag.id) || [],
+        entity_list: duplicateEvent.entities?.map(entity => entity.id) || [],
+        // Clear date/time fields as they should be set manually for new event
+        door_at: '',
+        start_at: '',
+        end_at: '',
+        soundcheck_at: '',
+        cancelled_at: '',
+        series_id: '', // Don't duplicate series assignment
+      }));
+      
+      // Set the name and slug in the slug hook
+      setName(duplicateName);
+      setSlug(duplicateSlug);
+      
+      // Set selected tags and entities for the UI
+      if (duplicateEvent.tags) {
+        setSelectedTags(duplicateEvent.tags.map(tag => ({ id: tag.id, name: tag.name })));
+      }
+      if (duplicateEvent.entities) {
+        setSelectedEntities(duplicateEvent.entities.map(entity => ({ id: entity.id, name: entity.name })));
+      }
+    }
+  }, [duplicateEvent, duplicate, setName, setSlug]);
+
   useEffect(() => {
     const name = formData.name.trim();
     const slug = formData.slug.trim();
     if (!name || !slug) {
       setNameCheck('idle');
-      setDuplicateEvent(null);
+      setDuplicateEventState(null);
       return;
     }
     const controller = new AbortController();
@@ -112,10 +174,10 @@ const EventCreate: React.FC = () => {
         });
         if (data?.data?.length > 0) {
           const evt = data.data[0];
-          setDuplicateEvent({ name: evt.name, slug: evt.slug });
+          setDuplicateEventState({ name: evt.name, slug: evt.slug });
           setNameCheck('duplicate');
         } else {
-          setDuplicateEvent(null);
+          setDuplicateEventState(null);
           setNameCheck('unique');
         }
       } catch {
@@ -190,7 +252,9 @@ const EventCreate: React.FC = () => {
 
   return (
     <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">Create Event</h1>
+      <h1 className="text-2xl font-bold">
+        {duplicate ? `Duplicate Event${duplicateEvent ? ` - ${duplicateEvent.name}` : ''}` : 'Create Event'}
+      </h1>
       {generalError && <div className="text-red-500">{generalError}</div>}
       <ValidationSummary errorSummary={errorSummary} />
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -204,11 +268,11 @@ const EventCreate: React.FC = () => {
           {nameCheck === 'unique' && (
             <p className="text-green-500 text-sm">No other event found with the same name or slug.</p>
           )}
-          {nameCheck === 'duplicate' && duplicateEvent && (
+          {nameCheck === 'duplicate' && duplicateEventState && (
             <p className="text-red-500 text-sm">
               Another event found with the same name:{' '}
-              <Link to="/events/$slug" params={{ slug: duplicateEvent.slug }} className="underline">
-                {duplicateEvent.name}
+              <Link to="/events/$slug" params={{ slug: duplicateEventState.slug }} className="underline">
+                {duplicateEventState.name}
               </Link>
               . Please verify this is not a duplicate.
             </p>
@@ -482,6 +546,11 @@ const EventCreate: React.FC = () => {
 export const EventCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/event/create',
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      duplicate: search.duplicate as string | undefined,
+    };
+  },
   component: EventCreate,
   head: () => {
     // Build current absolute URL in the client; SSR fallback to site root

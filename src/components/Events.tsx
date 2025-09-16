@@ -186,7 +186,7 @@ export default function Events() {
                             </p>
                             {user && (
                                 <Button asChild className="self-start">
-                                    <Link to="/event/create">Create Event</Link>
+                                    <Link to="/event/create" search={{ duplicate: undefined }}>Create Event</Link>
                                 </Button>
                             )}
                         </div>
