@@ -204,7 +204,7 @@ describe('EventStructuredData', () => {
         const script = container.querySelector('script[type="application/ld+json"]');
         const structuredData = JSON.parse(script?.textContent || '{}');
 
-        expect(structuredData.endDate).toBeUndefined();
+        expect(structuredData.endDate).toBe('2024-03-16T00:00:00.000Z');
         expect(structuredData.startDate).toBe('2024-03-15T20:00:00.000Z');
     });
 
