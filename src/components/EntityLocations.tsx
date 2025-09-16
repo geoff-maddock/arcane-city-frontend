@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Location } from '../types/api';
@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useSlug } from '@/hooks/useSlug';
 import {
     Dialog,
     DialogContent,
@@ -31,6 +32,8 @@ interface EntityLocationsProps {
 }
 
 export default function EntityLocations({ entityId, entitySlug, canEdit }: EntityLocationsProps) {
+    // Shared field classes to match Create Entity form contrast (light/dark)
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
     const { data, isLoading, error, refetch } = useQuery<Location[]>({
         queryKey: ['entity', entitySlug, 'locations'],
         queryFn: async () => {
@@ -65,6 +68,23 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
         visibility_id: 1,
         location_type_id: 1
     });
+
+    // Use same slug behavior as Entity Create: auto-generate from name until user edits slug
+    const {
+        name: createName,
+        slug: createSlug,
+        setName: setCreateName,
+        setSlug: setCreateSlug,
+        initialize: initializeCreateSlug,
+        manuallyOverridden: slugOverridden,
+    } = useSlug('', '');
+
+    // Reset the slug hook whenever the create dialog is opened fresh
+    useEffect(() => {
+        if (isCreateOpen) {
+            initializeCreateSlug('', '');
+        }
+    }, [isCreateOpen, initializeCreateSlug]);
 
     const saveMutation = useMutation({
         mutationFn: async (loc: Location) => {
@@ -109,6 +129,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                 visibility_id: 1,
                 location_type_id: 1
             });
+            initializeCreateSlug('', '');
         },
         onError: (error: ApiError) => {
             console.error('Error creating location:', error);
@@ -196,30 +217,9 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
         );
     }
 
-    if (!data || data.length === 0) {
-        return canEdit ? (
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5" />
-                            <h2 className="text-xl font-semibold">Locations</h2>
-                        </div>
-                        <Button
-                            size="sm"
-                            onClick={() => setIsCreateOpen(true)}
-                            className="flex items-center gap-1"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Add Location
-                        </Button>
-                    </div>
-                    <div className="text-gray-500 text-sm">
-                        No locations found for this entity.
-                    </div>
-                </CardContent>
-            </Card>
-        ) : null;
+    // Preserve behavior: if no data and user cannot edit, render nothing
+    if ((!data || data.length === 0) && !canEdit) {
+        return null;
     }
 
     return (
@@ -242,60 +242,66 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                             </Button>
                         )}
                     </div>
-                    <ul className="space-y-3">
-                        {data.map((loc) => (
-                            <li key={loc.id} className="flex justify-between gap-2 text-sm">
-                                <div className="flex-1">
-                                    <div className="font-medium">{loc.name}</div>
-                                    {loc.address_one && <div>{loc.address_one}</div>}
-                                    {loc.address_two && <div>{loc.address_two}</div>}
-                                    {loc.neighborhood && (
-                                        <div className="text-xs text-gray-600">{loc.neighborhood}</div>
-                                    )}
-                                    <div>
-                                        {loc.city}
-                                        {loc.state && `, ${loc.state}`}
-                                        {loc.postcode && ` ${loc.postcode}`}
+                    {(!data || data.length === 0) ? (
+                        <div className="text-gray-500 text-sm">
+                            No locations found for this entity.
+                        </div>
+                    ) : (
+                        <ul className="space-y-3">
+                            {data.map((loc) => (
+                                <li key={loc.id} className="flex justify-between gap-2 text-sm">
+                                    <div className="flex-1">
+                                        <div className="font-medium">{loc.name}</div>
+                                        {loc.address_one && <div>{loc.address_one}</div>}
+                                        {loc.address_two && <div>{loc.address_two}</div>}
+                                        {loc.neighborhood && (
+                                            <div className="text-xs text-gray-600">{loc.neighborhood}</div>
+                                        )}
+                                        <div>
+                                            {loc.city}
+                                            {loc.state && `, ${loc.state}`}
+                                            {loc.postcode && ` ${loc.postcode}`}
+                                        </div>
+                                        {loc.country && loc.country !== loc.city && (
+                                            <div className="text-xs text-gray-600">{loc.country}</div>
+                                        )}
                                     </div>
-                                    {loc.country && loc.country !== loc.city && (
-                                        <div className="text-xs text-gray-600">{loc.country}</div>
+                                    {canEdit && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                className="text-gray-600 hover:text-gray-900"
+                                                onClick={() => {
+                                                    // Ensure all fields have default values
+                                                    const locationToEdit = {
+                                                        ...loc,
+                                                        latitude: loc.latitude ?? 0,
+                                                        longitude: loc.longitude ?? 0,
+                                                        visibility_id: loc.visibility_id ?? 1,
+                                                        location_type_id: loc.location_type_id ?? 1
+                                                    };
+                                                    setEditing(locationToEdit);
+                                                    setIsEditOpen(true);
+                                                }}
+                                                aria-label="Edit location"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                className="text-red-600 hover:text-red-800"
+                                                onClick={() => {
+                                                    setDeleting(loc);
+                                                    setIsDeleteOpen(true);
+                                                }}
+                                                aria-label="Delete location"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     )}
-                                </div>
-                                {canEdit && (
-                                    <div className="flex gap-2">
-                                        <button
-                                            className="text-gray-600 hover:text-gray-900"
-                                            onClick={() => {
-                                                // Ensure all fields have default values
-                                                const locationToEdit = {
-                                                    ...loc,
-                                                    latitude: loc.latitude ?? 0,
-                                                    longitude: loc.longitude ?? 0,
-                                                    visibility_id: loc.visibility_id ?? 1,
-                                                    location_type_id: loc.location_type_id ?? 1
-                                                };
-                                                setEditing(locationToEdit);
-                                                setIsEditOpen(true);
-                                            }}
-                                            aria-label="Edit location"
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            className="text-red-600 hover:text-red-800"
-                                            onClick={() => {
-                                                setDeleting(loc);
-                                                setIsDeleteOpen(true);
-                                            }}
-                                            aria-label="Delete location"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </CardContent>
             </Card>
 
@@ -455,8 +461,18 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                 <Label htmlFor="create-location-name">Name</Label>
                                 <Input
                                     id="create-location-name"
-                                    value={creating.name}
-                                    onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                    value={createName}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setCreateName(val);
+                                        setCreating((prev) => ({ ...prev, name: val }));
+                                        if (!slugOverridden) {
+                                            queueMicrotask(() =>
+                                                setCreating((p) => ({ ...p, slug: createSlug }))
+                                            );
+                                        }
+                                    }}
+                                    className={fieldClasses}
                                     required
                                 />
                             </div>
@@ -464,8 +480,13 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                 <Label htmlFor="create-location-slug">Slug</Label>
                                 <Input
                                     id="create-location-slug"
-                                    value={creating.slug}
-                                    onChange={(e) => setCreating({ ...creating, slug: e.target.value })}
+                                    value={createSlug}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setCreateSlug(val);
+                                        setCreating((prev) => ({ ...prev, slug: val }));
+                                    }}
+                                    className={fieldClasses}
                                     required
                                 />
                             </div>
@@ -477,6 +498,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     onChange={(e) =>
                                         setCreating({ ...creating, address_one: e.target.value })
                                     }
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -487,6 +509,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     onChange={(e) =>
                                         setCreating({ ...creating, address_two: e.target.value })
                                     }
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -495,6 +518,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-neighborhood"
                                     value={creating.neighborhood ?? ''}
                                     onChange={(e) => setCreating({ ...creating, neighborhood: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -503,6 +527,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-city"
                                     value={creating.city ?? ''}
                                     onChange={(e) => setCreating({ ...creating, city: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -511,6 +536,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-state"
                                     value={creating.state ?? ''}
                                     onChange={(e) => setCreating({ ...creating, state: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -519,6 +545,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-postal"
                                     value={creating.postcode ?? ''}
                                     onChange={(e) => setCreating({ ...creating, postcode: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -527,6 +554,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-country"
                                     value={creating.country ?? ''}
                                     onChange={(e) => setCreating({ ...creating, country: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -535,6 +563,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-map-url"
                                     value={creating.map_url ?? ''}
                                     onChange={(e) => setCreating({ ...creating, map_url: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                         </div>
