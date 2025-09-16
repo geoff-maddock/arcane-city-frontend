@@ -11,9 +11,10 @@ interface ImageLightboxProps {
     alt: string;
     allImages: Array<{ src: string; alt: string; thumbnail?: string }>;
     initialIndex: number;
+    containerClassName?: string;
 }
 
-export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex }: ImageLightboxProps) {
+export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex, containerClassName }: ImageLightboxProps) {
     const [open, setOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
@@ -51,7 +52,7 @@ export function ImageLightbox({ thumbnailUrl, alt, allImages, initialIndex }: Im
         <>
             <div
                 onClick={() => setOpen(true)}
-                className="cursor-pointer overflow-hidden rounded-l-lg"
+                className={containerClassName ?? "cursor-pointer overflow-hidden rounded-l-lg"}
             >
                 <AspectRatio ratio={1}>
                     <img
