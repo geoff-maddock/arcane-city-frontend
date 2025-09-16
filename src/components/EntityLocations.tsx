@@ -31,6 +31,8 @@ interface EntityLocationsProps {
 }
 
 export default function EntityLocations({ entityId, entitySlug, canEdit }: EntityLocationsProps) {
+    // Shared field classes to match Create Entity form contrast (light/dark)
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
     const { data, isLoading, error, refetch } = useQuery<Location[]>({
         queryKey: ['entity', entitySlug, 'locations'],
         queryFn: async () => {
@@ -442,6 +444,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-name"
                                     value={creating.name}
                                     onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                    className={fieldClasses}
                                     required
                                 />
                             </div>
@@ -451,6 +454,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-slug"
                                     value={creating.slug}
                                     onChange={(e) => setCreating({ ...creating, slug: e.target.value })}
+                                    className={fieldClasses}
                                     required
                                 />
                             </div>
@@ -462,6 +466,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     onChange={(e) =>
                                         setCreating({ ...creating, address_one: e.target.value })
                                     }
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -472,6 +477,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     onChange={(e) =>
                                         setCreating({ ...creating, address_two: e.target.value })
                                     }
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -480,6 +486,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-neighborhood"
                                     value={creating.neighborhood ?? ''}
                                     onChange={(e) => setCreating({ ...creating, neighborhood: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -488,6 +495,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-city"
                                     value={creating.city ?? ''}
                                     onChange={(e) => setCreating({ ...creating, city: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -496,6 +504,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-state"
                                     value={creating.state ?? ''}
                                     onChange={(e) => setCreating({ ...creating, state: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -504,6 +513,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-postal"
                                     value={creating.postcode ?? ''}
                                     onChange={(e) => setCreating({ ...creating, postcode: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -512,6 +522,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-country"
                                     value={creating.country ?? ''}
                                     onChange={(e) => setCreating({ ...creating, country: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -520,6 +531,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                     id="create-location-map-url"
                                     value={creating.map_url ?? ''}
                                     onChange={(e) => setCreating({ ...creating, map_url: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                         </div>

@@ -34,6 +34,8 @@ interface EntityLinksProps {
 }
 
 export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLinksProps) {
+    // Shared field classes to match Create Entity form contrast (light/dark)
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
     const { data, isLoading, error, refetch } = useQuery<EntityLink[]>({
         queryKey: ['entity', entitySlug, 'links'],
         queryFn: async () => {
@@ -199,11 +201,12 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit} className="space-y-4 mt-2">
                             <div className="space-y-2">
-                                <Label htmlFor="create-link-title">Title</Label>
+                                <Label htmlFor="create-link-text">Text</Label>
                                 <Input
-                                    id="create-link-title"
-                                    value={creating.title ?? ''}
-                                    onChange={(e) => setCreating({ ...creating, title: e.target.value })}
+                                    id="create-link-text"
+                                    value={creating.text ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, text: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -212,18 +215,20 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                     id="create-link-url"
                                     value={creating.url ?? ''}
                                     onChange={(e) => setCreating({ ...creating, url: e.target.value })}
+                                    className={fieldClasses}
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="create-link-text">Text</Label>
-                                <Textarea
-                                    id="create-link-text"
-                                    value={creating.text ?? ''}
-                                    onChange={(e) => setCreating({ ...creating, text: e.target.value })}
-                                    rows={3}
+                                <Label htmlFor="create-link-title">Title</Label>
+                                <Input
+                                    id="create-link-title"
+                                    value={creating.title ?? ''}
+                                    onChange={(e) => setCreating({ ...creating, title: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
+
                             <div className="flex items-center gap-2">
                                 <Switch
                                     id="create-link-primary"

@@ -32,6 +32,8 @@ interface EntityContactsProps {
 }
 
 export default function EntityContacts({ entityId, entitySlug, canEdit }: EntityContactsProps) {
+    // Shared field classes to match Create Entity form contrast (light/dark)
+    const fieldClasses = "bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400";
     const { data, isLoading, error, refetch } = useQuery<Contact[]>({
         queryKey: ['entity', entitySlug, 'contacts'],
         queryFn: async () => {
@@ -212,6 +214,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     id="create-contact-name"
                                     value={creating.name}
                                     onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                    className={fieldClasses}
                                     required
                                 />
                             </div>
@@ -221,7 +224,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     value={creating.type}
                                     onValueChange={(value) => setCreating({ ...creating, type: value })}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
                                         <SelectValue placeholder="Select contact type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -242,6 +245,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     type="email"
                                     value={creating.email ?? ''}
                                     onChange={(e) => setCreating({ ...creating, email: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -250,6 +254,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     id="create-contact-phone"
                                     value={creating.phone ?? ''}
                                     onChange={(e) => setCreating({ ...creating, phone: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -258,6 +263,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     id="create-contact-other"
                                     value={creating.other ?? ''}
                                     onChange={(e) => setCreating({ ...creating, other: e.target.value })}
+                                    className={fieldClasses}
                                 />
                             </div>
                             <DialogFooter>
