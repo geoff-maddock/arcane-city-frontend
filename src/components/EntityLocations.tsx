@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Location } from '../types/api';
@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useSlug } from '@/hooks/useSlug';
 import {
     Dialog,
     DialogContent,
@@ -68,6 +69,23 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
         location_type_id: 1
     });
 
+    // Use same slug behavior as Entity Create: auto-generate from name until user edits slug
+    const {
+        name: createName,
+        slug: createSlug,
+        setName: setCreateName,
+        setSlug: setCreateSlug,
+        initialize: initializeCreateSlug,
+        manuallyOverridden: slugOverridden,
+    } = useSlug('', '');
+
+    // Reset the slug hook whenever the create dialog is opened fresh
+    useEffect(() => {
+        if (isCreateOpen) {
+            initializeCreateSlug('', '');
+        }
+    }, [isCreateOpen, initializeCreateSlug]);
+
     const saveMutation = useMutation({
         mutationFn: async (loc: Location) => {
             await api.put(`/entities/${entityId}/locations/${loc.id}`, loc);
@@ -111,6 +129,7 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                 visibility_id: 1,
                 location_type_id: 1
             });
+            initializeCreateSlug('', '');
         },
         onError: (error: ApiError) => {
             console.error('Error creating location:', error);
@@ -442,8 +461,17 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                 <Label htmlFor="create-location-name">Name</Label>
                                 <Input
                                     id="create-location-name"
-                                    value={creating.name}
-                                    onChange={(e) => setCreating({ ...creating, name: e.target.value })}
+                                    value={createName}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setCreateName(val);
+                                        setCreating((prev) => ({ ...prev, name: val }));
+                                        if (!slugOverridden) {
+                                            queueMicrotask(() =>
+                                                setCreating((p) => ({ ...p, slug: createSlug }))
+                                            );
+                                        }
+                                    }}
                                     className={fieldClasses}
                                     required
                                 />
@@ -452,8 +480,12 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                                 <Label htmlFor="create-location-slug">Slug</Label>
                                 <Input
                                     id="create-location-slug"
-                                    value={creating.slug}
-                                    onChange={(e) => setCreating({ ...creating, slug: e.target.value })}
+                                    value={createSlug}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setCreateSlug(val);
+                                        setCreating((prev) => ({ ...prev, slug: val }));
+                                    }}
                                     className={fieldClasses}
                                     required
                                 />
