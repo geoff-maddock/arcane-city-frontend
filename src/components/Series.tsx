@@ -161,7 +161,7 @@ export default function Series() {
                             </p>
                             {user && (
                                 <Button asChild className="self-start">
-                                    <Link to="/series/create">Create Series</Link>
+                                    <Link to="/series/create" search={{ fromEvent: undefined }}>Create Series</Link>
                                 </Button>
                             )}
                         </div>

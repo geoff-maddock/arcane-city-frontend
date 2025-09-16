@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2, Copy, Plus } from 'lucide-react';
 // Lucide doesn't ship an Instagram brand icon; create a lightweight inline SVG component
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -250,6 +250,24 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                                 <InstagramIcon className="h-5 w-5" /> Post to Instagram
                                                             </button>
                                                         )}
+                                                        <Link
+                                                            to="/event/create"
+                                                            search={{ duplicate: event.slug }}
+                                                            className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors w-full"
+                                                            onClick={() => setActionsMenuOpen(false)}
+                                                        >
+                                                            <Copy className="h-4 w-4" />
+                                                            Duplicate Event
+                                                        </Link>
+                                                        <Link
+                                                            to="/series/create"
+                                                            search={{ fromEvent: event.slug }}
+                                                            className="flex items-center gap-2 px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md transition-colors w-full"
+                                                            onClick={() => setActionsMenuOpen(false)}
+                                                        >
+                                                            <Plus className="h-4 w-4" />
+                                                            Create Series
+                                                        </Link>
                                                         <Link
                                                             to="/event/$eventSlug/edit"
                                                             params={{ eventSlug: event.slug }}

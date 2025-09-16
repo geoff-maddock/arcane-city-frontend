@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createRoute, useNavigate, Link } from '@tanstack/react-router';
+import { createRoute, useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,8 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import { seriesCreateSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { useQuery } from '@tanstack/react-query';
+import type { Event } from '../types/api';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -23,6 +25,20 @@ interface ValidationErrors {
 
 const SeriesCreate: React.FC = () => {
   const navigate = useNavigate();
+  const { fromEvent } = useSearch({ from: '/series/create' }) as { fromEvent?: string };
+  
+  // Fetch event data for creating series if fromEvent slug is provided
+  const { data: sourceEvent } = useQuery<Event | null>({
+    queryKey: ['event', fromEvent],
+    queryFn: async () => {
+      if (!fromEvent) return null;
+      const { data } = await api.get<Event>(`/events/${fromEvent}`);
+      return data;
+    },
+    enabled: !!fromEvent,
+    staleTime: 60_000,
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -88,6 +104,51 @@ const SeriesCreate: React.FC = () => {
       }
     }
   }, [visibilityOptions, formData.visibility_id]);
+
+  // Pre-populate form data when creating series from an event
+  useEffect(() => {
+    if (sourceEvent && fromEvent) {
+      // Generate series name from event name
+      const seriesName = sourceEvent.name.replace(/\s+(#\d+|\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4}|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*$/i, '').trim();
+      const seriesSlug = seriesName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      
+      setFormData(prev => ({
+        ...prev,
+        name: seriesName,
+        slug: seriesSlug,
+        short: sourceEvent.short || '',
+        description: sourceEvent.description || '',
+        event_type_id: sourceEvent.event_type?.id || '',
+        promoter_id: sourceEvent.promoter?.id || '',
+        venue_id: sourceEvent.venue?.id || '',
+        is_benefit: sourceEvent.is_benefit || false,
+        presale_price: sourceEvent.presale_price ? sourceEvent.presale_price.toString() : '',
+        door_price: sourceEvent.door_price ? sourceEvent.door_price.toString() : '',
+        min_age: sourceEvent.min_age ? sourceEvent.min_age.toString() : '',
+        ticket_link: sourceEvent.ticket_link || '',
+        tag_list: sourceEvent.tags?.map(tag => tag.id) || [],
+        entity_list: sourceEvent.entities?.map(entity => entity.id) || [],
+        // Clear date/time fields and occurrence settings - should be set manually
+        start_at: '',
+        end_at: '',
+        occurrence_type_id: '',
+        occurrence_week_id: '',
+        occurrence_day_id: '',
+      }));
+      
+      // Set the name and slug in the slug hook
+      setName(seriesName);
+      setSlug(seriesSlug);
+      
+      // Set selected tags and entities for the UI
+      if (sourceEvent.tags) {
+        setSelectedTags(sourceEvent.tags.map(tag => ({ id: tag.id, name: tag.name })));
+      }
+      if (sourceEvent.entities) {
+        setSelectedEntities(sourceEvent.entities.map(entity => ({ id: entity.id, name: entity.name })));
+      }
+    }
+  }, [sourceEvent, fromEvent, setName, setSlug]);
 
   useEffect(() => {
     const name = formData.name.trim();
@@ -188,7 +249,9 @@ const SeriesCreate: React.FC = () => {
 
   return (
     <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">Create Series</h1>
+      <h1 className="text-2xl font-bold">
+        {fromEvent ? `Create Series${sourceEvent ? ` from ${sourceEvent.name}` : ''}` : 'Create Series'}
+      </h1>
       {generalError && <div className="text-red-500">{generalError}</div>}
       <ValidationSummary errorSummary={errorSummary} />
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -503,6 +566,11 @@ const SeriesCreate: React.FC = () => {
 export const SeriesCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/series/create',
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      fromEvent: search.fromEvent as string | undefined,
+    };
+  },
   component: SeriesCreate,
 });
 
