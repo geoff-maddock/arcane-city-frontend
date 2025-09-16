@@ -196,30 +196,9 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
         );
     }
 
-    if (!data || data.length === 0) {
-        return canEdit ? (
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5" />
-                            <h2 className="text-xl font-semibold">Locations</h2>
-                        </div>
-                        <Button
-                            size="sm"
-                            onClick={() => setIsCreateOpen(true)}
-                            className="flex items-center gap-1"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Add Location
-                        </Button>
-                    </div>
-                    <div className="text-gray-500 text-sm">
-                        No locations found for this entity.
-                    </div>
-                </CardContent>
-            </Card>
-        ) : null;
+    // Preserve behavior: if no data and user cannot edit, render nothing
+    if ((!data || data.length === 0) && !canEdit) {
+        return null;
     }
 
     return (
@@ -242,60 +221,66 @@ export default function EntityLocations({ entityId, entitySlug, canEdit }: Entit
                             </Button>
                         )}
                     </div>
-                    <ul className="space-y-3">
-                        {data.map((loc) => (
-                            <li key={loc.id} className="flex justify-between gap-2 text-sm">
-                                <div className="flex-1">
-                                    <div className="font-medium">{loc.name}</div>
-                                    {loc.address_one && <div>{loc.address_one}</div>}
-                                    {loc.address_two && <div>{loc.address_two}</div>}
-                                    {loc.neighborhood && (
-                                        <div className="text-xs text-gray-600">{loc.neighborhood}</div>
-                                    )}
-                                    <div>
-                                        {loc.city}
-                                        {loc.state && `, ${loc.state}`}
-                                        {loc.postcode && ` ${loc.postcode}`}
+                    {(!data || data.length === 0) ? (
+                        <div className="text-gray-500 text-sm">
+                            No locations found for this entity.
+                        </div>
+                    ) : (
+                        <ul className="space-y-3">
+                            {data.map((loc) => (
+                                <li key={loc.id} className="flex justify-between gap-2 text-sm">
+                                    <div className="flex-1">
+                                        <div className="font-medium">{loc.name}</div>
+                                        {loc.address_one && <div>{loc.address_one}</div>}
+                                        {loc.address_two && <div>{loc.address_two}</div>}
+                                        {loc.neighborhood && (
+                                            <div className="text-xs text-gray-600">{loc.neighborhood}</div>
+                                        )}
+                                        <div>
+                                            {loc.city}
+                                            {loc.state && `, ${loc.state}`}
+                                            {loc.postcode && ` ${loc.postcode}`}
+                                        </div>
+                                        {loc.country && loc.country !== loc.city && (
+                                            <div className="text-xs text-gray-600">{loc.country}</div>
+                                        )}
                                     </div>
-                                    {loc.country && loc.country !== loc.city && (
-                                        <div className="text-xs text-gray-600">{loc.country}</div>
+                                    {canEdit && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                className="text-gray-600 hover:text-gray-900"
+                                                onClick={() => {
+                                                    // Ensure all fields have default values
+                                                    const locationToEdit = {
+                                                        ...loc,
+                                                        latitude: loc.latitude ?? 0,
+                                                        longitude: loc.longitude ?? 0,
+                                                        visibility_id: loc.visibility_id ?? 1,
+                                                        location_type_id: loc.location_type_id ?? 1
+                                                    };
+                                                    setEditing(locationToEdit);
+                                                    setIsEditOpen(true);
+                                                }}
+                                                aria-label="Edit location"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                className="text-red-600 hover:text-red-800"
+                                                onClick={() => {
+                                                    setDeleting(loc);
+                                                    setIsDeleteOpen(true);
+                                                }}
+                                                aria-label="Delete location"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     )}
-                                </div>
-                                {canEdit && (
-                                    <div className="flex gap-2">
-                                        <button
-                                            className="text-gray-600 hover:text-gray-900"
-                                            onClick={() => {
-                                                // Ensure all fields have default values
-                                                const locationToEdit = {
-                                                    ...loc,
-                                                    latitude: loc.latitude ?? 0,
-                                                    longitude: loc.longitude ?? 0,
-                                                    visibility_id: loc.visibility_id ?? 1,
-                                                    location_type_id: loc.location_type_id ?? 1
-                                                };
-                                                setEditing(locationToEdit);
-                                                setIsEditOpen(true);
-                                            }}
-                                            aria-label="Edit location"
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            className="text-red-600 hover:text-red-800"
-                                            onClick={() => {
-                                                setDeleting(loc);
-                                                setIsDeleteOpen(true);
-                                            }}
-                                            aria-label="Delete location"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </CardContent>
             </Card>
 

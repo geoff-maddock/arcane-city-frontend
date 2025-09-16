@@ -389,11 +389,12 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                         {editing && (
                             <form onSubmit={handleEditSubmit} className="space-y-4 mt-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-link-title">Title</Label>
-                                    <Input
-                                        id="edit-link-title"
-                                        value={editing.title ?? ''}
-                                        onChange={(e) => setEditing({ ...editing!, title: e.target.value })}
+                                    <Label htmlFor="edit-link-text">Text</Label>
+                                    <Textarea
+                                        id="edit-link-text"
+                                        value={editing.text ?? ''}
+                                        onChange={(e) => setEditing({ ...editing!, text: e.target.value })}
+                                        rows={3}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -406,14 +407,14 @@ export default function EntityLinks({ entityId, entitySlug, canEdit }: EntityLin
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-link-text">Text</Label>
-                                    <Textarea
-                                        id="edit-link-text"
-                                        value={editing.text ?? ''}
-                                        onChange={(e) => setEditing({ ...editing!, text: e.target.value })}
-                                        rows={3}
+                                    <Label htmlFor="edit-link-title">Title</Label>
+                                    <Input
+                                        id="edit-link-title"
+                                        value={editing.title ?? ''}
+                                        onChange={(e) => setEditing({ ...editing!, title: e.target.value })}
                                     />
                                 </div>
+
                                 <div className="flex items-center gap-2">
                                     <Switch
                                         id="edit-link-primary"
