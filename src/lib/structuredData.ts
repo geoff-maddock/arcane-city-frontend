@@ -128,6 +128,7 @@ export function buildEventStructuredData(event: Event, origin?: string): Structu
         structuredData.organizer = {
             "@type": "Organization",
             name: event.venue.name,
+            url: event.venue.primary_link ? event.venue.primary_link : undefined,
         };
     }
 
