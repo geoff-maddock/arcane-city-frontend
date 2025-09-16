@@ -40,6 +40,7 @@ interface StructuredDataBase {
     organizer?: {
         "@type": string;
         name: string;
+        url?: string;
     };
 }
 
@@ -68,7 +69,15 @@ export function buildEventStructuredData(event: Event, origin?: string): Structu
         },
     };
 
-    if (event.end_at) structuredData.endDate = toISO(event.end_at);
+    if (event.end_at) {
+        structuredData.endDate = toISO(event.end_at);
+    } else {
+        // If no end date, assume event lasts 4 hours
+        const assumedEnd = new Date(event.start_at);
+        assumedEnd.setHours(assumedEnd.getHours() + 4);
+        structuredData.endDate = assumedEnd.toISOString();
+    }
+
     if (event.primary_photo) structuredData.image = [event.primary_photo];
 
     if (event.venue) {
@@ -113,6 +122,7 @@ export function buildEventStructuredData(event: Event, origin?: string): Structu
         structuredData.organizer = {
             "@type": "Organization",
             name: event.promoter.name,
+            url: event.promoter.primary_link ? event.promoter.primary_link : undefined,
         };
     } else if (event.venue) {
         structuredData.organizer = {

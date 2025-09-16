@@ -81,6 +81,7 @@ export interface EntityResponse {
     description?: string;
     entity_type?: EntityType;
     entity_status?: EntityStatus;
+    primary_link?: string;
     primary_photo?: string;
     primary_photo_thumbnail?: string;
     facebook_username?: string;
