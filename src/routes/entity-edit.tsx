@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -54,8 +55,11 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
-    const { data: tagOptions } = useSearchOptions('tags', tagQuery);
-    const { data: roleOptions } = useSearchOptions('roles', roleQuery);
+    // Debounce tag and role queries to avoid firing requests while typing
+    const debouncedTagQuery = useDebounce(tagQuery, 300);
+    const debouncedRoleQuery = useDebounce(roleQuery, 300);
+    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
+    const { data: roleOptions } = useSearchOptions('roles', debouncedRoleQuery);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [generalError, setGeneralError] = useState('');
 
@@ -205,6 +209,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                         <SearchableInput
                             id="entity_type_id"
                             endpoint="entity-types"
+                            debounceMs={300}
                             value={formData.entity_type_id}
                             onValueChange={(val) => setFormData((p) => ({ ...p, entity_type_id: val }))}
                         />
@@ -215,6 +220,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                         <SearchableInput
                             id="entity_status_id"
                             endpoint="entity-statuses"
+                            debounceMs={300}
                             value={formData.entity_status_id}
                             onValueChange={(val) => setFormData((p) => ({ ...p, entity_status_id: val }))}
                         />
@@ -226,6 +232,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                     <SearchableInput
                         id="primary_location_id"
                         endpoint="locations"
+                        debounceMs={300}
                         value={formData.primary_location_id}
                         onValueChange={(val) => setFormData((p) => ({ ...p, primary_location_id: val }))}
                     />

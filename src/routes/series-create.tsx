@@ -18,6 +18,7 @@ import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { useQuery } from '@tanstack/react-query';
 import type { Event } from '../types/api';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -72,8 +73,11 @@ const SeriesCreate: React.FC = () => {
   const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '', {}, { sort: 'id', direction: 'asc' });
   const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '', {}, { sort: 'id', direction: 'asc' });
   const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
-  const { data: tagOptions } = useSearchOptions('tags', tagQuery);
-  const { data: entityOptions } = useSearchOptions('entities', entityQuery);
+  // Debounce tag/entity queries to avoid firing requests while typing
+  const debouncedTagQuery = useDebounce(tagQuery, 300);
+  const debouncedEntityQuery = useDebounce(entityQuery, 300);
+  const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
+  const { data: entityOptions } = useSearchOptions('entities', debouncedEntityQuery);
   const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError } = useFormValidation({
     initialValues: formData,
     schema: seriesCreateSchema,
@@ -402,6 +406,7 @@ const SeriesCreate: React.FC = () => {
               id="promoter_id"
               endpoint="entities"
               extraParams={{ 'filters[role]': 'Promoter' }}
+              debounceMs={300}
               value={formData.promoter_id}
               onValueChange={(val) => setFormData((p) => ({ ...p, promoter_id: val }))}
               placeholder="Type to search promoters..."
@@ -414,6 +419,7 @@ const SeriesCreate: React.FC = () => {
               id="venue_id"
               endpoint="entities"
               extraParams={{ 'filters[role]': 'Venue' }}
+              debounceMs={300}
               value={formData.venue_id}
               onValueChange={(val) => setFormData((p) => ({ ...p, venue_id: val }))}
               placeholder="Type to search venues..."
