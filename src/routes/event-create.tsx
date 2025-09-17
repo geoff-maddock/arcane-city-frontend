@@ -10,7 +10,7 @@ import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSlug } from '@/hooks/useSlug';
-import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
+import AjaxMultiSelect from '@/components/AjaxMultiSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { eventCreateSchema } from '@/validation/schemas';
@@ -66,20 +66,11 @@ const EventCreate: React.FC = () => {
     tag_list: [] as number[],
     entity_list: [] as number[],
   });
-  const [tagQuery, setTagQuery] = useState('');
-  const [entityQuery, setEntityQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
-  const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
+
   // Slug sync hook
   const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
-  // Debounce tag search to avoid firing requests while user is typing
-  const debouncedTagQuery = useDebounce(tagQuery, 300);
-  const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
-  // Debounce entity search to avoid firing requests while user is typing
-  const debouncedEntityQuery = useDebounce(entityQuery, 300);
-  const { data: entityOptions } = useSearchOptions('entities', debouncedEntityQuery);
   const { setValues: setFormDataProxy, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError } = useFormValidation({
     initialValues: formData,
     schema: eventCreateSchema,
@@ -149,13 +140,8 @@ const EventCreate: React.FC = () => {
       setName(duplicateName);
       setSlug(duplicateSlug);
 
-      // Set selected tags and entities for the UI
-      if (duplicateEvent.tags) {
-        setSelectedTags(duplicateEvent.tags.map(tag => ({ id: tag.id, name: tag.name })));
-      }
-      if (duplicateEvent.entities) {
-        setSelectedEntities(duplicateEvent.entities.map(entity => ({ id: entity.id, name: entity.name })));
-      }
+      // The AjaxMultiSelect components will handle displaying the selected tags/entities
+      // based on the tag_list and entity_list arrays in formData
     }
   }, [duplicateEvent, duplicate, setName, setSlug]);
 
@@ -517,31 +503,22 @@ const EventCreate: React.FC = () => {
             />
             {renderError('ticket_link')}
           </div>
-          <TagEntityMultiSelect
+
+          {/* New AjaxMultiSelect Components */}
+          <AjaxMultiSelect
             label="Tags"
-            datalistId="tag-options"
-            query={tagQuery}
-            setQuery={setTagQuery}
-            options={tagOptions}
-            valueIds={formData.tag_list}
-            setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
-            selected={selectedTags}
-            setSelected={setSelectedTags}
-            placeholder="Type to add tag..."
-            ariaLabelRemove="Remove tag"
+            endpoint="tags"
+            value={formData.tag_list}
+            onChange={(ids) => setFormData(p => ({ ...p, tag_list: ids }))}
+            placeholder="Type to search and add tags..."
           />
-          <TagEntityMultiSelect
-            label="Entities"
-            datalistId="entity-options"
-            query={entityQuery}
-            setQuery={setEntityQuery}
-            options={entityOptions}
-            valueIds={formData.entity_list}
-            setValueIds={(ids) => setFormData(p => ({ ...p, entity_list: typeof ids === 'function' ? ids(p.entity_list) : ids }))}
-            selected={selectedEntities}
-            setSelected={setSelectedEntities}
-            placeholder="Type to add entity..."
-            ariaLabelRemove="Remove entity"
+
+          <AjaxMultiSelect
+            label="Related Entities"
+            endpoint="entities"
+            value={formData.entity_list}
+            onChange={(ids) => setFormData(p => ({ ...p, entity_list: ids }))}
+            placeholder="Type to search and add entities..."
           />
         </div>
         <Button type="submit" className="w-full">Create Event</Button>
