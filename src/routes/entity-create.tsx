@@ -14,6 +14,7 @@ import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -44,8 +45,11 @@ const EntityCreate: React.FC = () => {
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
-    const { data: tagOptions } = useSearchOptions('tags', tagQuery);
-    const { data: roleOptions } = useSearchOptions('roles', roleQuery);
+    // Debounce tag and role queries to avoid firing requests while the user is typing
+    const debouncedTagQuery = useDebounce(tagQuery, 300);
+    const debouncedRoleQuery = useDebounce(roleQuery, 300);
+    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
+    const { data: roleOptions } = useSearchOptions('roles', debouncedRoleQuery);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [generalError, setGeneralError] = useState('');
     const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
@@ -236,6 +240,7 @@ const EntityCreate: React.FC = () => {
                         <SearchableInput
                             id="entity_type_id"
                             endpoint="entity-types"
+                            debounceMs={300}
                             value={formData.entity_type_id}
                             onValueChange={(val) =>
                                 setFormData((p) => ({ ...p, entity_type_id: val }))
@@ -268,6 +273,7 @@ const EntityCreate: React.FC = () => {
                         <SearchableInput
                             id="primary_location_id"
                             endpoint="locations"
+                            debounceMs={300}
                             value={formData.primary_location_id}
                             onValueChange={(val) =>
                                 setFormData((p) => ({ ...p, primary_location_id: val }))

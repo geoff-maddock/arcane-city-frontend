@@ -19,6 +19,7 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 import { useQuery } from '@tanstack/react-query';
 import type { Event } from '../types/api';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -27,7 +28,7 @@ interface ValidationErrors {
 const EventCreate: React.FC = () => {
   const navigate = useNavigate();
   const { duplicate } = useSearch({ from: '/event/create' }) as { duplicate?: string };
-  
+
   // Fetch event data for duplication if duplicate slug is provided
   const { data: duplicateEvent } = useQuery<Event | null>({
     queryKey: ['event', duplicate],
@@ -73,8 +74,12 @@ const EventCreate: React.FC = () => {
   const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
-  const { data: tagOptions } = useSearchOptions('tags', tagQuery);
-  const { data: entityOptions } = useSearchOptions('entities', entityQuery);
+  // Debounce tag search to avoid firing requests while user is typing
+  const debouncedTagQuery = useDebounce(tagQuery, 300);
+  const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
+  // Debounce entity search to avoid firing requests while user is typing
+  const debouncedEntityQuery = useDebounce(entityQuery, 300);
+  const { data: entityOptions } = useSearchOptions('entities', debouncedEntityQuery);
   const { setValues: setFormDataProxy, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError } = useFormValidation({
     initialValues: formData,
     schema: eventCreateSchema,
@@ -114,7 +119,7 @@ const EventCreate: React.FC = () => {
       // Create new name and slug for the duplicate
       const duplicateName = `${duplicateEvent.name} - Copy`;
       const duplicateSlug = `${duplicateEvent.slug}-copy`;
-      
+
       setFormData(prev => ({
         ...prev,
         name: duplicateName,
@@ -139,11 +144,11 @@ const EventCreate: React.FC = () => {
         cancelled_at: '',
         series_id: '', // Don't duplicate series assignment
       }));
-      
+
       // Set the name and slug in the slug hook
       setName(duplicateName);
       setSlug(duplicateSlug);
-      
+
       // Set selected tags and entities for the UI
       if (duplicateEvent.tags) {
         setSelectedTags(duplicateEvent.tags.map(tag => ({ id: tag.id, name: tag.name })));
@@ -350,6 +355,7 @@ const EventCreate: React.FC = () => {
               id="promoter_id"
               endpoint="entities"
               extraParams={{ 'filters[role]': 'Promoter' }}
+              debounceMs={300}
               value={formData.promoter_id}
               onValueChange={(val) =>
                 setFormData((p) => ({ ...p, promoter_id: val }))
@@ -364,6 +370,7 @@ const EventCreate: React.FC = () => {
               id="venue_id"
               endpoint="entities"
               extraParams={{ 'filters[role]': 'Venue' }}
+              debounceMs={300}
               value={formData.venue_id}
               onValueChange={(val) =>
                 setFormData((p) => ({ ...p, venue_id: val }))

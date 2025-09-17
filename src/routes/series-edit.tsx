@@ -17,6 +17,7 @@ import { seriesEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -66,8 +67,11 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '', {}, { sort: 'id', direction: 'asc' });
     const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '', {}, { sort: 'id', direction: 'asc' });
     const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
-    const { data: tagOptions } = useSearchOptions('tags', tagQuery);
-    const { data: entityOptions } = useSearchOptions('entities', entityQuery);
+    // Debounce tag/entity queries to avoid firing requests while typing
+    const debouncedTagQuery = useDebounce(tagQuery, 300);
+    const debouncedEntityQuery = useDebounce(entityQuery, 300);
+    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
+    const { data: entityOptions } = useSearchOptions('entities', debouncedEntityQuery);
     // Shared form field classes (light + dark)
     const fieldClasses = 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400';
     const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
@@ -329,6 +333,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             id="promoter_id"
                             endpoint="entities"
                             extraParams={{ 'filters[role]': 'Promoter' }}
+                            debounceMs={300}
                             value={formData.promoter_id}
                             onValueChange={(val) => setFormData((p) => ({ ...p, promoter_id: val }))}
                             placeholder="Type to search promoters..."
@@ -341,6 +346,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                             id="venue_id"
                             endpoint="entities"
                             extraParams={{ 'filters[role]': 'Venue' }}
+                            debounceMs={300}
                             value={formData.venue_id}
                             onValueChange={(val) => setFormData((p) => ({ ...p, venue_id: val }))}
                             placeholder="Type to search venues..."
