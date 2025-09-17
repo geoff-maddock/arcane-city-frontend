@@ -27,7 +27,7 @@ interface ValidationErrors {
 const SeriesCreate: React.FC = () => {
   const navigate = useNavigate();
   const { fromEvent } = useSearch({ from: '/series/create' }) as { fromEvent?: string };
-  
+
   // Fetch event data for creating series if fromEvent slug is provided
   const { data: sourceEvent } = useQuery<Event | null>({
     queryKey: ['event', fromEvent],
@@ -115,7 +115,7 @@ const SeriesCreate: React.FC = () => {
       // Generate series name from event name
       const seriesName = sourceEvent.name.replace(/\s+(#\d+|\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4}|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*$/i, '').trim();
       const seriesSlug = seriesName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-      
+
       setFormData(prev => ({
         ...prev,
         name: seriesName,
@@ -139,11 +139,11 @@ const SeriesCreate: React.FC = () => {
         occurrence_week_id: '',
         occurrence_day_id: '',
       }));
-      
+
       // Set the name and slug in the slug hook
       setName(seriesName);
       setSlug(seriesSlug);
-      
+
       // Set selected tags and entities for the UI
       if (sourceEvent.tags) {
         setSelectedTags(sourceEvent.tags.map(tag => ({ id: tag.id, name: tag.name })));
