@@ -51,8 +51,27 @@ describe('AjaxMultiSelect', () => {
     mockUseSearchOptions.mockReturnValue({
       data: mockOptions,
       isLoading: false,
+      isError: false,
       error: null,
-    } as const);
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+    } as any);
   });
 
   it('renders with label and placeholder', () => {
@@ -68,7 +87,7 @@ describe('AjaxMultiSelect', () => {
 
   it('opens dropdown when input is focused', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <AjaxMultiSelect {...defaultProps} />
@@ -85,13 +104,32 @@ describe('AjaxMultiSelect', () => {
 
   it('filters options based on search query', async () => {
     const user = userEvent.setup();
-    
+
     // Mock filtered results
     mockUseSearchOptions.mockReturnValue({
       data: [{ id: 4, name: 'Filtered Option' }],
       isLoading: false,
+      isError: false,
       error: null,
-    } as const);
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+    } as any);
 
     render(
       <TestWrapper>
@@ -131,9 +169,9 @@ describe('AjaxMultiSelect', () => {
   it('displays selected options as tags', () => {
     render(
       <TestWrapper>
-        <AjaxMultiSelect 
-          {...defaultProps} 
-          value={[1, 2]} 
+        <AjaxMultiSelect
+          {...defaultProps}
+          value={[1, 2]}
         />
       </TestWrapper>
     );
@@ -187,7 +225,7 @@ describe('AjaxMultiSelect', () => {
 
     // Press Arrow Down to focus first option
     await user.keyboard('{ArrowDown}');
-    
+
     // Press Enter to select
     await user.keyboard('{Enter}');
 
@@ -220,13 +258,32 @@ describe('AjaxMultiSelect', () => {
 
   it('shows no results message when search yields no results', async () => {
     const user = userEvent.setup();
-    
+
     // Mock empty results
     mockUseSearchOptions.mockReturnValue({
       data: [],
       isLoading: false,
+      isError: false,
       error: null,
-    } as const);
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+    } as any);
 
     render(
       <TestWrapper>
@@ -274,9 +331,9 @@ describe('AjaxMultiSelect', () => {
 
     const input = screen.getByRole('textbox');
     await user.click(input);
-    
+
     expect(input).toHaveValue('');
-    
+
     await user.keyboard('{Backspace}');
 
     await waitFor(() => {
