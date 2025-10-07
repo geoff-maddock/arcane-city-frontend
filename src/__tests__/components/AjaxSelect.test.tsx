@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AjaxMultiSelect from '@/components/AjaxMultiSelect';
+import AjaxSelect from '@/components/AjaxSelect';
 
 // Mock the useSearchOptions hook
 vi.mock('../../hooks/useSearchOptions', () => ({
@@ -37,11 +37,11 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-describe('AjaxMultiSelect', () => {
+describe('AjaxSelect', () => {
   const defaultProps = {
     label: 'Test Select',
     endpoint: 'test-endpoint',
-    value: [],
+    value: '' as number | '',
     onChange: vi.fn(),
     placeholder: 'Type to search...',
   };
@@ -51,33 +51,14 @@ describe('AjaxMultiSelect', () => {
     mockUseSearchOptions.mockReturnValue({
       data: mockOptions,
       isLoading: false,
-      isError: false,
       error: null,
-      isSuccess: true,
-      status: 'success',
-      fetchStatus: 'idle',
-      isPending: false,
-      isLoadingError: false,
-      isRefetchError: false,
-      isRefetching: false,
-      isFetching: false,
-      isFetched: true,
-      isFetchedAfterMount: true,
-      isPlaceholderData: false,
-      isStale: false,
-      refetch: vi.fn(),
-      dataUpdatedAt: Date.now(),
-      errorUpdatedAt: 0,
-      failureCount: 0,
-      failureReason: null,
-      errorUpdateCount: 0,
     } as const);
   });
 
   it('renders with label and placeholder', () => {
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} />
+        <AjaxSelect {...defaultProps} />
       </TestWrapper>
     );
 
@@ -87,10 +68,10 @@ describe('AjaxMultiSelect', () => {
 
   it('opens dropdown when input is focused', async () => {
     const user = userEvent.setup();
-
+    
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} />
+        <AjaxSelect {...defaultProps} />
       </TestWrapper>
     );
 
@@ -104,36 +85,17 @@ describe('AjaxMultiSelect', () => {
 
   it('filters options based on search query', async () => {
     const user = userEvent.setup();
-
+    
     // Mock filtered results
     mockUseSearchOptions.mockReturnValue({
       data: [{ id: 4, name: 'Filtered Option' }],
       isLoading: false,
-      isError: false,
       error: null,
-      isSuccess: true,
-      status: 'success',
-      fetchStatus: 'idle',
-      isPending: false,
-      isLoadingError: false,
-      isRefetchError: false,
-      isRefetching: false,
-      isFetching: false,
-      isFetched: true,
-      isFetchedAfterMount: true,
-      isPlaceholderData: false,
-      isStale: false,
-      refetch: vi.fn(),
-      dataUpdatedAt: Date.now(),
-      errorUpdatedAt: 0,
-      failureCount: 0,
-      failureReason: null,
-      errorUpdateCount: 0,
     } as const);
 
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} />
+        <AjaxSelect {...defaultProps} />
       </TestWrapper>
     );
 
@@ -153,7 +115,7 @@ describe('AjaxMultiSelect', () => {
 
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} onChange={onChange} />
+        <AjaxSelect {...defaultProps} onChange={onChange} />
       </TestWrapper>
     );
 
@@ -163,33 +125,27 @@ describe('AjaxMultiSelect', () => {
     const option = screen.getByText('Option 1');
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith([1]);
+    expect(onChange).toHaveBeenCalledWith(1);
   });
 
-  it('displays selected options as tags', () => {
+  it('displays selected option', () => {
     render(
       <TestWrapper>
-        <AjaxMultiSelect
-          {...defaultProps}
-          value={[1, 2]}
-        />
+        <AjaxSelect {...defaultProps} value={1} />
       </TestWrapper>
     );
 
-    // We need to simulate having selected options
-    // Since the component doesn't automatically fetch names for existing IDs,
-    // we'll need to handle this in the implementation
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
-  it('removes tag when X button is clicked', async () => {
+  it('clears selection when X button is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
     // First render with no selection
     const { rerender } = render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} onChange={onChange} />
+        <AjaxSelect {...defaultProps} onChange={onChange} />
       </TestWrapper>
     );
 
@@ -199,16 +155,14 @@ describe('AjaxMultiSelect', () => {
     const option = screen.getByText('Option 1');
     await user.click(option);
 
-    // Now rerender with the selected value to simulate the parent updating state
+    // Now rerender with the selected value
     rerender(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} value={[1]} onChange={onChange} />
+        <AjaxSelect {...defaultProps} value={1} onChange={onChange} />
       </TestWrapper>
     );
 
-    // The tag should be visible, but since we don't have the selected options state
-    // properly managed in this test, we'll focus on testing the core functionality
-    expect(onChange).toHaveBeenCalledWith([1]);
+    expect(onChange).toHaveBeenCalledWith(1);
   });
 
   it('handles keyboard navigation', async () => {
@@ -216,7 +170,7 @@ describe('AjaxMultiSelect', () => {
 
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} />
+        <AjaxSelect {...defaultProps} />
       </TestWrapper>
     );
 
@@ -225,11 +179,11 @@ describe('AjaxMultiSelect', () => {
 
     // Press Arrow Down to focus first option
     await user.keyboard('{ArrowDown}');
-
+    
     // Press Enter to select
     await user.keyboard('{Enter}');
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith([1]);
+    expect(defaultProps.onChange).toHaveBeenCalledWith(1);
   });
 
   it('closes dropdown on Escape key', async () => {
@@ -237,7 +191,7 @@ describe('AjaxMultiSelect', () => {
 
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} />
+        <AjaxSelect {...defaultProps} />
       </TestWrapper>
     );
 
@@ -258,36 +212,17 @@ describe('AjaxMultiSelect', () => {
 
   it('shows no results message when search yields no results', async () => {
     const user = userEvent.setup();
-
+    
     // Mock empty results
     mockUseSearchOptions.mockReturnValue({
       data: [],
       isLoading: false,
-      isError: false,
       error: null,
-      isSuccess: true,
-      status: 'success',
-      fetchStatus: 'idle',
-      isPending: false,
-      isLoadingError: false,
-      isRefetchError: false,
-      isRefetching: false,
-      isFetching: false,
-      isFetched: true,
-      isFetchedAfterMount: true,
-      isPlaceholderData: false,
-      isStale: false,
-      refetch: vi.fn(),
-      dataUpdatedAt: Date.now(),
-      errorUpdatedAt: 0,
-      failureCount: 0,
-      failureReason: null,
-      errorUpdateCount: 0,
     } as const);
 
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} />
+        <AjaxSelect {...defaultProps} />
       </TestWrapper>
     );
 
@@ -303,7 +238,7 @@ describe('AjaxMultiSelect', () => {
   it('is disabled when disabled prop is true', () => {
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} disabled={true} />
+        <AjaxSelect {...defaultProps} disabled={true} />
       </TestWrapper>
     );
 
@@ -311,33 +246,25 @@ describe('AjaxMultiSelect', () => {
     expect(input).toBeDisabled();
   });
 
-  it.skip('removes last tag with backspace when input is empty', async () => {
+  it.skip('clears selection with backspace when input is empty', async () => {
     // This test is skipped due to timing issues with state synchronization in tests
-    // The functionality works in the actual UI, but the test environment has
-    // complex async state management that's difficult to replicate
+    // The functionality works in the actual UI
     const user = userEvent.setup();
     const onChange = vi.fn();
 
+    // Render with selected value
     render(
       <TestWrapper>
-        <AjaxMultiSelect {...defaultProps} value={[1]} onChange={onChange} />
+        <AjaxSelect {...defaultProps} value={1} onChange={onChange} />
       </TestWrapper>
     );
 
-    await waitFor(() => {
-      const input = screen.getByRole('textbox');
-      expect(input).toBeInTheDocument();
-    });
-
     const input = screen.getByRole('textbox');
     await user.click(input);
-
-    expect(input).toHaveValue('');
-
+    
+    // Press backspace when input is empty
     await user.keyboard('{Backspace}');
 
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith([]);
-    });
+    expect(onChange).toHaveBeenCalledWith('');
   });
 });
