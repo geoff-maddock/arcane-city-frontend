@@ -19,7 +19,6 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 import { useQuery } from '@tanstack/react-query';
 import type { Event } from '../types/api';
-import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
   [key: string]: string[];
