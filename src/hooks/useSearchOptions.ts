@@ -10,10 +10,11 @@ export const useSearchOptions = (
     endpoint: string,
     search: string,
     extraParams: Record<string, string | number> = {},
-    queryOverrides: Record<string, string | number> = {}
+    queryOverrides: Record<string, string | number> = {},
+    selectedIds: number[] = []
 ) => {
     return useQuery<Option[]>({
-        queryKey: ['search', endpoint, search, extraParams, queryOverrides],
+        queryKey: ['search', endpoint, search, extraParams, queryOverrides, selectedIds],
         queryFn: async () => {
             const defaultQueryParts = {
                 limit: '20',
@@ -28,6 +29,11 @@ export const useSearchOptions = (
 
             if (search) {
                 queryParts.push(`filters[name]=${encodeURIComponent(search)}`);
+            }
+
+            // Include selected IDs in the query to ensure they're returned
+            if (selectedIds.length > 0) {
+                queryParts.push(`filters[id]=${selectedIds.join(',')}`);
             }
 
             for (const [k, v] of Object.entries(extraParams)) {

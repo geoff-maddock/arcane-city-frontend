@@ -45,8 +45,16 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const prevValueRef = useRef<number[]>(value);
 
-  // Fetch options using the existing hook
-  const { data: options = [] } = useSearchOptions(endpoint, debouncedQuery, extraParams);
+  // Fetch options using the existing hook, including selected IDs
+  // This ensures that when the component loads with pre-selected items,
+  // their names are fetched from the API
+  const { data: options = [] } = useSearchOptions(
+    endpoint, 
+    debouncedQuery, 
+    extraParams,
+    {},
+    value // Pass selected IDs to fetch their names
+  );
 
   // Filter out already selected options
   const availableOptions = options.filter(option => !value.includes(option.id));

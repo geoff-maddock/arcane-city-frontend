@@ -45,8 +45,16 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const prevValueRef = useRef<number | ''>(value);
 
-  // Fetch options using the existing hook
-  const { data: options = [] } = useSearchOptions(endpoint, debouncedQuery, extraParams);
+  // Fetch options using the existing hook, including selected ID if present
+  // This ensures that when the component loads with a pre-selected item,
+  // its name is fetched from the API
+  const { data: options = [] } = useSearchOptions(
+    endpoint, 
+    debouncedQuery, 
+    extraParams,
+    {},
+    value ? [value] : [] // Pass selected ID to fetch its name
+  );
 
   // Filter out the already selected option
   const availableOptions = selectedOption 
