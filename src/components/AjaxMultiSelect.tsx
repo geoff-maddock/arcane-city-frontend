@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchOptions } from '../hooks/useSearchOptions';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useSearchOptions, useSelectedOptions } from '../hooks/useSearchOptions';
 import { ChevronDown, X } from 'lucide-react';
 
 export interface Option {
@@ -19,10 +19,6 @@ interface AjaxMultiSelectProps {
   disabled?: boolean;
 }
 
-/**
- * Select2-style AJAX autocomplete multi-select component.
- * Features debounced search, inline tag display, and dropdown selection.
- */
 export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
   label,
   endpoint,
@@ -37,27 +33,47 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const prevValueRef = useRef<number[]>(value);
 
-  // Fetch options using the existing hook, including selected IDs
-  // This ensures that when the component loads with pre-selected items,
-  // their names are fetched from the API
-  const { data: options = [] } = useSearchOptions(
-    endpoint, 
-    debouncedQuery, 
-    extraParams,
-    {},
-    value // Pass selected IDs to fetch their names
+  // Fetch selected options by IDs
+  const { data: selectedOptionsData = [] } = useSelectedOptions(
+    endpoint,
+    value
   );
 
-  // Filter out already selected options
-  const availableOptions = options.filter(option => !value.includes(option.id));
+  // Fetch search results based on user query
+  const { data: searchResults = [], isLoading } = useSearchOptions(
+    endpoint,
+    debouncedQuery,
+    extraParams
+  );
+
+  // Merge and deduplicate options from both queries
+  const allOptions = useMemo(() => {
+    const optionsMap = new Map<number, Option>();
+
+    // Add selected options first
+    selectedOptionsData.forEach(option => {
+      optionsMap.set(option.id, option);
+    });
+
+    // Add search results (will overwrite if same ID)
+    searchResults.forEach(option => {
+      optionsMap.set(option.id, option);
+    });
+
+    return Array.from(optionsMap.values());
+  }, [selectedOptionsData, searchResults]);
+
+  // Filter out already selected options for the dropdown
+  const availableOptions = allOptions.filter(option => !value.includes(option.id));
+
+  // Get selected options for display as tags
+  const selectedOptions = allOptions.filter(option => value.includes(option.id));
 
   // Debounce search query
   useEffect(() => {
@@ -67,49 +83,6 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
 
     return () => clearTimeout(timer);
   }, [query, debounceMs]);
-
-  // Sync selectedOptions when value prop changes
-  useEffect(() => {
-    // Only update if value actually changed
-    if (JSON.stringify(prevValueRef.current) !== JSON.stringify(value)) {
-      prevValueRef.current = value;
-      
-      if (value.length === 0) {
-        setSelectedOptions([]);
-      } else {
-        // Keep existing selectedOptions that are still in value array
-        setSelectedOptions(prev => {
-          const stillSelected = prev.filter(opt => value.includes(opt.id));
-          
-          // For new IDs not in selectedOptions, create placeholder entries
-          const newIds = value.filter(id => !stillSelected.some(opt => opt.id === id));
-          const newOptions = newIds.map(id => {
-            // Try to find the option in available options first
-            const foundOption = options.find(opt => opt.id === id);
-            return foundOption || { id, name: `Selected Item ${id}` };
-          });
-          
-          return [...stillSelected, ...newOptions];
-        });
-      }
-    }
-  }, [value, options]);
-
-  // Update option names when they become available in search results
-  useEffect(() => {
-    if (options.length > 0) {
-      setSelectedOptions(prev => 
-        prev.map(selected => {
-          const foundOption = options.find(opt => opt.id === selected.id);
-          // Only update if we found a better name (not a placeholder)
-          if (foundOption && selected.name.startsWith('Selected Item')) {
-            return foundOption;
-          }
-          return selected;
-        })
-      );
-    }
-  }, [options]);
 
   // Handle clicking outside to close dropdown
   useEffect(() => {
@@ -137,29 +110,23 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
 
   const handleOptionSelect = useCallback((option: Option) => {
     if (!value.includes(option.id)) {
-      const newSelectedOptions = [...selectedOptions, option];
       const newValue = [...value, option.id];
-      
-      setSelectedOptions(newSelectedOptions);
       onChange(newValue);
       setQuery('');
       setFocusedIndex(-1);
-      
+
       // Keep focus on input
       inputRef.current?.focus();
     }
-  }, [value, selectedOptions, onChange]);
+  }, [value, onChange]);
 
   const handleRemoveTag = useCallback((optionId: number) => {
-    const newSelectedOptions = selectedOptions.filter(opt => opt.id !== optionId);
     const newValue = value.filter(id => id !== optionId);
-    
-    setSelectedOptions(newSelectedOptions);
     onChange(newValue);
-    
+
     // Keep focus on input
     inputRef.current?.focus();
-  }, [selectedOptions, value, onChange]);
+  }, [value, onChange]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;
@@ -170,7 +137,7 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
         if (!isOpen) {
           setIsOpen(true);
         }
-        setFocusedIndex(prev => 
+        setFocusedIndex(prev =>
           prev < availableOptions.length - 1 ? prev + 1 : 0
         );
         break;
@@ -180,7 +147,7 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
         if (!isOpen) {
           setIsOpen(true);
         }
-        setFocusedIndex(prev => 
+        setFocusedIndex(prev =>
           prev > 0 ? prev - 1 : availableOptions.length - 1
         );
         break;
@@ -220,7 +187,7 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
         {label}
       </label>
-      
+
       <div
         ref={containerRef}
         className={`relative ${className}`}
@@ -279,9 +246,9 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded focus:outline-none"
             aria-label="Toggle dropdown"
           >
-            <ChevronDown 
-              size={16} 
-              className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+            <ChevronDown
+              size={16}
+              className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
             />
           </button>
         </div>
@@ -292,7 +259,11 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
             ref={dropdownRef}
             className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
           >
-            {availableOptions.length > 0 ? (
+            {isLoading ? (
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                Searching...
+              </div>
+            ) : availableOptions.length > 0 ? (
               availableOptions.map((option, index) => (
                 <button
                   key={option.id}
@@ -315,11 +286,7 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
               <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
                 Type to search...
               </div>
-            ) : (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
-                Searching...
-              </div>
-            )}
+            ) : null}
           </div>
         )}
       </div>
