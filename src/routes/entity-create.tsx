@@ -5,16 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import SearchableInput from '../components/SearchableInput';
+import AjaxSelect from '../components/AjaxSelect';
+import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSlug } from '@/hooks/useSlug';
-import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -37,19 +36,10 @@ const EntityCreate: React.FC = () => {
         tag_list: [] as number[],
         role_list: [] as number[],
     });
-    const [tagQuery, setTagQuery] = useState('');
-    const [roleQuery, setRoleQuery] = useState('');
-    const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
-    const [selectedRoles, setSelectedRoles] = useState<{ id: number; name: string }[]>([]);
     const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
-    // Debounce tag and role queries to avoid firing requests while the user is typing
-    const debouncedTagQuery = useDebounce(tagQuery, 300);
-    const debouncedRoleQuery = useDebounce(roleQuery, 300);
-    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
-    const { data: roleOptions } = useSearchOptions('roles', debouncedRoleQuery);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [generalError, setGeneralError] = useState('');
     const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
@@ -236,13 +226,11 @@ const EntityCreate: React.FC = () => {
                         {renderError('visibility_id')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="entity_type_id">Entity Type</Label>
-                        <SearchableInput
-                            id="entity_type_id"
+                        <AjaxSelect
+                            label="Entity Type"
                             endpoint="entity-types"
-                            debounceMs={300}
                             value={formData.entity_type_id}
-                            onValueChange={(val) =>
+                            onChange={(val) =>
                                 setFormData((p) => ({ ...p, entity_type_id: val }))
                             }
                             placeholder="Type to search entity types..."
@@ -269,13 +257,11 @@ const EntityCreate: React.FC = () => {
                         {renderError('entity_status_id')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="primary_location_id">Primary Location</Label>
-                        <SearchableInput
-                            id="primary_location_id"
+                        <AjaxSelect
+                            label="Primary Location"
                             endpoint="locations"
-                            debounceMs={300}
                             value={formData.primary_location_id}
-                            onValueChange={(val) =>
+                            onChange={(val) =>
                                 setFormData((p) => ({ ...p, primary_location_id: val }))
                             }
                             placeholder="Type to search locations..."
@@ -322,31 +308,19 @@ const EntityCreate: React.FC = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Tags"
-                        datalistId="tag-options"
-                        query={tagQuery}
-                        setQuery={setTagQuery}
-                        options={tagOptions}
-                        valueIds={formData.tag_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
-                        selected={selectedTags}
-                        setSelected={setSelectedTags}
+                        endpoint="tags"
+                        value={formData.tag_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, tag_list: ids }))}
                         placeholder="Type to add tag..."
-                        ariaLabelRemove="Remove tag"
                     />
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Roles"
-                        datalistId="role-options"
-                        query={roleQuery}
-                        setQuery={setRoleQuery}
-                        options={roleOptions}
-                        valueIds={formData.role_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, role_list: typeof ids === 'function' ? ids(p.role_list) : ids }))}
-                        selected={selectedRoles}
-                        setSelected={setSelectedRoles}
+                        endpoint="roles"
+                        value={formData.role_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, role_list: ids }))}
                         placeholder="Type to add role..."
-                        ariaLabelRemove="Remove role"
                     />
                 </div>
                 <Button type="submit" className="w-full">Create Entity</Button>

@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import SearchableInput from '../components/SearchableInput';
+import AjaxSelect from '../components/AjaxSelect';
+import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
@@ -13,9 +14,7 @@ import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Entity } from '../types/api';
 import { useQuery } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
-import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -47,19 +46,10 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
         role_list: [] as number[],
     });
 
-    const [tagQuery, setTagQuery] = useState('');
-    const [roleQuery, setRoleQuery] = useState('');
-    const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
-    const [selectedRoles, setSelectedRoles] = useState<{ id: number; name: string }[]>([]);
     const { name, slug, setName, setSlug, initialize, manuallyOverridden } = useSlug('', '');
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
-    // Debounce tag and role queries to avoid firing requests while typing
-    const debouncedTagQuery = useDebounce(tagQuery, 300);
-    const debouncedRoleQuery = useDebounce(roleQuery, 300);
-    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
-    const { data: roleOptions } = useSearchOptions('roles', debouncedRoleQuery);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [generalError, setGeneralError] = useState('');
 
@@ -83,8 +73,6 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 tag_list: entity.tags?.map(t => t.id) || [],
                 role_list: entity.roles?.map(r => r.id) || [],
             });
-            setSelectedTags(entity.tags?.map(t => ({ id: t.id, name: t.name })) || []);
-            setSelectedRoles(entity.roles?.map(r => ({ id: r.id, name: r.name })) || []);
             initialize(entity.name || '', entity.slug || '');
         }
     }, [entity, initialize]);
@@ -204,37 +192,30 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                     {renderError('description')}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="entity_type_id">Type</Label>
-                        <SearchableInput
-                            id="entity_type_id"
-                            endpoint="entity-types"
-                            debounceMs={300}
-                            value={formData.entity_type_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, entity_type_id: val }))}
-                        />
-                        {renderError('entity_type_id')}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="entity_status_id">Status</Label>
-                        <SearchableInput
-                            id="entity_status_id"
-                            endpoint="entity-statuses"
-                            debounceMs={300}
-                            value={formData.entity_status_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, entity_status_id: val }))}
-                        />
-                        {renderError('entity_status_id')}
-                    </div>
+                    <AjaxSelect
+                        label="Type"
+                        endpoint="entity-types"
+                        value={formData.entity_type_id}
+                        onChange={(val) => setFormData((p) => ({ ...p, entity_type_id: val }))}
+                        placeholder="Select entity type..."
+                    />
+                    {renderError('entity_type_id')}
+                    <AjaxSelect
+                        label="Status"
+                        endpoint="entity-statuses"
+                        value={formData.entity_status_id}
+                        onChange={(val) => setFormData((p) => ({ ...p, entity_status_id: val }))}
+                        placeholder="Select status..."
+                    />
+                    {renderError('entity_status_id')}
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="primary_location_id">Primary Location</Label>
-                    <SearchableInput
-                        id="primary_location_id"
+                    <AjaxSelect
+                        label="Primary Location"
                         endpoint="locations"
-                        debounceMs={300}
                         value={formData.primary_location_id}
-                        onValueChange={(val) => setFormData((p) => ({ ...p, primary_location_id: val }))}
+                        onChange={(val) => setFormData((p) => ({ ...p, primary_location_id: val }))}
+                        placeholder="Select location..."
                     />
                     {renderError('primary_location_id')}
                 </div>
@@ -256,31 +237,19 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Tags"
-                        datalistId="tag-options"
-                        query={tagQuery}
-                        setQuery={setTagQuery}
-                        options={tagOptions}
-                        valueIds={formData.tag_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
-                        selected={selectedTags}
-                        setSelected={setSelectedTags}
+                        endpoint="tags"
+                        value={formData.tag_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, tag_list: ids }))}
                         placeholder="Type to add tag..."
-                        ariaLabelRemove="Remove tag"
                     />
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Roles"
-                        datalistId="role-options"
-                        query={roleQuery}
-                        setQuery={setRoleQuery}
-                        options={roleOptions}
-                        valueIds={formData.role_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, role_list: typeof ids === 'function' ? ids(p.role_list) : ids }))}
-                        selected={selectedRoles}
-                        setSelected={setSelectedRoles}
+                        endpoint="roles"
+                        value={formData.role_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, role_list: ids }))}
                         placeholder="Type to add role..."
-                        ariaLabelRemove="Remove role"
                     />
                 </div>
                 <Button type="submit" className="w-full">Save Entity</Button>
