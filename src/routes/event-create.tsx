@@ -5,12 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import SearchableInput from '../components/SearchableInput';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSlug } from '@/hooks/useSlug';
 import AjaxMultiSelect from '@/components/AjaxMultiSelect';
+import AjaxSelect from '@/components/AjaxSelect';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { eventCreateSchema } from '@/validation/schemas';
@@ -319,51 +319,36 @@ const EventCreate: React.FC = () => {
             </Select>
             {renderError('visibility_id')}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="event_type_id">Event Type</Label>
-            <SearchableInput
-              id="event_type_id"
-              endpoint="event-types"
-              value={formData.event_type_id}
-              onValueChange={(val) => {
-                setFormData((p) => ({ ...p, event_type_id: val }));
-                // Sync into validation state so the hook sees the updated value
-                setFormDataProxy((p: typeof formData) => ({ ...p, event_type_id: val }));
-              }}
-              placeholder="Type to search event types..."
-            />
-            {renderError('event_type_id')}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="promoter_id">Promoter</Label>
-            <SearchableInput
-              id="promoter_id"
-              endpoint="entities"
-              extraParams={{ 'filters[role]': 'Promoter' }}
-              debounceMs={300}
-              value={formData.promoter_id}
-              onValueChange={(val) =>
-                setFormData((p) => ({ ...p, promoter_id: val }))
-              }
-              placeholder="Type to search promoters..."
-            />
-            {renderError('promoter_id')}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="venue_id">Venue</Label>
-            <SearchableInput
-              id="venue_id"
-              endpoint="entities"
-              extraParams={{ 'filters[role]': 'Venue' }}
-              debounceMs={300}
-              value={formData.venue_id}
-              onValueChange={(val) =>
-                setFormData((p) => ({ ...p, venue_id: val }))
-              }
-              placeholder="Type to search venues..."
-            />
-            {renderError('venue_id')}
-          </div>
+          <AjaxSelect
+            label="Event Type"
+            endpoint="event-types"
+            value={formData.event_type_id}
+            onChange={(val) => {
+              setFormData((p) => ({ ...p, event_type_id: val }));
+              // Sync into validation state so the hook sees the updated value
+              setFormDataProxy((p: typeof formData) => ({ ...p, event_type_id: val }));
+            }}
+            placeholder="Type to search event types..."
+          />
+          {renderError('event_type_id')}
+          <AjaxSelect
+            label="Promoter"
+            endpoint="entities"
+            extraParams={{ 'filters[role]': 'Promoter' }}
+            value={formData.promoter_id}
+            onChange={(val) => setFormData((p) => ({ ...p, promoter_id: val }))}
+            placeholder="Type to search promoters..."
+          />
+          {renderError('promoter_id')}
+          <AjaxSelect
+            label="Venue"
+            endpoint="entities"
+            extraParams={{ 'filters[role]': 'Venue' }}
+            value={formData.venue_id}
+            onChange={(val) => setFormData((p) => ({ ...p, venue_id: val }))}
+            placeholder="Type to search venues..."
+          />
+          {renderError('venue_id')}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
@@ -462,19 +447,14 @@ const EventCreate: React.FC = () => {
             />
             {renderError('end_at')}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="series_id">Series</Label>
-            <SearchableInput
-              id="series_id"
-              endpoint="series"
-              value={formData.series_id}
-              onValueChange={(val) =>
-                setFormData((p) => ({ ...p, series_id: val }))
-              }
-              placeholder="Type to search series..."
-            />
-            {renderError('series_id')}
-          </div>
+          <AjaxSelect
+            label="Series"
+            endpoint="series"
+            value={formData.series_id}
+            onChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
+            placeholder="Type to search series..."
+          />
+          {renderError('series_id')}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
