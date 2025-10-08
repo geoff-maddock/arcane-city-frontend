@@ -8,11 +8,16 @@ import AjaxMultiSelect from '@/components/AjaxMultiSelect';
 // Mock the useSearchOptions hook
 vi.mock('../../hooks/useSearchOptions', () => ({
   useSearchOptions: vi.fn(),
+  useSelectedOptions: vi.fn(),
 }));
 
 const mockUseSearchOptions = vi.mocked(
   await import('../../hooks/useSearchOptions')
 ).useSearchOptions;
+
+const mockUseSelectedOptions = vi.mocked(
+  await import('../../hooks/useSearchOptions')
+).useSelectedOptions;
 
 const mockOptions = [
   { id: 1, name: 'Option 1' },
@@ -75,6 +80,36 @@ describe('AjaxMultiSelect', () => {
       isPaused: false,
       isEnabled: true,
       promise: Promise.resolve(mockOptions),
+    } as const);
+
+    // Mock useSelectedOptions to return empty by default
+    mockUseSelectedOptions.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve([]),
     } as const);
   });
 
@@ -176,6 +211,42 @@ describe('AjaxMultiSelect', () => {
   });
 
   it('displays selected options as tags', () => {
+    // Mock useSelectedOptions to return the selected options
+    mockUseSelectedOptions.mockReturnValue({
+      data: [
+        { id: 1, name: 'Option 1' },
+        { id: 2, name: 'Option 2' }
+      ],
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve([
+        { id: 1, name: 'Option 1' },
+        { id: 2, name: 'Option 2' }
+      ]),
+    } as const);
+
     render(
       <TestWrapper>
         <AjaxMultiSelect
@@ -207,6 +278,36 @@ describe('AjaxMultiSelect', () => {
 
     const option = screen.getByText('Option 1');
     await user.click(option);
+
+    // Mock useSelectedOptions to return the selected option for rerender
+    mockUseSelectedOptions.mockReturnValue({
+      data: [{ id: 1, name: 'Option 1' }],
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve([{ id: 1, name: 'Option 1' }]),
+    } as const);
 
     // Now rerender with the selected value to simulate the parent updating state
     rerender(

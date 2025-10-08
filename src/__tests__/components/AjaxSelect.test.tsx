@@ -8,11 +8,16 @@ import AjaxSelect from '@/components/AjaxSelect';
 // Mock the useSearchOptions hook
 vi.mock('../../hooks/useSearchOptions', () => ({
   useSearchOptions: vi.fn(),
+  useSelectedOptions: vi.fn(),
 }));
 
 const mockUseSearchOptions = vi.mocked(
   await import('../../hooks/useSearchOptions')
 ).useSearchOptions;
+
+const mockUseSelectedOptions = vi.mocked(
+  await import('../../hooks/useSearchOptions')
+).useSelectedOptions;
 
 const mockOptions = [
   { id: 1, name: 'Option 1' },
@@ -76,6 +81,36 @@ describe('AjaxSelect', () => {
       isEnabled: true,
       promise: Promise.resolve(mockOptions),
     } as const);
+
+    // Mock useSelectedOptions to return empty by default
+    mockUseSelectedOptions.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve([]),
+    } as const);
   });
 
   it('renders with label and placeholder', () => {
@@ -91,7 +126,7 @@ describe('AjaxSelect', () => {
 
   it('opens dropdown when input is focused', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <AjaxSelect {...defaultProps} />
@@ -108,7 +143,7 @@ describe('AjaxSelect', () => {
 
   it('filters options based on search query', async () => {
     const user = userEvent.setup();
-    
+
     // Mock filtered results
     const filteredData = [{ id: 4, name: 'Filtered Option' }];
     mockUseSearchOptions.mockReturnValue({
@@ -176,6 +211,36 @@ describe('AjaxSelect', () => {
   });
 
   it('displays selected option', () => {
+    // Mock useSelectedOptions to return the selected option
+    mockUseSelectedOptions.mockReturnValue({
+      data: [{ id: 1, name: 'Option 1' }],
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve([{ id: 1, name: 'Option 1' }]),
+    } as const);
+
     render(
       <TestWrapper>
         <AjaxSelect {...defaultProps} value={1} />
@@ -202,6 +267,36 @@ describe('AjaxSelect', () => {
     const option = screen.getByText('Option 1');
     await user.click(option);
 
+    // Mock useSelectedOptions to return the selected option for rerender
+    mockUseSelectedOptions.mockReturnValue({
+      data: [{ id: 1, name: 'Option 1' }],
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve([{ id: 1, name: 'Option 1' }]),
+    } as const);
+
     // Now rerender with the selected value
     rerender(
       <TestWrapper>
@@ -226,7 +321,7 @@ describe('AjaxSelect', () => {
 
     // Press Arrow Down to focus first option
     await user.keyboard('{ArrowDown}');
-    
+
     // Press Enter to select
     await user.keyboard('{Enter}');
 
@@ -259,7 +354,7 @@ describe('AjaxSelect', () => {
 
   it('shows no results message when search yields no results', async () => {
     const user = userEvent.setup();
-    
+
     // Mock empty results
     const emptyData: typeof mockOptions = [];
     mockUseSearchOptions.mockReturnValue({
@@ -332,7 +427,7 @@ describe('AjaxSelect', () => {
 
     const input = screen.getByRole('textbox');
     await user.click(input);
-    
+
     // Press backspace when input is empty
     await user.keyboard('{Backspace}');
 
