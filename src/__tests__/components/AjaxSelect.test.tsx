@@ -52,6 +52,29 @@ describe('AjaxSelect', () => {
       data: mockOptions,
       isLoading: false,
       error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve(mockOptions),
     } as const);
   });
 
@@ -87,10 +110,34 @@ describe('AjaxSelect', () => {
     const user = userEvent.setup();
     
     // Mock filtered results
+    const filteredData = [{ id: 4, name: 'Filtered Option' }];
     mockUseSearchOptions.mockReturnValue({
-      data: [{ id: 4, name: 'Filtered Option' }],
+      data: filteredData,
       isLoading: false,
       error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve(filteredData),
     } as const);
 
     render(
@@ -214,10 +261,34 @@ describe('AjaxSelect', () => {
     const user = userEvent.setup();
     
     // Mock empty results
+    const emptyData: typeof mockOptions = [];
     mockUseSearchOptions.mockReturnValue({
-      data: [],
+      data: emptyData,
       isLoading: false,
       error: null,
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isRefetching: false,
+      isFetching: false,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isPlaceholderData: false,
+      isStale: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve(emptyData),
     } as const);
 
     render(

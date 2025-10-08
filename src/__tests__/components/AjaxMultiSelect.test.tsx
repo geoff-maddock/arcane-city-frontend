@@ -71,6 +71,10 @@ describe('AjaxMultiSelect', () => {
       failureCount: 0,
       failureReason: null,
       errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve(mockOptions),
     } as const);
   });
 
@@ -106,8 +110,9 @@ describe('AjaxMultiSelect', () => {
     const user = userEvent.setup();
 
     // Mock filtered results
+    const filteredData = [{ id: 4, name: 'Filtered Option' }];
     mockUseSearchOptions.mockReturnValue({
-      data: [{ id: 4, name: 'Filtered Option' }],
+      data: filteredData,
       isLoading: false,
       isError: false,
       error: null,
@@ -129,6 +134,10 @@ describe('AjaxMultiSelect', () => {
       failureCount: 0,
       failureReason: null,
       errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve(filteredData),
     } as const);
 
     render(
@@ -260,8 +269,9 @@ describe('AjaxMultiSelect', () => {
     const user = userEvent.setup();
 
     // Mock empty results
+    const emptyData: typeof mockOptions = [];
     mockUseSearchOptions.mockReturnValue({
-      data: [],
+      data: emptyData,
       isLoading: false,
       isError: false,
       error: null,
@@ -283,6 +293,10 @@ describe('AjaxMultiSelect', () => {
       failureCount: 0,
       failureReason: null,
       errorUpdateCount: 0,
+      isInitialLoading: false,
+      isPaused: false,
+      isEnabled: true,
+      promise: Promise.resolve(emptyData),
     } as const);
 
     render(
