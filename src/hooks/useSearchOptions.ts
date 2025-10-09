@@ -42,3 +42,27 @@ export const useSearchOptions = (
         },
     });
 };
+
+// New hook for fetching selected options by IDs
+export const useSelectedOptions = (
+    endpoint: string,
+    selectedIds: number[],
+    enabled: boolean = true
+) => {
+    return useQuery<Option[]>({
+        queryKey: ['selected', endpoint, selectedIds],
+        queryFn: async () => {
+            if (selectedIds.length === 0) {
+                return [];
+            }
+
+            const queryParts = [`filters[id]=${selectedIds.join(',')}`];
+            const queryString = queryParts.join('&');
+            const { data } = await api.get<{ data: Option[] }>(
+                `/${endpoint}?${queryString}`
+            );
+            return data.data;
+        },
+        enabled: enabled && selectedIds.length > 0,
+    });
+};

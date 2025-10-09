@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import SearchableInput from '../components/SearchableInput';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
@@ -16,9 +15,9 @@ import { useSlug } from '@/hooks/useSlug';
 import { eventEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
+import AjaxMultiSelect from '@/components/AjaxMultiSelect';
+import AjaxSelect from '@/components/AjaxSelect';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -60,10 +59,6 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
         entity_list: [] as number[],
     });
 
-    const [tagQuery, setTagQuery] = useState('');
-    const [entityQuery, setEntityQuery] = useState('');
-    const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
-    const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
     // useSlug manages name<->slug auto sync until the user edits slug manually.
     // We will call initialize once the event data loads so that existing values
     // are seeded WITHOUT marking the slug as manually overridden (allowing
@@ -72,11 +67,6 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: eventStatusOptions } = useSearchOptions('event-statuses', '');
-    // Debounce tag/entity queries to avoid firing requests while the user is typing
-    const debouncedTagQuery = useDebounce(tagQuery, 300);
-    const debouncedEntityQuery = useDebounce(entityQuery, 300);
-    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
-    const { data: entityOptions } = useSearchOptions('entities', debouncedEntityQuery);
     const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
         initialValues: formData,
         schema: eventEditSchema,
@@ -127,8 +117,6 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
             };
             setFormData(populated);
             setFormValuesInternal(populated);
-            setSelectedTags(event.tags?.map(t => ({ id: t.id, name: t.name })) || []);
-            setSelectedEntities(event.entities?.map(e => ({ id: e.id, name: e.name })) || []);
             initialize(event.name || '', event.slug || '');
         }
     }, [event, initialize, setFormValuesInternal]);
@@ -268,45 +256,34 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                         </Select>
                         {renderError('visibility_id')}
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="event_type_id">Event Type</Label>
-                        <SearchableInput
-                            id="event_type_id"
-                            endpoint="event-types"
-                            value={formData.event_type_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, event_type_id: val }))}
-                            placeholder="Type to search event types..."
-                        />
-                        {renderError('event_type_id')}
-                    </div>
+                    <AjaxSelect
+                        label="Event Type"
+                        endpoint="event-types"
+                        value={formData.event_type_id}
+                        onChange={(val) => setFormData((p) => ({ ...p, event_type_id: val }))}
+                        placeholder="Type to search event types..."
+                    />
+                    {renderError('event_type_id')}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="promoter_id">Promoter</Label>
-                        <SearchableInput
-                            id="promoter_id"
-                            endpoint="entities"
-                            extraParams={{ 'filters[role]': 'Promoter' }}
-                            debounceMs={300}
-                            value={formData.promoter_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, promoter_id: val }))}
-                            placeholder="Type to search promoters..."
-                        />
-                        {renderError('promoter_id')}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="venue_id">Venue</Label>
-                        <SearchableInput
-                            id="venue_id"
-                            endpoint="entities"
-                            extraParams={{ 'filters[role]': 'Venue' }}
-                            debounceMs={300}
-                            value={formData.venue_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, venue_id: val }))}
-                            placeholder="Type to search venues..."
-                        />
-                        {renderError('venue_id')}
-                    </div>
+                    <AjaxSelect
+                        label="Promoter"
+                        endpoint="entities"
+                        extraParams={{ 'filters[role]': 'Promoter' }}
+                        value={formData.promoter_id}
+                        onChange={(val) => setFormData((p) => ({ ...p, promoter_id: val }))}
+                        placeholder="Type to search promoters..."
+                    />
+                    {renderError('promoter_id')}
+                    <AjaxSelect
+                        label="Venue"
+                        endpoint="entities"
+                        extraParams={{ 'filters[role]': 'Venue' }}
+                        value={formData.venue_id}
+                        onChange={(val) => setFormData((p) => ({ ...p, venue_id: val }))}
+                        placeholder="Type to search venues..."
+                    />
+                    {renderError('venue_id')}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="space-y-2">
@@ -393,17 +370,14 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                         />
                         {renderError('end_at')}
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="series_id">Series</Label>
-                        <SearchableInput
-                            id="series_id"
-                            endpoint="series"
-                            value={formData.series_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
-                            placeholder="Type to search series..."
-                        />
-                        {renderError('series_id')}
-                    </div>
+                    <AjaxSelect
+                        label="Series"
+                        endpoint="series"
+                        value={formData.series_id}
+                        onChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
+                        placeholder="Type to search series..."
+                    />
+                    {renderError('series_id')}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="ticket_link">Ticket Link</Label>
@@ -418,31 +392,19 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                     {renderError('ticket_link')}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Tags"
-                        datalistId="tag-options"
-                        query={tagQuery}
-                        setQuery={setTagQuery}
-                        options={tagOptions}
-                        valueIds={formData.tag_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
-                        selected={selectedTags}
-                        setSelected={setSelectedTags}
-                        placeholder="Type to add tag..."
-                        ariaLabelRemove="Remove tag"
+                        endpoint="tags"
+                        value={formData.tag_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, tag_list: ids }))}
+                        placeholder="Type to search and add tags..."
                     />
-                    <TagEntityMultiSelect
-                        label="Entities"
-                        datalistId="entity-options"
-                        query={entityQuery}
-                        setQuery={setEntityQuery}
-                        options={entityOptions}
-                        valueIds={formData.entity_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, entity_list: typeof ids === 'function' ? ids(p.entity_list) : ids }))}
-                        selected={selectedEntities}
-                        setSelected={setSelectedEntities}
-                        placeholder="Type to add entity..."
-                        ariaLabelRemove="Remove entity"
+                    <AjaxMultiSelect
+                        label="Related Entities"
+                        endpoint="entities"
+                        value={formData.entity_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, entity_list: ids }))}
+                        placeholder="Type to search and add entities..."
                     />
                 </div>
                 <Button type="submit" className="w-full">Save Event</Button>

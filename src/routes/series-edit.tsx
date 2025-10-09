@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import SearchableInput from '../components/SearchableInput';
+import AjaxSelect from '../components/AjaxSelect';
+import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
@@ -16,8 +17,6 @@ import { useSlug } from '@/hooks/useSlug';
 import { seriesEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import TagEntityMultiSelect from '@/components/TagEntityMultiSelect';
-import { useDebounce } from '@/hooks/useDebounce';
 
 interface ValidationErrors {
     [key: string]: string[];
@@ -57,21 +56,13 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
         occurrence_day_id: '' as number | '',
     });
 
-    const [tagQuery, setTagQuery] = useState('');
-    const [entityQuery, setEntityQuery] = useState('');
-    const [selectedTags, setSelectedTags] = useState<{ id: number; name: string }[]>([]);
-    const [selectedEntities, setSelectedEntities] = useState<{ id: number; name: string }[]>([]);
     const { name, slug, setName, setSlug, initialize, manuallyOverridden } = useSlug('', '');
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '', {}, { sort: 'id', direction: 'asc' });
     const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '', {}, { sort: 'id', direction: 'asc' });
     const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
-    // Debounce tag/entity queries to avoid firing requests while typing
-    const debouncedTagQuery = useDebounce(tagQuery, 300);
-    const debouncedEntityQuery = useDebounce(entityQuery, 300);
-    const { data: tagOptions } = useSearchOptions('tags', debouncedTagQuery);
-    const { data: entityOptions } = useSearchOptions('entities', debouncedEntityQuery);
+
     // Shared form field classes (light + dark)
     const fieldClasses = 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400';
     const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
@@ -118,8 +109,6 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             };
             setFormData(populated);
             setFormValuesInternal(populated);
-            setSelectedTags(series.tags?.map(t => ({ id: t.id, name: t.name })) || []);
-            setSelectedEntities(series.entities?.map(e => ({ id: e.id, name: e.name })) || []);
             initialize(series.name || '', series.slug || '');
         }
     }, [series, initialize, setFormValuesInternal]);
@@ -317,38 +306,33 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         {renderError('visibility_id')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="event_type_id">Event Type</Label>
-                        <SearchableInput
-                            id="event_type_id"
+                        <AjaxSelect
+                            label="Event Type"
                             endpoint="event-types"
                             value={formData.event_type_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, event_type_id: val }))}
+                            onChange={(val) => setFormData(p => ({ ...p, event_type_id: val }))}
                             placeholder="Type to search event types..."
                         />
                         {renderError('event_type_id')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="promoter_id">Promoter</Label>
-                        <SearchableInput
-                            id="promoter_id"
+                        <AjaxSelect
+                            label="Promoter"
                             endpoint="entities"
                             extraParams={{ 'filters[role]': 'Promoter' }}
-                            debounceMs={300}
                             value={formData.promoter_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, promoter_id: val }))}
+                            onChange={(val) => setFormData(p => ({ ...p, promoter_id: val }))}
                             placeholder="Type to search promoters..."
                         />
                         {renderError('promoter_id')}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="venue_id">Venue</Label>
-                        <SearchableInput
-                            id="venue_id"
+                        <AjaxSelect
+                            label="Venue"
                             endpoint="entities"
                             extraParams={{ 'filters[role]': 'Venue' }}
-                            debounceMs={300}
                             value={formData.venue_id}
-                            onValueChange={(val) => setFormData((p) => ({ ...p, venue_id: val }))}
+                            onChange={(val) => setFormData(p => ({ ...p, venue_id: val }))}
                             placeholder="Type to search venues..."
                         />
                         {renderError('venue_id')}
@@ -467,31 +451,19 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         />
                         {renderError('ticket_link')}
                     </div>
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Tags"
-                        datalistId="tag-options"
-                        query={tagQuery}
-                        setQuery={setTagQuery}
-                        options={tagOptions}
-                        valueIds={formData.tag_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, tag_list: typeof ids === 'function' ? ids(p.tag_list) : ids }))}
-                        selected={selectedTags}
-                        setSelected={setSelectedTags}
+                        endpoint="tags"
+                        value={formData.tag_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, tag_list: ids }))}
                         placeholder="Type to add tag..."
-                        ariaLabelRemove="Remove tag"
                     />
-                    <TagEntityMultiSelect
+                    <AjaxMultiSelect
                         label="Entities"
-                        datalistId="entity-options"
-                        query={entityQuery}
-                        setQuery={setEntityQuery}
-                        options={entityOptions}
-                        valueIds={formData.entity_list}
-                        setValueIds={(ids) => setFormData(p => ({ ...p, entity_list: typeof ids === 'function' ? ids(p.entity_list) : ids }))}
-                        selected={selectedEntities}
-                        setSelected={setSelectedEntities}
+                        endpoint="entities"
+                        value={formData.entity_list}
+                        onChange={(ids) => setFormData(p => ({ ...p, entity_list: ids }))}
                         placeholder="Type to add entity..."
-                        ariaLabelRemove="Remove entity"
                     />
                 </div>
                 <Button type="submit" className="w-full">Save Series</Button>

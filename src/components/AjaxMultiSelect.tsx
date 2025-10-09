@@ -1,0 +1,297 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useSearchOptions, useSelectedOptions } from '../hooks/useSearchOptions';
+import { ChevronDown, X } from 'lucide-react';
+
+export interface Option {
+  id: number;
+  name: string;
+}
+
+interface AjaxMultiSelectProps {
+  label: string;
+  endpoint: string;
+  value: number[]; // Array of selected IDs
+  onChange: (selectedIds: number[]) => void;
+  placeholder?: string;
+  debounceMs?: number;
+  extraParams?: Record<string, string | number>;
+  className?: string;
+  disabled?: boolean;
+}
+
+export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
+  label,
+  endpoint,
+  value,
+  onChange,
+  placeholder = 'Type to search...',
+  debounceMs = 300,
+  extraParams = {},
+  className = '',
+  disabled = false,
+}) => {
+  const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fetch selected options by IDs
+  const { data: selectedOptionsData = [] } = useSelectedOptions(
+    endpoint,
+    value
+  );
+
+  // Fetch search results based on user query
+  const { data: searchResults = [], isLoading } = useSearchOptions(
+    endpoint,
+    debouncedQuery,
+    extraParams
+  );
+
+  // Merge and deduplicate options from both queries
+  const allOptions = useMemo(() => {
+    const optionsMap = new Map<number, Option>();
+
+    // Add selected options first
+    selectedOptionsData.forEach(option => {
+      optionsMap.set(option.id, option);
+    });
+
+    // Add search results (will overwrite if same ID)
+    searchResults.forEach(option => {
+      optionsMap.set(option.id, option);
+    });
+
+    return Array.from(optionsMap.values());
+  }, [selectedOptionsData, searchResults]);
+
+  // Filter out already selected options for the dropdown
+  const availableOptions = allOptions.filter(option => !value.includes(option.id));
+
+  // Get selected options for display as tags
+  const selectedOptions = allOptions.filter(option => value.includes(option.id));
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, debounceMs);
+
+    return () => clearTimeout(timer);
+  }, [query, debounceMs]);
+
+  // Handle clicking outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setFocusedIndex(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    setIsOpen(true);
+    setFocusedIndex(-1);
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  };
+
+  const handleOptionSelect = useCallback((option: Option) => {
+    if (!value.includes(option.id)) {
+      const newValue = [...value, option.id];
+      onChange(newValue);
+      setQuery('');
+      setFocusedIndex(-1);
+
+      // Keep focus on input
+      inputRef.current?.focus();
+    }
+  }, [value, onChange]);
+
+  const handleRemoveTag = useCallback((optionId: number) => {
+    const newValue = value.filter(id => id !== optionId);
+    onChange(newValue);
+
+    // Keep focus on input
+    inputRef.current?.focus();
+  }, [value, onChange]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (disabled) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+        }
+        setFocusedIndex(prev =>
+          prev < availableOptions.length - 1 ? prev + 1 : 0
+        );
+        break;
+
+      case 'ArrowUp':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+        }
+        setFocusedIndex(prev =>
+          prev > 0 ? prev - 1 : availableOptions.length - 1
+        );
+        break;
+
+      case 'Enter':
+        e.preventDefault();
+        if (isOpen && focusedIndex >= 0 && availableOptions[focusedIndex]) {
+          handleOptionSelect(availableOptions[focusedIndex]);
+        }
+        break;
+
+      case 'Escape':
+        setIsOpen(false);
+        setFocusedIndex(-1);
+        break;
+
+      case 'Backspace':
+        if (query === '' && selectedOptions.length > 0) {
+          e.preventDefault();
+          const lastOption = selectedOptions[selectedOptions.length - 1];
+          handleRemoveTag(lastOption.id);
+        }
+        break;
+    }
+  };
+
+  const toggleDropdown = () => {
+    if (disabled) return;
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      inputRef.current?.focus();
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        {label}
+      </label>
+
+      <div
+        ref={containerRef}
+        className={`relative ${className}`}
+      >
+        {/* Main input container */}
+        <div
+          className={`
+            flex flex-wrap items-center gap-1 p-2 border rounded-md bg-white dark:bg-slate-800 
+            border-gray-300 dark:border-slate-600 min-h-[2.5rem] cursor-text
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-slate-500'}
+            ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}
+          `}
+          onClick={() => inputRef.current?.focus()}
+        >
+          {/* Selected tags */}
+          {selectedOptions.map((option) => (
+            <span
+              key={option.id}
+              className="inline-flex items-center px-2 py-1 rounded text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+            >
+              {option.name}
+              {!disabled && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveTag(option.id);
+                  }}
+                  className="ml-1 hover:text-red-600 dark:hover:text-red-400 focus:outline-none"
+                  aria-label={`Remove ${option.name}`}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </span>
+          ))}
+
+          {/* Input field */}
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            onKeyDown={handleKeyDown}
+            placeholder={selectedOptions.length === 0 ? placeholder : ''}
+            disabled={disabled}
+            className="flex-1 min-w-[120px] outline-none bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+          />
+
+          {/* Dropdown indicator */}
+          <button
+            type="button"
+            onClick={toggleDropdown}
+            disabled={disabled}
+            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded focus:outline-none"
+            aria-label="Toggle dropdown"
+          >
+            <ChevronDown
+              size={16}
+              className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+        </div>
+
+        {/* Dropdown */}
+        {isOpen && (
+          <div
+            ref={dropdownRef}
+            className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
+          >
+            {isLoading ? (
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                Searching...
+              </div>
+            ) : availableOptions.length > 0 ? (
+              availableOptions.map((option, index) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleOptionSelect(option)}
+                  className={`
+                    w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700
+                    text-gray-900 dark:text-gray-100 focus:outline-none
+                    ${index === focusedIndex ? 'bg-blue-100 dark:bg-blue-900' : ''}
+                  `}
+                >
+                  {option.name}
+                </button>
+              ))
+            ) : query && debouncedQuery ? (
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                No results found for "{query}"
+              </div>
+            ) : !query ? (
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                Type to search...
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AjaxMultiSelect;
