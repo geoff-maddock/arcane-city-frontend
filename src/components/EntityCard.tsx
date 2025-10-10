@@ -116,10 +116,12 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
                     </div>
                     {entity.short && <p className="text-gray-600">{entity.short}</p>}
 
-                    <div className="flex items-center gap-2 text-gray-600">
-                        <EntityTypeIcon entityTypeName={entity.entity_type.name} />
-                        <span className="font-medium">{entity.entity_type.name}</span>
-                    </div>
+                    {entity.entity_type && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                            <EntityTypeIcon entityTypeName={entity.entity_type.name} />
+                            <span className="font-medium">{entity.entity_type.name}</span>
+                        </div>
+                    )}
 
                     {entity.primary_location && (
                         <div className="flex items-start gap-2 text-gray-600">
