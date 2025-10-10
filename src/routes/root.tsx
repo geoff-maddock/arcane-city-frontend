@@ -1,11 +1,13 @@
 import { createRootRoute, Outlet, HeadContent } from '@tanstack/react-router';
 import MenuBar from '../components/MenuBar';
+import { NavigationLoadingIndicator } from '../components/NavigationLoadingIndicator';
 import { SITE_NAME, SITE_DESCRIPTION, DEFAULT_IMAGE } from '../lib/seo';
 
 function RootLayout() {
     return (
         <>
             <HeadContent />
+            <NavigationLoadingIndicator />
             <div className="min-h-screen">
                 <MenuBar />
                 <div className="xl:ml-64 pt-16 xl:pt-0">
