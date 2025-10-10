@@ -1,8 +1,20 @@
-import { createRootRoute, Outlet, HeadContent } from '@tanstack/react-router';
+import { createRootRoute, Outlet, HeadContent, useRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import MenuBar from '../components/MenuBar';
 import { SITE_NAME, SITE_DESCRIPTION, DEFAULT_IMAGE } from '../lib/seo';
 
 function RootLayout() {
+    const router = useRouter();
+
+    // Scroll to top on route changes
+    useEffect(() => {
+        const unsubscribe = router.subscribe('onResolved', () => {
+            window.scrollTo(0, 0);
+        });
+
+        return () => unsubscribe();
+    }, [router]);
+
     return (
         <>
             <HeadContent />

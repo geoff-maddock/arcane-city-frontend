@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { RouterProvider } from '@tanstack/react-router'
 import { router } from '../router'
@@ -25,6 +25,11 @@ vi.mock('../components/Calendar', () => ({
 const client = new QueryClient()
 
 describe('Router Configuration', () => {
+    beforeEach(() => {
+        // Mock window.scrollTo
+        vi.stubGlobal('scrollTo', vi.fn())
+    })
+
     it('renders Events component at root path', async () => {
         render(
             <QueryClientProvider client={client}>
@@ -100,6 +105,38 @@ describe('Router Configuration', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('calendar-component')).toBeInTheDocument()
+        })
+    })
+
+    it('scrolls to top when navigating between routes', async () => {
+        const scrollToMock = vi.fn()
+        vi.stubGlobal('scrollTo', scrollToMock)
+
+        // Start at events page
+        await router.navigate({ to: '/events' })
+
+        render(
+            <QueryClientProvider client={client}>
+                <MediaPlayerProvider>
+                    <RouterProvider router={router} />
+                </MediaPlayerProvider>
+            </QueryClientProvider>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByTestId('events-component')).toBeInTheDocument()
+        })
+
+        // Navigate to entities page
+        await router.navigate({ to: '/entities' })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('entities-component')).toBeInTheDocument()
+        })
+
+        // Verify scrollTo was called with (0, 0)
+        await waitFor(() => {
+            expect(scrollToMock).toHaveBeenCalledWith(0, 0)
         })
     })
 })
