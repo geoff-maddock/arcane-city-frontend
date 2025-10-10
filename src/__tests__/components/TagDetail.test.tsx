@@ -29,6 +29,17 @@ vi.mock('../../lib/api', () => ({
                     },
                 });
             }
+            if (url === '/tags/test-tag/related-tags') {
+                return Promise.resolve({
+                    data: {
+                        House: 334,
+                        Electronic: 215,
+                        Bass: 86,
+                        Experimental: 63,
+                        Electro: 59,
+                    },
+                });
+            }
             return Promise.resolve({ data: paginated });
         }),
         post: vi.fn(),
@@ -73,6 +84,30 @@ describe('TagDetail', () => {
         fireEvent.click(actionsButton);
         expect(screen.getByText('Edit Tag')).toBeInTheDocument();
         expect(screen.getByText('Delete Tag')).toBeInTheDocument();
+    });
+
+    it('displays related tags sorted by relatedness', async () => {
+        render(<TagDetail slug="test-tag" />);
+
+        // Wait for the component to load
+        await screen.findByText('Test Tag');
+
+        // Check that related tags heading is present
+        expect(screen.getByText('Related Tags')).toBeInTheDocument();
+
+        // Check that related tags are displayed
+        expect(await screen.findByText('House')).toBeInTheDocument();
+        expect(screen.getByText('Electronic')).toBeInTheDocument();
+        expect(screen.getByText('Bass')).toBeInTheDocument();
+        expect(screen.getByText('Experimental')).toBeInTheDocument();
+        expect(screen.getByText('Electro')).toBeInTheDocument();
+
+        // Check that relatedness scores are displayed
+        expect(screen.getByText('(334)')).toBeInTheDocument();
+        expect(screen.getByText('(215)')).toBeInTheDocument();
+        expect(screen.getByText('(86)')).toBeInTheDocument();
+        expect(screen.getByText('(63)')).toBeInTheDocument();
+        expect(screen.getByText('(59)')).toBeInTheDocument();
     });
 });
 

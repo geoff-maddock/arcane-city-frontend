@@ -171,6 +171,10 @@ export interface Tag {
     created_by?: number;
 }
 
+export interface RelatedTags {
+    [tagName: string]: number;
+}
+
 export interface EntityType {
     id: number;
     name: string;
