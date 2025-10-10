@@ -109,7 +109,7 @@ export default function TagDetail({ slug }: { slug: string }) {
         queryFn: async () => {
             const params = new URLSearchParams();
             params.append('page', '1');
-            params.append('limit', '5');
+            params.append('limit', '8');
             params.append('filters[tag]', slug);
             const { data } = await api.get<PaginatedResponse<Entity>>(`/entities?${params.toString()}`);
             return data;
@@ -122,7 +122,7 @@ export default function TagDetail({ slug }: { slug: string }) {
         queryFn: async () => {
             const params = new URLSearchParams();
             params.append('page', '1');
-            params.append('limit', '5');
+            params.append('limit', '8');
             params.append('filters[tag]', slug);
             const { data } = await api.get<PaginatedResponse<Series>>(`/series?${params.toString()}`);
             return data;
@@ -338,7 +338,7 @@ export default function TagDetail({ slug }: { slug: string }) {
                             {entitiesLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                             ) : entitiesData && entitiesData.data.length > 0 ? (
-                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
                                     {entitiesData.data.map((entity, idx) => (
                                         <EntityCardCondensed key={entity.id} entity={entity} allImages={entityImages} imageIndex={idx} />
                                     ))}
@@ -362,7 +362,7 @@ export default function TagDetail({ slug }: { slug: string }) {
                             {seriesLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                             ) : seriesData && seriesData.data.length > 0 ? (
-                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
                                     {seriesData.data.map((series, idx) => (
                                         <SeriesCardCondensed key={series.id} series={series} allImages={seriesImages} imageIndex={idx} />
                                     ))}
