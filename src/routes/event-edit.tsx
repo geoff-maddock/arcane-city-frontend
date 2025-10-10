@@ -109,7 +109,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 end_at: event.end_at ? new Date(event.end_at).toISOString().slice(0, 16) : '',
                 series_id: (event.series?.id ?? '') as number | '',
                 min_age: event.min_age ? String(event.min_age) : '',
-                primary_link: '',
+                primary_link: event.primary_link || '',
                 ticket_link: event.ticket_link || '',
                 cancelled_at: '',
                 tag_list: event.tags?.map(t => t.id) || [],
@@ -167,7 +167,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 ...formData,
                 presale_price: formData.presale_price ? parseFloat(formData.presale_price) : undefined,
                 door_price: formData.door_price ? parseFloat(formData.door_price) : undefined,
-                series_id: formData.series_id ? Number(formData.series_id) : undefined,
+                series_id: formData.series_id ? Number(formData.series_id) : null,
                 event_type_id: formData.event_type_id ? Number(formData.event_type_id) : undefined,
                 promoter_id: formData.promoter_id ? Number(formData.promoter_id) : undefined,
                 venue_id: formData.venue_id ? Number(formData.venue_id) : undefined,
@@ -370,26 +370,42 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                         />
                         {renderError('end_at')}
                     </div>
-                    <AjaxSelect
-                        label="Series"
-                        endpoint="series"
-                        value={formData.series_id}
-                        onChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
-                        placeholder="Type to search series..."
-                    />
-                    {renderError('series_id')}
+                    <div>
+                        <AjaxSelect
+                            label="Series"
+                            endpoint="series"
+                            value={formData.series_id}
+                            onChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
+                            placeholder="Type to search series..."
+                        />
+                        {renderError('series_id')}
+                    </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="ticket_link">Ticket Link</Label>
-                    <Input
-                        id="ticket_link"
-                        name="ticket_link"
-                        value={formData.ticket_link}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={fieldClasses}
-                    />
-                    {renderError('ticket_link')}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="primary_link">Primary Link</Label>
+                        <Input
+                            id="primary_link"
+                            name="primary_link"
+                            value={formData.primary_link}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className={fieldClasses}
+                        />
+                        {renderError('primary_link')}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="ticket_link">Ticket Link</Label>
+                        <Input
+                            id="ticket_link"
+                            name="ticket_link"
+                            value={formData.ticket_link}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className={fieldClasses}
+                        />
+                        {renderError('ticket_link')}
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <AjaxMultiSelect

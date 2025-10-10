@@ -15,6 +15,7 @@ export interface Event {
     min_age?: number;
     tags?: Tag[];
     entities?: EntityResponse[];
+    primary_link?: string;
     ticket_link?: string;
     primary_photo?: string;
     primary_photo_thumbnail?: string;
@@ -261,6 +262,7 @@ export interface Series {
     tags?: Tag[];
     entities?: EntityResponse[];
     ticket_link?: string;
+    primary_link?: string;
     primary_photo?: string;
     primary_photo_thumbnail?: string;
     occurrence_type?: OccurrenceType;
