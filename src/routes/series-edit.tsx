@@ -102,7 +102,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                 end_at: series.end_at || '',
                 founded_at: series.founded_at || '',
                 min_age: series.min_age?.toString() || '',
-                primary_link: '',
+                primary_link: series.primary_link || '',
                 ticket_link: series.ticket_link || '',
                 tag_list: series.tags?.map(t => t.id) || [],
                 entity_list: series.entities?.map(e => e.id) || [],

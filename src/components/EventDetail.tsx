@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2, Copy, Plus } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2, Copy, Plus, ExternalLink } from 'lucide-react';
 // Lucide doesn't ship an Instagram brand icon; create a lightweight inline SVG component
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -442,6 +442,18 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                                 <span className="text-gray-500 font-bold" title="Promoter slug unavailable">{event.promoter.name}</span>
                                                             )}
                                                         </span>
+                                                    )}
+
+                                                    {event.primary_link && (
+                                                        <a
+                                                            href={event.primary_link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 ml-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                                            title="Event link"
+                                                        >
+                                                            <ExternalLink className="h-4 w-4 text-gray-600 hover:text-gray-900" />
+                                                        </a>
                                                     )}
                                                 </div>
                                             )}

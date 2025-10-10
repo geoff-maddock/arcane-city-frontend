@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Star, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, MapPin, DollarSign, Ticket, Star, MoreHorizontal, Pencil, Trash2, ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { sanitizeHTML } from '../lib/sanitize';
 import PhotoGallery from './PhotoGallery';
@@ -290,6 +290,18 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                                                             <span className="text-gray-500 font-bold" title="Promoter slug unavailable">{series.promoter.name}</span>
                                                         )}
                                                     </span>
+                                                )}
+
+                                                {series.primary_link && (
+                                                    <a
+                                                        href={series.primary_link}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 ml-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                                        title="Event link"
+                                                    >
+                                                        <ExternalLink className="h-4 w-4 text-gray-600 hover:text-gray-900" />
+                                                    </a>
                                                 )}
                                             </div>
                                         )}

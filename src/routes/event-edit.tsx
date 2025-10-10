@@ -109,7 +109,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 end_at: event.end_at ? new Date(event.end_at).toISOString().slice(0, 16) : '',
                 series_id: (event.series?.id ?? '') as number | '',
                 min_age: event.min_age ? String(event.min_age) : '',
-                primary_link: '',
+                primary_link: event.primary_link || '',
                 ticket_link: event.ticket_link || '',
                 cancelled_at: '',
                 tag_list: event.tags?.map(t => t.id) || [],
