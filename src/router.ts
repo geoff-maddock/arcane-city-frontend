@@ -175,6 +175,40 @@ const calendarRoute = createRoute({
     },
 });
 
+// Tag filter routes - redirect to index pages with tag query parameter
+const eventTagRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/events/tag/$slug',
+    beforeLoad: ({ params }) => {
+        throw redirect({
+            to: '/events',
+            search: { tag: params.slug },
+        });
+    },
+});
+
+const entityTagRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/entities/tag/$slug',
+    beforeLoad: ({ params }) => {
+        throw redirect({
+            to: '/entities',
+            search: { tag: params.slug },
+        });
+    },
+});
+
+const seriesTagRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/series/tag/$slug',
+    beforeLoad: ({ params }) => {
+        throw redirect({
+            to: '/series',
+            search: { tag: params.slug },
+        });
+    },
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
     indexRoute,
@@ -182,6 +216,9 @@ const routeTree = rootRoute.addChildren([
     entityRoute,
     seriesRoute,
     tagRoute,
+    eventTagRoute,
+    entityTagRoute,
+    seriesTagRoute,
     BlogsRoute,
     UsersRoute,
     TagCreateRoute,

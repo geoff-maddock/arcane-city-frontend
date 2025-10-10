@@ -63,6 +63,15 @@ export default function Series() {
         direction
     });
 
+    // Initialize filters from query parameters
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tag = params.get('tag');
+        if (tag) {
+            setFilters(prev => ({ ...prev, tag }));
+        }
+    }, []);
+
     // Reset pagination when filters change
     useEffect(() => {
         setPage(1);

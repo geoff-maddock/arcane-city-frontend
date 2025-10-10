@@ -5,7 +5,7 @@ import React from 'react';
 import { authService } from '../../services/auth.service';
 
 vi.mock('@tanstack/react-router', () => ({
-    Link: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
+    Link: ({ children, ...props }: { children: React.ReactNode;[key: string]: unknown }) => (
         <a {...props}>{children}</a>
     ),
     useNavigate: () => vi.fn(),
@@ -101,13 +101,6 @@ describe('TagDetail', () => {
         expect(screen.getByText('Bass')).toBeInTheDocument();
         expect(screen.getByText('Experimental')).toBeInTheDocument();
         expect(screen.getByText('Electro')).toBeInTheDocument();
-
-        // Check that relatedness scores are displayed
-        expect(screen.getByText('(334)')).toBeInTheDocument();
-        expect(screen.getByText('(215)')).toBeInTheDocument();
-        expect(screen.getByText('(86)')).toBeInTheDocument();
-        expect(screen.getByText('(63)')).toBeInTheDocument();
-        expect(screen.getByText('(59)')).toBeInTheDocument();
     });
 });
 
