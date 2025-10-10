@@ -12,7 +12,7 @@ import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Series } from '../types/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import { seriesEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
@@ -24,6 +24,7 @@ interface ValidationErrors {
 
 const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { data: series } = useQuery<Series>({
         queryKey: ['series', seriesSlug],
         queryFn: async () => {
@@ -164,6 +165,8 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                 entity_list: formData.entity_list,
             };
             const { data } = await api.put(`/series/${seriesSlug}`, payload);
+            // Invalidate the series query cache to ensure fresh data is loaded on the detail page
+            await queryClient.invalidateQueries({ queryKey: ['series', data.slug] });
             navigate({ to: `/series/${data.slug}` });
         } catch (err) {
             if ((err as AxiosError).response?.status === 422) {

@@ -10,7 +10,7 @@ import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Event } from '../types/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import { eventEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
@@ -25,6 +25,7 @@ interface ValidationErrors {
 
 const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { data: event } = useQuery<Event>({
         queryKey: ['event', eventSlug],
         queryFn: async () => {
@@ -176,6 +177,8 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 entity_list: formData.entity_list,
             };
             const { data } = await api.put(`/events/${eventSlug}`, payload);
+            // Invalidate the event query cache to ensure fresh data is loaded on the detail page
+            await queryClient.invalidateQueries({ queryKey: ['event', data.slug] });
             navigate({ to: `/events/${data.slug}` });
         } catch (err) {
             if ((err as AxiosError).response?.status === 422) {
