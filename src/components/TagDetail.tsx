@@ -94,7 +94,7 @@ export default function TagDetail({ slug }: { slug: string }) {
         queryFn: async () => {
             const params = new URLSearchParams();
             params.append('page', '1');
-            params.append('limit', '5');
+            params.append('limit', '8');
             params.append('filters[tag]', slug);
             params.append('sort', 'start_at');
             params.append('direction', 'desc');
@@ -278,7 +278,7 @@ export default function TagDetail({ slug }: { slug: string }) {
                             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                         ) : sortedRelatedTags.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
-                                {sortedRelatedTags.map(({ name, score }) => (
+                                {sortedRelatedTags.map(({ name }) => (
                                     <Link
                                         key={name}
                                         to="/tags/$slug"
@@ -286,7 +286,6 @@ export default function TagDetail({ slug }: { slug: string }) {
                                         className="inline-flex items-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 transition-colors border border-gray-200 dark:border-slate-600"
                                     >
                                         <span className="font-medium">{name}</span>
-                                        <span className="ml-2 text-xs text-gray-500 dark:text-slate-400">({score})</span>
                                     </Link>
                                 ))}
                             </div>
@@ -297,7 +296,16 @@ export default function TagDetail({ slug }: { slug: string }) {
 
                     <div className="space-y-8">
                         <div>
-                            <h2 className="text-2xl font-semibold mb-4">Events</h2>
+                            <div className="flex items-baseline gap-3 mb-4">
+                                <h2 className="text-2xl font-semibold">Events</h2>
+                                <Link
+                                    to="/events/tag/$slug"
+                                    params={{ slug }}
+                                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    View all
+                                </Link>
+                            </div>
                             {eventsLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                             ) : eventsData && eventsData.data.length > 0 ? (
@@ -317,7 +325,16 @@ export default function TagDetail({ slug }: { slug: string }) {
                         </div>
 
                         <div>
-                            <h2 className="text-2xl font-semibold mb-4">Entities</h2>
+                            <div className="flex items-baseline gap-3 mb-4">
+                                <h2 className="text-2xl font-semibold">Entities</h2>
+                                <Link
+                                    to="/entities/tag/$slug"
+                                    params={{ slug }}
+                                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    View all
+                                </Link>
+                            </div>
                             {entitiesLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                             ) : entitiesData && entitiesData.data.length > 0 ? (
@@ -332,7 +349,16 @@ export default function TagDetail({ slug }: { slug: string }) {
                         </div>
 
                         <div>
-                            <h2 className="text-2xl font-semibold mb-4">Series</h2>
+                            <div className="flex items-baseline gap-3 mb-4">
+                                <h2 className="text-2xl font-semibold">Series</h2>
+                                <Link
+                                    to="/series/tag/$slug"
+                                    params={{ slug }}
+                                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    View all
+                                </Link>
+                            </div>
                             {seriesLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                             ) : seriesData && seriesData.data.length > 0 ? (
@@ -349,6 +375,6 @@ export default function TagDetail({ slug }: { slug: string }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
