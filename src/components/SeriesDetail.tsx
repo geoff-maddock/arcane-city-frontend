@@ -268,6 +268,7 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                                         {series.occurrence_type && (
                                             <p className="text-gray-600">{series.occurrence_type.name} {series.occurrence_repeat}</p>
                                         )}
+
                                         {series.event_type && (
                                             <div className="items-center">
                                                 <span className="text-gray-500 font-bold">
@@ -312,7 +313,11 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                                                     </>
                                                 )}
                                         </div>
-
+                                        {series.founded_at && (
+                                            <p className="text-sm text-gray-500">
+                                                Founded {new Date(series.founded_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                            </p>
+                                        )}
                                         {series.venue && (
                                             <div className="flex items-center gap-2 text-gray-600">
                                                 <MapPin className="h-5 w-5" />
@@ -372,6 +377,7 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                                     <EntityBadges entities={series.entities} onClick={handleEntityClick} />
 
                                     <TagBadges tags={series.tags} onClick={handleTagClick} />
+
                                 </CardContent>
                             </Card>
 

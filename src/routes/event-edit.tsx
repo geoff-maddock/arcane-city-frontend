@@ -370,26 +370,42 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                         />
                         {renderError('end_at')}
                     </div>
-                    <AjaxSelect
-                        label="Series"
-                        endpoint="series"
-                        value={formData.series_id}
-                        onChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
-                        placeholder="Type to search series..."
-                    />
-                    {renderError('series_id')}
+                    <div>
+                        <AjaxSelect
+                            label="Series"
+                            endpoint="series"
+                            value={formData.series_id}
+                            onChange={(val) => setFormData((p) => ({ ...p, series_id: val }))}
+                            placeholder="Type to search series..."
+                        />
+                        {renderError('series_id')}
+                    </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="ticket_link">Ticket Link</Label>
-                    <Input
-                        id="ticket_link"
-                        name="ticket_link"
-                        value={formData.ticket_link}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={fieldClasses}
-                    />
-                    {renderError('ticket_link')}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="primary_link">Primary Link</Label>
+                        <Input
+                            id="primary_link"
+                            name="primary_link"
+                            value={formData.primary_link}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className={fieldClasses}
+                        />
+                        {renderError('primary_link')}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="ticket_link">Ticket Link</Label>
+                        <Input
+                            id="ticket_link"
+                            name="ticket_link"
+                            value={formData.ticket_link}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className={fieldClasses}
+                        />
+                        {renderError('ticket_link')}
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <AjaxMultiSelect

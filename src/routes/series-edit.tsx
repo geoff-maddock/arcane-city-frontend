@@ -46,6 +46,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
         door_price: '',
         start_at: '',
         end_at: '',
+        founded_at: '',
         min_age: '',
         primary_link: '',
         ticket_link: '',
@@ -77,6 +78,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             door_price: vals.door_price,
             start_at: vals.start_at,
             end_at: vals.end_at,
+            founded_at: vals.founded_at,
             primary_link: vals.primary_link,
             ticket_link: vals.ticket_link,
         })
@@ -98,6 +100,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                 door_price: series.door_price?.toString() || '',
                 start_at: series.start_at || '',
                 end_at: series.end_at || '',
+                founded_at: series.founded_at || '',
                 min_age: series.min_age?.toString() || '',
                 primary_link: '',
                 ticket_link: series.ticket_link || '',
@@ -423,7 +426,19 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                         />
                         {renderError('end_at')}
                     </div>
-                    <div className="space-y-2" />
+                    <div className="space-y-2">
+                        <Label htmlFor="founded_at">Founded At</Label>
+                        <Input
+                            id="founded_at"
+                            name="founded_at"
+                            type="datetime-local"
+                            value={formData.founded_at}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className={fieldClasses}
+                        />
+                        {renderError('founded_at')}
+                    </div>
                     <div className="space-y-2" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

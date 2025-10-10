@@ -53,6 +53,7 @@ const SeriesCreate: React.FC = () => {
     door_price: '',
     start_at: '',
     end_at: '',
+    founded_at: '',
     min_age: '',
     primary_link: '',
     ticket_link: '',
@@ -82,6 +83,7 @@ const SeriesCreate: React.FC = () => {
       end_at: vals.end_at,
       primary_link: vals.primary_link,
       ticket_link: vals.ticket_link,
+      founded_at: vals.founded_at,
     })
   });
   const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
@@ -125,6 +127,7 @@ const SeriesCreate: React.FC = () => {
         // Clear date/time fields and occurrence settings - should be set manually
         start_at: '',
         end_at: '',
+        founded_at: '',
         occurrence_type_id: '',
         occurrence_week_id: '',
         occurrence_day_id: '',
@@ -486,6 +489,19 @@ const SeriesCreate: React.FC = () => {
               className={fieldClasses}
             />
             {renderError('end_at')}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="founded_at">Founded At</Label>
+            <Input
+              id="founded_at"
+              name="founded_at"
+              type="datetime-local"
+              value={formData.founded_at}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={fieldClasses}
+            />
+            {renderError('founded_at')}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
