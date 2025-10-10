@@ -167,7 +167,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 ...formData,
                 presale_price: formData.presale_price ? parseFloat(formData.presale_price) : undefined,
                 door_price: formData.door_price ? parseFloat(formData.door_price) : undefined,
-                series_id: formData.series_id ? Number(formData.series_id) : undefined,
+                series_id: formData.series_id ? Number(formData.series_id) : null,
                 event_type_id: formData.event_type_id ? Number(formData.event_type_id) : undefined,
                 promoter_id: formData.promoter_id ? Number(formData.promoter_id) : undefined,
                 venue_id: formData.venue_id ? Number(formData.venue_id) : undefined,
