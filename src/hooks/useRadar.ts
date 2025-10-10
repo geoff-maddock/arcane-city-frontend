@@ -17,8 +17,10 @@ export const useUserAttendingEvents = () => {
             if (!user?.id) throw new Error('User ID not available');
 
             const params = new URLSearchParams();
-            // Filter for future events only
-            params.append('filters[start_at][start]', new Date().toISOString());
+            // Filter for events starting from today at 00:00 (midnight)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            params.append('filters[start_at][start]', today.toISOString());
             // Sort by start date, oldest to newest
             params.append('sort', 'start_at');
             params.append('direction', 'asc');
