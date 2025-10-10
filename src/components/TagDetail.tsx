@@ -172,7 +172,7 @@ export default function TagDetail({ slug }: { slug: string }) {
     })) ?? [];
 
     // Convert related tags object to sorted array
-    const sortedRelatedTags = relatedTagsData 
+    const sortedRelatedTags = relatedTagsData
         ? Object.entries(relatedTagsData)
             .sort(([, a], [, b]) => b - a)
             .map(([name, score]) => ({ name, score }))
@@ -272,6 +272,29 @@ export default function TagDetail({ slug }: { slug: string }) {
                         </DialogContent>
                     </Dialog>
 
+                    <div>
+                        <h2 className="text-l font-semibold mb-4">Related Tags</h2>
+                        {relatedTagsLoading ? (
+                            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                        ) : sortedRelatedTags.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                                {sortedRelatedTags.map(({ name, score }) => (
+                                    <Link
+                                        key={name}
+                                        to="/tags/$slug"
+                                        params={{ slug: name.toLowerCase().replace(/\s+/g, '-') }}
+                                        className="inline-flex items-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 transition-colors border border-gray-200 dark:border-slate-600"
+                                    >
+                                        <span className="font-medium">{name}</span>
+                                        <span className="ml-2 text-xs text-gray-500 dark:text-slate-400">({score})</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-gray-500">No related tags found.</p>
+                        )}
+                    </div>
+
                     <div className="space-y-8">
                         <div>
                             <h2 className="text-2xl font-semibold mb-4">Events</h2>
@@ -323,28 +346,6 @@ export default function TagDetail({ slug }: { slug: string }) {
                             )}
                         </div>
 
-                        <div>
-                            <h2 className="text-2xl font-semibold mb-4">Related Tags</h2>
-                            {relatedTagsLoading ? (
-                                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                            ) : sortedRelatedTags.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {sortedRelatedTags.map(({ name, score }) => (
-                                        <Link
-                                            key={name}
-                                            to="/tags/$slug"
-                                            params={{ slug: name.toLowerCase().replace(/\s+/g, '-') }}
-                                            className="inline-flex items-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 transition-colors border border-gray-200 dark:border-slate-600"
-                                        >
-                                            <span className="font-medium">{name}</span>
-                                            <span className="ml-2 text-xs text-gray-500 dark:text-slate-400">({score})</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-500">No related tags found.</p>
-                            )}
-                        </div>
                     </div>
                 </div>
             </div>
