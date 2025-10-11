@@ -4,6 +4,7 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
+  recaptcha_token?: string;
 }
 
 export interface PasswordResetRequest {
