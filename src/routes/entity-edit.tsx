@@ -12,7 +12,7 @@ import { AxiosError } from 'axios';
 import { formatApiError } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Entity } from '../types/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
@@ -22,6 +22,7 @@ interface ValidationErrors {
 
 const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { data: entity } = useQuery<Entity>({
         queryKey: ['entity', entitySlug],
         queryFn: async () => {
@@ -122,6 +123,8 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 role_list: formData.role_list,
             };
             const { data } = await api.put(`/entities/${entitySlug}`, payload);
+            // Invalidate the entity query cache to ensure fresh data is loaded on the detail page
+            await queryClient.invalidateQueries({ queryKey: ['entity', data.slug] });
             navigate({ to: `/entities/${data.slug}` });
         } catch (err) {
             if ((err as AxiosError).response?.status === 422) {
