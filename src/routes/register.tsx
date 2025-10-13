@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { createRoute, useNavigate } from '@tanstack/react-router';
 import { AxiosError } from 'axios';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { rootRoute } from './root';
 import { userService } from '../services/user.service';
 import { Button } from '../components/ui/button';
@@ -14,6 +15,7 @@ interface FieldErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
+  recaptcha?: string;
   general?: string;
 }
 
@@ -23,7 +25,9 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const validate = (): FieldErrors => {
     const validationErrors: FieldErrors = {};
@@ -44,6 +48,9 @@ const Register: React.FC = () => {
     if (password !== confirmPassword) {
       validationErrors.confirmPassword = 'Passwords do not match';
     }
+    if (!recaptchaToken) {
+      validationErrors.recaptcha = 'Please complete the reCAPTCHA verification';
+    }
     return validationErrors;
   };
 
@@ -56,7 +63,12 @@ const Register: React.FC = () => {
     }
     setErrors({});
     try {
-      await userService.createUser({ name, email, password });
+      await userService.createUser({
+        name,
+        email,
+        password,
+        'g-recaptcha-response': recaptchaToken || undefined,
+      });
       navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
@@ -70,6 +82,12 @@ const Register: React.FC = () => {
         return;
       }
       setErrors({ general: formatApiError(err) });
+    } finally {
+      // Reset reCAPTCHA after submission attempt
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+        setRecaptchaToken(null);
+      }
     }
   };
 
@@ -99,6 +117,27 @@ const Register: React.FC = () => {
             {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword}</div>}
           </div>
           {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
+          <div className="space-y-2">
+            {import.meta.env.VITE_RECAPTCHA_SITE_KEY && (
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                onChange={(token) => {
+                  setRecaptchaToken(token);
+                  setErrors(prev => ({ ...prev, recaptcha: undefined }));
+                }}
+                onExpired={() => {
+                  setRecaptchaToken(null);
+                  setErrors(prev => ({ ...prev, recaptcha: 'reCAPTCHA expired, please verify again' }));
+                }}
+                onErrored={() => {
+                  setRecaptchaToken(null);
+                  setErrors(prev => ({ ...prev, recaptcha: 'reCAPTCHA error, please try again' }));
+                }}
+              />
+            )}
+            {errors.recaptcha && <div className="text-red-500 text-sm">{errors.recaptcha}</div>}
+          </div>
           <Button type="submit" className="w-full">Register</Button>
         </form>
       </div>
