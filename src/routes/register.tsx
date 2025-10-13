@@ -63,11 +63,11 @@ const Register: React.FC = () => {
     }
     setErrors({});
     try {
-      await userService.createUser({ 
-        name, 
-        email, 
+      await userService.createUser({
+        name,
+        email,
         password,
-        recaptcha_token: recaptchaToken || undefined,
+        'g-recaptcha-response': recaptchaToken || undefined,
       });
       navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
