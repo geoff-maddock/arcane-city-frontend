@@ -14,6 +14,13 @@ export interface PasswordResetRequest {
   secret: string;
 }
 
+export interface EmailVerificationRequest {
+  userId: string;
+  hash: string;
+  expires: string;
+  signature: string;
+}
+
 export const userService = {
   async createUser(payload: CreateUserRequest) {
     const { data } = await api.post('/register', payload);
@@ -29,6 +36,11 @@ export const userService = {
   },
   async resetPassword(payload: PasswordResetRequest) {
     const { data } = await api.post('/user/reset-password', payload);
+    return data;
+  },
+  async verifyEmail(payload: EmailVerificationRequest) {
+    const { userId, hash, expires, signature } = payload;
+    const { data } = await api.get(`/email/verify/${userId}/${hash}?expires=${expires}&signature=${signature}`);
     return data;
   },
 };
