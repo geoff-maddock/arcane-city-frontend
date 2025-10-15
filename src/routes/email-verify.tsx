@@ -20,7 +20,7 @@ const EmailVerify: React.FC = () => {
         const verifyEmail = async () => {
             if (!expires || !signature) {
                 setStatus('error');
-                setMessage('Invalid verification link. Missing required parameters.');
+                setMessage('Invalid verification link. Missing required parameters. Expires: ' + !expires + ', Signature: ' + !signature);
                 return;
             }
 
@@ -137,7 +137,7 @@ export const EmailVerifyRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/email/verify/$userId/$hash',
     validateSearch: (search: Record<string, unknown>): EmailVerifySearchParams => ({
-        expires: typeof search.expires === 'string' ? search.expires : undefined,
+        expires: typeof search.expires === 'string' ? search.expires : typeof search.expires === 'number' ? String(search.expires) : undefined,
         signature: typeof search.signature === 'string' ? search.signature : undefined,
     }),
     component: EmailVerify,
