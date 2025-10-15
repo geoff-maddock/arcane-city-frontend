@@ -7,17 +7,30 @@ export interface Option {
   name: string;
 }
 
-interface AjaxSelectProps {
+// Overloaded interface to provide better type safety
+interface AjaxSelectPropsBase {
   label: string;
   endpoint: string;
-  value: number | ''; // Single selected ID or empty
-  onChange: (selectedId: number | '') => void;
   placeholder?: string;
   debounceMs?: number;
   extraParams?: Record<string, string | number>;
   className?: string;
   disabled?: boolean;
 }
+
+interface AjaxSelectPropsWithId extends AjaxSelectPropsBase {
+  value: number | '';
+  onChange: (selectedId: number | '') => void;
+  useValueAsKey?: false;
+}
+
+interface AjaxSelectPropsWithName extends AjaxSelectPropsBase {
+  value: string;
+  onChange: (selectedName: string) => void;
+  useValueAsKey: true;
+}
+
+type AjaxSelectProps = AjaxSelectPropsWithId | AjaxSelectPropsWithName;
 
 export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   label,
@@ -29,7 +42,8 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   extraParams = {},
   className = '',
   disabled = false,
-}) => {
+  useValueAsKey = false,
+}: AjaxSelectProps) => {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -39,11 +53,20 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch selected option by ID
+  // Fetch selected option by ID or name
+  const selectedIds = useMemo(() => {
+    if (!value) return [];
+    if (useValueAsKey) {
+      // When using name as key, we don't have an ID to fetch by
+      return [];
+    }
+    return [value as number];
+  }, [value, useValueAsKey]);
+
   const { data: selectedOptionsData = [] } = useSelectedOptions(
     endpoint,
-    value ? [value] : [],
-    !!value
+    selectedIds,
+    selectedIds.length > 0
   );
 
   // Fetch search results based on user query
@@ -71,14 +94,22 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   }, [selectedOptionsData, searchResults]);
 
   // Filter out already selected option for the dropdown
-  const availableOptions = value
-    ? allOptions.filter(option => option.id !== value)
-    : allOptions;
+  const availableOptions = useMemo(() => {
+    if (!value) return allOptions;
+    if (useValueAsKey) {
+      return allOptions.filter(option => option.name !== value);
+    }
+    return allOptions.filter(option => option.id !== value);
+  }, [allOptions, value, useValueAsKey]);
 
   // Get selected option for display
-  const selectedOption = value
-    ? allOptions.find(option => option.id === value) || null
-    : null;
+  const selectedOption = useMemo(() => {
+    if (!value) return null;
+    if (useValueAsKey) {
+      return allOptions.find(option => option.name === value) || null;
+    }
+    return allOptions.find(option => option.id === value) || null;
+  }, [allOptions, value, useValueAsKey]);
 
   // Debounce search query
   useEffect(() => {
@@ -114,22 +145,30 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   };
 
   const handleOptionSelect = useCallback((option: Option) => {
-    onChange(option.id);
+    if (useValueAsKey) {
+      (onChange as (name: string) => void)(option.name);
+    } else {
+      (onChange as (id: number | '') => void)(option.id);
+    }
     setQuery('');
     setFocusedIndex(-1);
     setIsOpen(false);
 
     // Keep focus on input
     inputRef.current?.focus();
-  }, [onChange]);
+  }, [onChange, useValueAsKey]);
 
   const handleClear = useCallback(() => {
-    onChange('');
+    if (useValueAsKey) {
+      (onChange as (name: string) => void)('');
+    } else {
+      (onChange as (id: number | '') => void)('');
+    }
     setQuery('');
 
     // Keep focus on input
     inputRef.current?.focus();
-  }, [onChange]);
+  }, [onChange, useValueAsKey]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;

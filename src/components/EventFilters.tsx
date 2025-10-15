@@ -4,8 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Calendar as CalendarIcon, Search, MapPin, Users, X, DollarSign } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, DollarSign, X } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
+import AjaxSelect from './AjaxSelect';
 import {
     Popover,
     PopoverContent,
@@ -114,76 +115,52 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="venue">Venue</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="venue"
-                            placeholder="Filter by venue..."
-                            className="pl-9"
-                            value={filters.venue}
-                            onChange={(e) => onFilterChange({ ...filters, venue: e.target.value })}
-                        />
-                    </div>
-                </div>
+                <AjaxSelect
+                    label="Venue"
+                    endpoint="entities"
+                    value={filters.venue}
+                    onChange={(value) => onFilterChange({ ...filters, venue: value })}
+                    placeholder="Filter by venue..."
+                    useValueAsKey={true}
+                    extraParams={{ 'filters[entity_type]': 'venue' }}
+                />
 
-                <div className="space-y-2">
-                    <Label htmlFor="promoter">Promoter</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="promoter"
-                            placeholder="Filter by promoter..."
-                            className="pl-9"
-                            value={filters.promoter}
-                            onChange={(e) => onFilterChange({ ...filters, promoter: e.target.value })}
-                        />
-                    </div>
-                </div>
+                <AjaxSelect
+                    label="Promoter"
+                    endpoint="entities"
+                    value={filters.promoter}
+                    onChange={(value) => onFilterChange({ ...filters, promoter: value })}
+                    placeholder="Filter by promoter..."
+                    useValueAsKey={true}
+                    extraParams={{ 'filters[entity_type]': 'promoter' }}
+                />
 
-                <div className="space-y-2">
-                    <Label htmlFor="entity">Entity</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="entity"
-                            placeholder="Filter by entity..."
-                            className="pl-9"
-                            value={filters.entity}
-                            onChange={(e) => onFilterChange({ ...filters, entity: e.target.value })}
-                        />
-                    </div>
-                </div>
+                <AjaxSelect
+                    label="Entity"
+                    endpoint="entities"
+                    value={filters.entity}
+                    onChange={(value) => onFilterChange({ ...filters, entity: value })}
+                    placeholder="Filter by entity..."
+                    useValueAsKey={true}
+                />
 
+                <AjaxSelect
+                    label="Type"
+                    endpoint="event-types"
+                    value={filters.event_type}
+                    onChange={(value) => onFilterChange({ ...filters, event_type: value })}
+                    placeholder="Filter by type..."
+                    useValueAsKey={true}
+                />
 
-                <div className="space-y-2">
-                    <Label htmlFor="type">Type</Label>
-                    <div className="relative">
-                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="type"
-                            placeholder="Filter by type..."
-                            className="pl-9"
-                            value={filters.event_type}
-                            onChange={(e) => onFilterChange({ ...filters, event_type: e.target.value })}
-                        />
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="tag">Tag</Label>
-                    <div className="relative">
-                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="tag"
-                            placeholder="Filter by tag..."
-                            className="pl-9"
-                            value={filters.tag}
-                            onChange={(e) => onFilterChange({ ...filters, tag: e.target.value })}
-                        />
-                    </div>
-                </div>
+                <AjaxSelect
+                    label="Tag"
+                    endpoint="tags"
+                    value={filters.tag}
+                    onChange={(value) => onFilterChange({ ...filters, tag: value })}
+                    placeholder="Filter by tag..."
+                    useValueAsKey={true}
+                />
 
                 <div className="space-y-2">
                     <Label htmlFor="door_price_min">Door Price</Label>
