@@ -68,6 +68,7 @@ const Register: React.FC = () => {
         email,
         password,
         'g-recaptcha-response': recaptchaToken || undefined,
+        'frontend-url': import.meta.env.VITE_FRONTEND_URL,
       });
       navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {

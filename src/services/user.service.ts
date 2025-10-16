@@ -5,6 +5,7 @@ export interface CreateUserRequest {
   email: string;
   password: string;
   'g-recaptcha-response'?: string;
+  'frontend-url'?: string;
 }
 
 export interface PasswordResetRequest {
