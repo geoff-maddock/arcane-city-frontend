@@ -29,7 +29,7 @@ const Login: React.FC = () => {
         <h2 className="text-3xl font-bold tracking-tight">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Email</Label>
             <Input
               id="username"
               value={username}
