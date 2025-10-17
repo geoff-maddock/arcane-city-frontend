@@ -35,6 +35,7 @@ import { RadarRoute } from './routes/radar';
 import { authService } from './services/auth.service';
 import { SearchRoute } from './routes/search';
 import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
+import YourCalendar from './components/YourCalendar';
 
 // Create routes
 const indexRoute = createRoute({
@@ -176,6 +177,36 @@ const calendarRoute = createRoute({
     },
 });
 
+const userCalendarRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/calendar/your',
+    beforeLoad: () => {
+        if (!authService.isAuthenticated()) {
+            throw redirect({
+                to: '/login',
+                search: {
+                    redirect: '/calendar/your',
+                },
+            });
+        }
+    },
+    component: YourCalendar,
+    head: () => {
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/calendar/your';
+        return {
+            meta: [
+                { title: `Your Calendar • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Your Calendar • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `A personalized calendar of events you're attending.` },
+                { name: 'description', content: `A personalized calendar of events you're attending.` },
+            ],
+        };
+    },
+});
+
 // Tag filter routes - redirect to index pages with tag query parameter
 const eventTagRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -238,6 +269,7 @@ const routeTree = rootRoute.addChildren([
     accountRoute,
     AccountEditRoute,
     calendarRoute,
+    userCalendarRoute,
     RadarRoute,
     AboutRoute,
     HelpRoute,

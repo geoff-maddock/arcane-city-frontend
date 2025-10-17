@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { authService } from '../services/auth.service';
 import type { Event, PaginatedResponse, UseEventsParams } from '../types/api';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { toKebabCase } from '../lib/utils';
@@ -7,11 +8,13 @@ import { toKebabCase } from '../lib/utils';
 interface UseCalendarEventsParams {
     currentDate: Date;
     filters?: UseEventsParams['filters'];
+    attendingOnly?: boolean;
 }
 
-export const useCalendarEvents = ({ currentDate, filters }: UseCalendarEventsParams) => {
+export const useCalendarEvents = ({ currentDate, filters, attendingOnly = false }: UseCalendarEventsParams) => {
+    const isAuthenticated = authService.isAuthenticated();
     return useQuery<PaginatedResponse<Event>>({
-        queryKey: ['calendarEvents', currentDate, filters],
+        queryKey: ['calendarEvents', attendingOnly ? 'attending' : 'all', currentDate, filters],
         queryFn: async () => {
             const params = new URLSearchParams();
 
@@ -45,8 +48,10 @@ export const useCalendarEvents = ({ currentDate, filters }: UseCalendarEventsPar
             params.append('sort', 'start_at');
             params.append('direction', 'asc');
 
-            const { data } = await api.get<PaginatedResponse<Event>>(`/events?${params.toString()}`);
+            const endpoint = attendingOnly ? '/events/attending' : '/events';
+            const { data } = await api.get<PaginatedResponse<Event>>(`${endpoint}?${params.toString()}`);
             return data;
         },
+        enabled: attendingOnly ? isAuthenticated : true,
     });
 };

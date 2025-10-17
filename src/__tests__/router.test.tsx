@@ -22,6 +22,10 @@ vi.mock('../components/Calendar', () => ({
     default: () => <div data-testid="calendar-component">Calendar Page</div>
 }))
 
+vi.mock('../components/YourCalendar', () => ({
+    default: () => <div data-testid="your-calendar-component">Your Calendar Page</div>
+}))
+
 const client = new QueryClient()
 
 describe('Router Configuration', () => {
