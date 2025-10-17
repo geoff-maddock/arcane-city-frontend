@@ -170,15 +170,15 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     <div className="relative">
                         <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                         <Select
-                            value={filters.event_type || ''}
-                            onValueChange={(value) => onFilterChange({ ...filters, event_type: value })}
+                            value={filters.event_type || 'all'}
+                            onValueChange={(value) => onFilterChange({ ...filters, event_type: value === 'all' ? '' : value })}
                             disabled={loadingEventTypes}
                         >
                             <SelectTrigger id="type" className="pl-9">
                                 <SelectValue placeholder={loadingEventTypes ? 'Loading types...' : 'All types'} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="">All types</SelectItem>
+                                <SelectItem value="all">All types</SelectItem>
                                 {eventTypeOptions?.map((opt) => (
                                     <SelectItem key={opt.id} value={opt.name}>
                                         {opt.name}
@@ -241,10 +241,10 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                         onValueChange={(value) => onFilterChange({ ...filters, min_age: value === 'all' ? '' : value })}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="Any age" />
+                            <SelectValue placeholder="All Restrictions" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">Any age</SelectItem>
+                            <SelectItem value="all">All Restrictions</SelectItem>
                             <SelectItem value="0">All Ages</SelectItem>
                             <SelectItem value="13">13+</SelectItem>
                             <SelectItem value="16">16+</SelectItem>
