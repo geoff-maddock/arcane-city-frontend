@@ -99,6 +99,12 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           <HiCalendar />
           <span className=" xl:inline">Event Calendar</span>
         </Link>
+        {user && (
+          <Link to="/calendar/your" className="flex items-center gap-2 hover:underline text-sm ml-6 text-gray-600 dark:text-gray-300">
+            <HiCalendar className="h-4 w-4" />
+            <span className=" xl:inline">Your Calendar</span>
+          </Link>
+        )}
         <Link to="/entities" className="flex items-center gap-2 hover:underline">
           <HiOfficeBuilding />
           <span className=" xl:inline">Entity Listings</span>
