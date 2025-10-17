@@ -1,4 +1,15 @@
 import { api } from '../lib/api';
+import axios from 'axios';
+
+const baseURL = import.meta.env.VITE_API_URL || '';
+
+// Create a separate axios instance without auth interceptors
+const noAuthApi = axios.create({
+  baseURL: baseURL + '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export interface CreateUserRequest {
   name: string;
@@ -41,7 +52,7 @@ export const userService = {
   },
   async verifyEmail(payload: EmailVerificationRequest) {
     const { userId, hash, expires, signature } = payload;
-    const { data } = await api.get(`/email/verify/${userId}/${hash}?expires=${expires}&signature=${signature}`);
+    const { data } = await noAuthApi.get(`/email/verify/${userId}/${hash}?expires=${expires}&signature=${signature}`);
     return data;
   },
 };
