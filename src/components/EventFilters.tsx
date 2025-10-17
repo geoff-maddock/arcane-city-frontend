@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Calendar as CalendarIcon, Search, MapPin, Users, X, DollarSign } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
+import { useSearchOptions } from '@/hooks/useSearchOptions';
 import {
     Popover,
     PopoverContent,
@@ -69,6 +70,13 @@ const getDateRanges = () => {
 };
 
 export default function EventFilters({ filters, onFilterChange }: EventFiltersProps) {
+    const { data: eventTypeOptions, isLoading: loadingEventTypes } = useSearchOptions(
+        'event-types',
+        '',
+        {},
+        { limit: '100', sort: 'name', direction: 'asc' }
+    );
+
     const handleDateChange = (field: 'start' | 'end', value: Date | null) => {
         onFilterChange({
             ...filters,
@@ -161,13 +169,23 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                     <Label htmlFor="type">Type</Label>
                     <div className="relative">
                         <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <Input
-                            id="type"
-                            placeholder="Filter by type..."
-                            className="pl-9"
-                            value={filters.event_type}
-                            onChange={(e) => onFilterChange({ ...filters, event_type: e.target.value })}
-                        />
+                        <Select
+                            value={filters.event_type || ''}
+                            onValueChange={(value) => onFilterChange({ ...filters, event_type: value })}
+                            disabled={loadingEventTypes}
+                        >
+                            <SelectTrigger id="type" className="pl-9">
+                                <SelectValue placeholder={loadingEventTypes ? 'Loading types...' : 'All types'} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="">All types</SelectItem>
+                                {eventTypeOptions?.map((opt) => (
+                                    <SelectItem key={opt.id} value={opt.name}>
+                                        {opt.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
