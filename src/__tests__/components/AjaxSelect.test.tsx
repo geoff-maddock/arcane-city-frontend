@@ -433,4 +433,114 @@ describe('AjaxSelect', () => {
 
     expect(onChange).toHaveBeenCalledWith('');
   });
+
+  describe('useValueAsKey mode', () => {
+    const valueAsKeyProps = {
+      label: 'Test Select with Names',
+      endpoint: 'test-endpoint',
+      value: '',
+      onChange: vi.fn(),
+      placeholder: 'Type to search...',
+      useValueAsKey: true as const,
+    };
+
+    it('returns name instead of id when selecting option', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+
+      render(
+        <TestWrapper>
+          <AjaxSelect {...valueAsKeyProps} onChange={onChange} />
+        </TestWrapper>
+      );
+
+      const input = screen.getByRole('textbox');
+      await user.click(input);
+
+      const option = screen.getByText('Option 1');
+      await user.click(option);
+
+      expect(onChange).toHaveBeenCalledWith('Option 1');
+    });
+
+    it('displays selected option by name', () => {
+      mockUseSearchOptions.mockReturnValue({
+        data: mockOptions,
+        isLoading: false,
+        error: null,
+        isError: false,
+        isSuccess: true,
+        status: 'success',
+        fetchStatus: 'idle',
+        isPending: false,
+        isLoadingError: false,
+        isRefetchError: false,
+        isRefetching: false,
+        isFetching: false,
+        isFetched: true,
+        isFetchedAfterMount: true,
+        isPlaceholderData: false,
+        isStale: false,
+        refetch: vi.fn(),
+        dataUpdatedAt: Date.now(),
+        errorUpdatedAt: 0,
+        failureCount: 0,
+        failureReason: null,
+        errorUpdateCount: 0,
+        isInitialLoading: false,
+        isPaused: false,
+        isEnabled: true,
+        promise: Promise.resolve(mockOptions),
+      } as const);
+
+      render(
+        <TestWrapper>
+          <AjaxSelect {...valueAsKeyProps} value="Option 2" />
+        </TestWrapper>
+      );
+
+      expect(screen.getByText('Option 2')).toBeInTheDocument();
+    });
+
+    it('filters out selected option by name from dropdown', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <AjaxSelect {...valueAsKeyProps} value="Option 1" />
+        </TestWrapper>
+      );
+
+      const input = screen.getByRole('textbox');
+      await user.click(input);
+
+      // Selected option should not be in dropdown - check within the dropdown
+      const buttons = screen.getAllByRole('button');
+      const optionButtons = buttons.filter(btn => 
+        btn.textContent && 
+        btn.textContent.includes('Option') && 
+        !btn.getAttribute('aria-label')?.includes('Clear')
+      );
+      
+      expect(optionButtons.find(btn => btn.textContent === 'Option 1')).toBeUndefined();
+      // But other options should be
+      expect(screen.getByText('Option 2')).toBeInTheDocument();
+    });
+
+    it('clears selection by returning empty string', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+
+      render(
+        <TestWrapper>
+          <AjaxSelect {...valueAsKeyProps} value="Option 1" onChange={onChange} />
+        </TestWrapper>
+      );
+
+      const clearButton = screen.getByLabelText('Clear Option 1');
+      await user.click(clearButton);
+
+      expect(onChange).toHaveBeenCalledWith('');
+    });
+  });
 });
