@@ -58,7 +58,7 @@ const Radar: React.FC = () => {
 
             {/* Events You're Attending */}
             {hasAttendingEvents && (
-                <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
                     <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                         <HiCalendar className="text-blue-500" />
                         Events You're Attending
@@ -85,7 +85,7 @@ const Radar: React.FC = () => {
 
             {/* Recommended Events Based on Follows */}
             {hasFollowedContent && (
-                <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
                     <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                         <HiTag className="text-green-500" />
                         Recommended for You
@@ -151,7 +151,7 @@ const Radar: React.FC = () => {
             )}
 
             {/* Recently Added Events */}
-            <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
                 <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                     <HiCalendar className="text-gray-500" />
                     Recently Added Events
