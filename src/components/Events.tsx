@@ -174,8 +174,8 @@ export default function Events() {
 
     return (
         <EventFilterContext.Provider value={{ filters, setFilters }}>
-            <div className="bg-background text-foreground min-h-screen p-4">
-                <div className="mx-auto px-6 py-8 max-w-[2400px]">
+            <div className="bg-background text-foreground min-h-screen m:p-4 p-2">
+                <div className="mx-auto md:px-6 md:py-8 px-3 py-4 max-w-[2400px]">
                     <div className="space-y-8">
                         <div className="flex flex-col space-y-2">
                             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
