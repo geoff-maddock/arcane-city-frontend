@@ -22,7 +22,7 @@ const sortOptions = [
     { value: 'name', label: 'Name' },
     { value: 'entity_type_id', label: 'Type' },
     { value: 'entity_status_id', label: 'Status' },
-    { value: 'created_at', label: 'Recently Added' }
+    { value: 'created_at', label: 'Created' }
 ];
 
 export default function Entities() {

@@ -267,8 +267,8 @@ const Search: React.FC = () => {
   };
 
   return (
-    <div className="bg-background text-foreground min-h-screen p-4">
-      <div className="mx-auto px-6 py-8 max-w-[2400px] space-y-8">
+    <div className="bg-background text-foreground min-h-screen md:p-4 p-2">
+      <div className="mx-auto md:px-6 md:py-8 px-3 py-4 max-w-[2400px] space-y-8">
         <div className="flex flex-col space-y-2">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">Search</h1>
           <p className="text-lg text-gray-500">Find events, entities, series and tags</p>

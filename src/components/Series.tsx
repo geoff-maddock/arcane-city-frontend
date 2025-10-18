@@ -20,8 +20,8 @@ import { authService } from '@/services/auth.service';
 const sortOptions = [
     { value: 'name', label: 'Name' },
     { value: 'event_type_id', label: 'Type' },
-    { value: 'founded_at', label: 'Founded Date' },
-    { value: 'created_at', label: 'Recently Added' }
+    { value: 'founded_at', label: 'Founded' },
+    { value: 'created_at', label: 'Created' }
 ];
 
 

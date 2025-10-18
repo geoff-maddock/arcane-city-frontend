@@ -23,7 +23,7 @@ const sortOptions = [
     { value: 'venue_id', label: 'Venue' },
     { value: 'promoter_id', label: 'Promoter' },
     { value: 'event_type_id', label: 'Type' },
-    { value: 'created_at', label: 'Recently Added' }
+    { value: 'created_at', label: 'Created' }
 ];
 
 export default function Events() {
