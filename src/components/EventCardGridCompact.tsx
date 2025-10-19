@@ -9,6 +9,7 @@ interface EventCardGridCompactProps {
     imageIndex: number;
     showDateBar?: boolean;
     dateLabel?: string;
+    isWeekend?: boolean;
 }
 
 /**
@@ -20,7 +21,8 @@ const EventCardGridCompact = ({
     allImages, 
     imageIndex,
     showDateBar = false,
-    dateLabel = ''
+    dateLabel = '',
+    isWeekend = false
 }: EventCardGridCompactProps) => {
     const navigate = useNavigate();
 
@@ -36,10 +38,18 @@ const EventCardGridCompact = ({
 
     return (
         <div className="flex flex-col">
-            {/* Date bar */}
-            {showDateBar && dateLabel && (
-                <div className="bg-primary text-primary-foreground text-xs font-medium px-2 py-1 text-center mb-1">
+            {/* Date bar or placeholder to maintain alignment */}
+            {showDateBar && dateLabel ? (
+                <div className={`text-xs font-medium px-2 py-1 text-center mb-1 ${
+                    isWeekend 
+                        ? 'bg-amber-500 text-white' 
+                        : 'bg-primary text-primary-foreground'
+                }`}>
                     {dateLabel}
+                </div>
+            ) : (
+                <div className="bg-background text-xs font-medium px-2 py-1 text-center mb-1 invisible">
+                    Placeholder
                 </div>
             )}
             

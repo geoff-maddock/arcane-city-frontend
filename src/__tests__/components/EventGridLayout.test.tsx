@@ -15,9 +15,13 @@ vi.mock('../../hooks/useLocalStorage', () => ({
 
 // Mock EventCardGridCompact component
 vi.mock('../../components/EventCardGridCompact', () => ({
-    default: ({ event, showDateBar, dateLabel }: { event: Event; showDateBar: boolean; dateLabel: string }) => (
+    default: ({ event, showDateBar, dateLabel, isWeekend }: { event: Event; showDateBar: boolean; dateLabel: string; isWeekend: boolean }) => (
         <div data-testid="event-card-grid-compact">
-            {showDateBar && <div data-testid="date-bar">{dateLabel}</div>}
+            {showDateBar && (
+                <div data-testid="date-bar" className={isWeekend ? 'weekend' : 'weekday'}>
+                    {dateLabel}
+                </div>
+            )}
             <div>{event.name}</div>
             <button>Details</button>
         </div>

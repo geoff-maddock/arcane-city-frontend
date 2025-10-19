@@ -49,9 +49,18 @@ const getDateKey = (dateString: string): string => {
 };
 
 /**
+ * Checks if a date is a weekend (Saturday or Sunday)
+ */
+const isWeekendDate = (dateString: string): boolean => {
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+};
+
+/**
  * Groups events by date and marks which ones should show the date bar
  */
-const prepareEventsWithDateBars = (events: Event[]): Array<Event & { showDateBar: boolean; dateLabel: string }> => {
+const prepareEventsWithDateBars = (events: Event[]): Array<Event & { showDateBar: boolean; dateLabel: string; isWeekend: boolean }> => {
     let lastDate = '';
     
     return events.map(event => {
@@ -65,7 +74,8 @@ const prepareEventsWithDateBars = (events: Event[]): Array<Event & { showDateBar
         return {
             ...event,
             showDateBar,
-            dateLabel: formatDateBar(event.start_at)
+            dateLabel: formatDateBar(event.start_at),
+            isWeekend: isWeekendDate(event.start_at)
         };
     });
 };
@@ -166,13 +176,13 @@ export default function EventGridLayout() {
     };
 
     // Create array of all event images
-    const allEventImages = data?.data
+    const allEventImages = (data?.data ?? [])
         .filter(event => event.primary_photo && event.primary_photo_thumbnail)
         .map(event => ({
             src: event.primary_photo!,
             alt: event.name,
             thumbnail: event.primary_photo_thumbnail
-        })) ?? [];
+        }));
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
@@ -276,6 +286,7 @@ export default function EventGridLayout() {
                                             )}
                                             showDateBar={event.showDateBar}
                                             dateLabel={event.dateLabel}
+                                            isWeekend={event.isWeekend}
                                         />
                                     ))}
                                 </div>

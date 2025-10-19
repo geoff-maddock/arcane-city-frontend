@@ -112,4 +112,54 @@ describe('EventCardGridCompact', () => {
 
         expect(screen.getByTestId('image-lightbox')).toBeInTheDocument()
     })
+
+    it('renders placeholder when showDateBar is false to maintain alignment', () => {
+        const { container } = render(
+            <EventCardGridCompact
+                event={mockEvent}
+                allImages={mockImages}
+                imageIndex={0}
+                showDateBar={false}
+            />
+        )
+
+        // Check that there's an invisible placeholder div
+        const placeholder = container.querySelector('.invisible')
+        expect(placeholder).toBeInTheDocument()
+        expect(placeholder).toHaveTextContent('Placeholder')
+    })
+
+    it('highlights weekend dates with amber background', () => {
+        render(
+            <EventCardGridCompact
+                event={mockEvent}
+                allImages={mockImages}
+                imageIndex={0}
+                showDateBar={true}
+                dateLabel="Sat, Dec 23, 2023"
+                isWeekend={true}
+            />
+        )
+
+        const dateBar = screen.getByText('Sat, Dec 23, 2023')
+        expect(dateBar).toHaveClass('bg-amber-500')
+        expect(dateBar).toHaveClass('text-white')
+    })
+
+    it('uses primary background for weekday dates', () => {
+        render(
+            <EventCardGridCompact
+                event={mockEvent}
+                allImages={mockImages}
+                imageIndex={0}
+                showDateBar={true}
+                dateLabel="Mon, Dec 25, 2023"
+                isWeekend={false}
+            />
+        )
+
+        const dateBar = screen.getByText('Mon, Dec 25, 2023')
+        expect(dateBar).toHaveClass('bg-primary')
+        expect(dateBar).toHaveClass('text-primary-foreground')
+    })
 })
