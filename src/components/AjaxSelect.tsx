@@ -39,6 +39,11 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Generate unique IDs for ARIA relationships
+  const componentId = useRef(`ajax-select-${Math.random().toString(36).substr(2, 9)}`);
+  const listboxId = `${componentId.current}-listbox`;
+  const statusId = `${componentId.current}-status`;
+
   // Fetch selected option by ID
   const { data: selectedOptionsData = [] } = useSelectedOptions(
     endpoint,
@@ -79,6 +84,20 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   const selectedOption = value
     ? allOptions.find(option => option.id === value) || null
     : null;
+
+  // Generate ID for focused option for aria-activedescendant
+  const focusedOptionId = focusedIndex >= 0 && availableOptions[focusedIndex]
+    ? `${componentId.current}-option-${availableOptions[focusedIndex].id}`
+    : undefined;
+
+  // Status message for screen readers
+  const statusMessage = isLoading
+    ? 'Searching...'
+    : availableOptions.length > 0
+      ? `${availableOptions.length} result${availableOptions.length === 1 ? '' : 's'} available`
+      : query && debouncedQuery
+        ? 'No results found'
+        : '';
 
   // Debounce search query
   useEffect(() => {
@@ -234,6 +253,13 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={!selectedOption || query ? placeholder : ''}
             disabled={disabled}
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-expanded={isOpen}
+            aria-controls={listboxId}
+            aria-activedescendant={focusedOptionId}
+            aria-autocomplete="list"
+            aria-label={label}
             className="flex-1 min-w-[120px] outline-none bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
           />
 
@@ -256,17 +282,23 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
         {isOpen && (
           <div
             ref={dropdownRef}
+            id={listboxId}
+            role="listbox"
+            aria-label={`${label} options`}
             className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
           >
             {isLoading ? (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm" role="status">
                 Searching...
               </div>
             ) : availableOptions.length > 0 ? (
               availableOptions.map((option, index) => (
                 <button
                   key={option.id}
+                  id={`${componentId.current}-option-${option.id}`}
                   type="button"
+                  role="option"
+                  aria-selected={index === focusedIndex}
                   onClick={() => handleOptionSelect(option)}
                   className={`
                     w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700
@@ -278,16 +310,27 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
                 </button>
               ))
             ) : query && debouncedQuery ? (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm" role="status">
                 No results found for "{query}"
               </div>
             ) : !query ? (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm" role="status">
                 Type to search...
               </div>
             ) : null}
           </div>
         )}
+
+        {/* Screen reader status announcements */}
+        <div
+          id={statusId}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {statusMessage}
+        </div>
       </div>
     </div>
   );

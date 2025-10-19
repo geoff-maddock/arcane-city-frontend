@@ -32,6 +32,10 @@ interface FilterToggleButtonProps {
      * Style variant for the button. Defaults to "outline"
      */
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+    /**
+     * ID of the element that contains the filters, for ARIA association
+     */
+    controlsId?: string;
 }
 
 /**
@@ -45,7 +49,8 @@ export function FilterToggleButton({
     hideText = "Hide Filters",
     showText = "Show Filters",
     size = "default",
-    variant = "outline"
+    variant = "outline",
+    controlsId
 }: FilterToggleButtonProps) {
     return (
         <Button
@@ -56,10 +61,14 @@ export function FilterToggleButton({
                 "flex items-center gap-2",
                 className
             )}
+            aria-expanded={filtersVisible}
+            aria-controls={controlsId}
+            aria-label={filtersVisible ? hideText : showText}
         >
             <FontAwesomeIcon
                 icon={filtersVisible ? faChevronUp : faChevronDown}
                 className="h-4 w-4"
+                aria-hidden="true"
             />
             {filtersVisible ? hideText : showText}
         </Button>

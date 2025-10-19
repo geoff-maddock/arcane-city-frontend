@@ -133,7 +133,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     expect(screen.getByText('Option 1')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
     await user.type(input, 'filtered');
 
@@ -201,7 +201,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     const option = screen.getByText('Option 1');
@@ -259,7 +259,7 @@ describe('AjaxMultiSelect', () => {
     // We need to simulate having selected options
     // Since the component doesn't automatically fetch names for existing IDs,
     // we'll need to handle this in the implementation
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
   it('removes tag when X button is clicked', async () => {
@@ -273,7 +273,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     const option = screen.getByText('Option 1');
@@ -330,7 +330,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     // Press Arrow Down to focus first option
@@ -351,7 +351,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     // Verify dropdown is open
@@ -406,7 +406,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
     await user.type(input, 'nonexistent');
 
@@ -422,7 +422,7 @@ describe('AjaxMultiSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     expect(input).toBeDisabled();
   });
 
@@ -440,11 +440,11 @@ describe('AjaxMultiSelect', () => {
     );
 
     await waitFor(() => {
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('combobox');
       expect(input).toBeInTheDocument();
     });
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     expect(input).toHaveValue('');

@@ -39,6 +39,11 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Generate unique IDs for ARIA relationships
+  const componentId = useRef(`ajax-multi-select-${Math.random().toString(36).substr(2, 9)}`);
+  const listboxId = `${componentId.current}-listbox`;
+  const statusId = `${componentId.current}-status`;
+
   // Fetch selected options by IDs
   const { data: selectedOptionsData = [] } = useSelectedOptions(
     endpoint,
@@ -74,6 +79,20 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
 
   // Get selected options for display as tags
   const selectedOptions = allOptions.filter(option => value.includes(option.id));
+
+  // ARIA: Track focused option for aria-activedescendant
+  const focusedOptionId = focusedIndex >= 0 && availableOptions[focusedIndex]
+    ? `${componentId.current}-option-${availableOptions[focusedIndex].id}`
+    : undefined;
+
+  // ARIA: Status message for screen reader announcements
+  const statusMessage = isLoading
+    ? 'Searching...'
+    : availableOptions.length > 0
+      ? `${availableOptions.length} ${availableOptions.length === 1 ? 'result' : 'results'} available`
+      : query.length > 0
+        ? 'No results found'
+        : '';
 
   // Debounce search query
   useEffect(() => {
@@ -229,6 +248,13 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
           <input
             ref={inputRef}
             type="text"
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-expanded={isOpen}
+            aria-controls={listboxId}
+            aria-activedescendant={focusedOptionId}
+            aria-autocomplete="list"
+            aria-label={`${label}, ${selectedOptions.length} selected`}
             value={query}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
@@ -249,6 +275,7 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
             <ChevronDown
               size={16}
               className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              aria-hidden="true"
             />
           </button>
         </div>
@@ -257,17 +284,23 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
         {isOpen && (
           <div
             ref={dropdownRef}
+            id={listboxId}
+            role="listbox"
+            aria-label={`${label} options`}
             className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
           >
             {isLoading ? (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+              <div role="status" className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
                 Searching...
               </div>
             ) : availableOptions.length > 0 ? (
               availableOptions.map((option, index) => (
                 <button
                   key={option.id}
+                  id={`${componentId.current}-option-${option.id}`}
                   type="button"
+                  role="option"
+                  aria-selected={index === focusedIndex}
                   onClick={() => handleOptionSelect(option)}
                   className={`
                     w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700
@@ -279,16 +312,27 @@ export const AjaxMultiSelect: React.FC<AjaxMultiSelectProps> = ({
                 </button>
               ))
             ) : query && debouncedQuery ? (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+              <div role="status" className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
                 No results found for "{query}"
               </div>
             ) : !query ? (
-              <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+              <div role="status" className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
                 Type to search...
               </div>
             ) : null}
           </div>
         )}
+
+        {/* Screen reader live region for announcements */}
+        <div
+          id={statusId}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {statusMessage}
+        </div>
       </div>
     </div>
   );
