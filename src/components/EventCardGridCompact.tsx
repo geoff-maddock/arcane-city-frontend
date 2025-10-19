@@ -14,8 +14,8 @@ interface EventCardGridCompactProps {
 }
 
 /**
- * A compact event card for grid layout displaying 120px x 120px images
- * with optional date bars and navigation buttons
+ * A compact event card for grid layout displaying responsive square images
+ * with optional date bars and navigation buttons. Minimum size 120px, scales up to 16 columns.
  */
 const EventCardGridCompact = ({ 
     event, 
@@ -58,9 +58,9 @@ const EventCardGridCompact = ({
                 </div>
             )}
             
-            {/* Image container - fixed 120px x 120px */}
+            {/* Image container - responsive size */}
             <div 
-                className="w-[120px] h-[120px] overflow-hidden relative"
+                className="w-full h-full aspect-square overflow-hidden relative"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -73,9 +73,9 @@ const EventCardGridCompact = ({
                     />
                 </div>
                 
-                {/* Hover overlay with event type and tags */}
+                {/* Hover overlay with event type and tags - pointer-events-none to allow clicks through */}
                 {isHovered && (
-                    <div className="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center p-2 text-white text-center">
+                    <div className="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center p-2 text-white text-center pointer-events-none">
                         {event.event_type && (
                             <div className="text-xs font-bold mb-1">
                                 {event.event_type.name}
@@ -101,7 +101,7 @@ const EventCardGridCompact = ({
             <Button
                 variant="outline"
                 size="sm"
-                className="mt-1 w-[120px] text-xs"
+                className="mt-1 w-full text-xs"
                 onClick={handleDetailsClick}
             >
                 Details

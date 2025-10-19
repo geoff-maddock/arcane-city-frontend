@@ -188,7 +188,8 @@ describe('EventCardGridCompact', () => {
             />
         )
 
-        const imageContainer = container.querySelector('.w-\\[120px\\]')
+        // Find the image container with aspect-square class (responsive size)
+        const imageContainer = container.querySelector('.aspect-square')
         expect(imageContainer).toBeInTheDocument()
 
         // Initially, overlay should not be visible

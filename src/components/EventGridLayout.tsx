@@ -274,8 +274,13 @@ export default function EventGridLayout() {
                             <>
                                 {renderPagination()}
 
-                                {/* Grid layout with 120px x 120px images - consistent grid */}
-                                <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,120px))] gap-4 justify-start">
+                                {/* Responsive grid layout - min 120px per item, scales with container */}
+                                <div 
+                                    className="grid gap-4 w-full"
+                                    style={{ 
+                                        gridTemplateColumns: 'repeat(auto-fill, minmax(max(120px, calc((100% - 15 * 1rem) / 16)), 1fr))'
+                                    }}
+                                >
                                     {eventsWithDateBars.map((event) => (
                                         <EventCardGridCompact
                                             key={event.slug}
