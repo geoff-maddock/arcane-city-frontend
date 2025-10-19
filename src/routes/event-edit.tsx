@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { formatApiError, utcToLocalDatetimeInput } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Event } from '../types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -106,8 +106,8 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 door_price: event.door_price ? String(event.door_price) : '',
                 soundcheck_at: '',
                 door_at: '',
-                start_at: event.start_at ? new Date(event.start_at).toISOString().slice(0, 16) : '',
-                end_at: event.end_at ? new Date(event.end_at).toISOString().slice(0, 16) : '',
+                start_at: utcToLocalDatetimeInput(event.start_at, { fixESTUtcBug: true }),
+                end_at: utcToLocalDatetimeInput(event.end_at, { fixESTUtcBug: true }),
                 series_id: (event.series?.id ?? '') as number | '',
                 min_age: event.min_age ? String(event.min_age) : '',
                 primary_link: event.primary_link || '',
@@ -175,6 +175,8 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                 min_age: formData.min_age ? Number(formData.min_age) : undefined,
                 tag_list: formData.tag_list,
                 entity_list: formData.entity_list,
+                start_at: formData.start_at ? `${formData.start_at}:00` : undefined,
+                end_at: formData.end_at ? `${formData.end_at}:00` : undefined,
             };
             const { data } = await api.put(`/events/${eventSlug}`, payload);
             // Invalidate the event query cache to ensure fresh data is loaded on the detail page

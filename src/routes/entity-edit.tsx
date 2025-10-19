@@ -9,7 +9,7 @@ import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { formatApiError, utcToLocalDatetimeInput } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Entity } from '../types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -67,7 +67,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 description: entity.description || '',
                 entity_type_id: entity.entity_type?.id || '',
                 entity_status_id: entity.entity_status?.id || 1,
-                started_at: entity.started_at || '',
+                started_at: utcToLocalDatetimeInput(entity.started_at, { fixESTUtcBug: true }),
                 facebook_username: entity.facebook_username || '',
                 instagram_username: entity.instagram_username || '',
                 primary_location_id: entity.primary_location?.id || '',
@@ -119,6 +119,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 entity_type_id: formData.entity_type_id ? Number(formData.entity_type_id) : undefined,
                 entity_status_id: formData.entity_status_id ? Number(formData.entity_status_id) : undefined,
                 primary_location_id: formData.primary_location_id ? Number(formData.primary_location_id) : undefined,
+                started_at: formData.started_at ? `${formData.started_at}:00` : undefined,
                 tag_list: formData.tag_list,
                 role_list: formData.role_list,
             };
@@ -225,7 +226,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="started_at">Started At</Label>
-                        <Input id="started_at" name="started_at" type="datetime-local" value={formData.started_at} onChange={handleChange} />
+                        <Input id="started_at" name="started_at" type="datetime-local" value={formData.started_at} onChange={handleChange} className={fieldClasses} />
                         {renderError('started_at')}
                     </div>
                     <div className="space-y-2">

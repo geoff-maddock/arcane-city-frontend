@@ -47,6 +47,106 @@ export function formatEventDate(
   return new Intl.DateTimeFormat('en-US', options).format(corrected);
 }
 
+/**
+ * Converts a UTC datetime string from the API to a local datetime-local input string.
+ * Uses the same timezone logic as formatEventDate with optional DST correction.
+ */
+export function utcToLocalDatetimeInput(
+  dateString: string | null | undefined,
+  opts?: { timeZone?: string; fixESTUtcBug?: boolean }
+): string {
+  if (!dateString) return '';
+
+  const timeZone = opts?.timeZone ?? EASTERN_TZ;
+  const raw = new Date(dateString);
+
+  // Check if date is valid
+  if (isNaN(raw.getTime())) {
+    return '';
+  }
+
+  const corrected =
+    opts?.fixESTUtcBug && isDSTInZone(raw, timeZone)
+      ? new Date(raw.getTime() - 60 * 60 * 1000)
+      : raw;
+
+  // Format to YYYY-MM-DDTHH:mm for datetime-local input
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(corrected);
+  const year = parts.find(p => p.type === 'year')?.value ?? '';
+  const month = parts.find(p => p.type === 'month')?.value ?? '';
+  const day = parts.find(p => p.type === 'day')?.value ?? '';
+  const hour = parts.find(p => p.type === 'hour')?.value ?? '';
+  const minute = parts.find(p => p.type === 'minute')?.value ?? '';
+
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+}
+
+/**
+ * Converts a local datetime-local input string to a UTC ISO string for the API.
+ * Reverses the timezone conversion applied by utcToLocalDatetimeInput.
+ */
+export function localDatetimeInputToUtc(
+  localString: string | null | undefined,
+  opts?: { timeZone?: string; fixESTUtcBug?: boolean }
+): string {
+  if (!localString) return '';
+
+  const timeZone = opts?.timeZone ?? EASTERN_TZ;
+
+  // Parse the datetime-local string (YYYY-MM-DDTHH:mm)
+  const [datePart, timePart] = localString.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hour, minute] = timePart.split(':').map(Number);
+
+  // Strategy: Use a reference UTC time to determine the timezone offset
+  // Use a date in the same month/year for DST accuracy
+  const referenceUtc = Date.UTC(year, month - 1, 15, 12, 0, 0, 0);
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  // See what the reference UTC time looks like in the target timezone
+  const parts = formatter.formatToParts(new Date(referenceUtc));
+  const localYear = Number(parts.find(p => p.type === 'year')?.value ?? 0);
+  const localMonth = Number(parts.find(p => p.type === 'month')?.value ?? 0);
+  const localDay = Number(parts.find(p => p.type === 'day')?.value ?? 0);
+  const localHour = Number(parts.find(p => p.type === 'hour')?.value ?? 0);
+  const localMinute = Number(parts.find(p => p.type === 'minute')?.value ?? 0);
+
+  // Calculate the timezone offset
+  const localTime = Date.UTC(localYear, localMonth - 1, localDay, localHour, localMinute, 0, 0);
+  const offset = referenceUtc - localTime;
+
+  // Apply the offset to convert from local time to UTC
+  const localAsUtc = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+  const correctedUtcDate = new Date(localAsUtc + offset);
+
+  // Apply DST bug correction if needed (reverse of what we did on input)
+  const final = opts?.fixESTUtcBug && isDSTInZone(correctedUtcDate, timeZone)
+    ? new Date(correctedUtcDate.getTime() + 60 * 60 * 1000)
+    : correctedUtcDate;
+
+  return final.toISOString();
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
