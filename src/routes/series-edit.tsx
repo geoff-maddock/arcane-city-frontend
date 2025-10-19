@@ -9,7 +9,7 @@ import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
 import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { formatApiError, utcToLocalDatetimeInput } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Series } from '../types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -99,9 +99,9 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                 is_benefit: series.is_benefit || false,
                 presale_price: series.presale_price?.toString() || '',
                 door_price: series.door_price?.toString() || '',
-                start_at: series.start_at || '',
-                end_at: series.end_at || '',
-                founded_at: series.founded_at || '',
+                start_at: utcToLocalDatetimeInput(series.start_at, { fixESTUtcBug: true }),
+                end_at: utcToLocalDatetimeInput(series.end_at, { fixESTUtcBug: true }),
+                founded_at: utcToLocalDatetimeInput(series.founded_at, { fixESTUtcBug: true }),
                 min_age: series.min_age?.toString() || '',
                 primary_link: series.primary_link || '',
                 ticket_link: series.ticket_link || '',
@@ -163,6 +163,9 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
                 min_age: formData.min_age ? Number(formData.min_age) : undefined,
                 tag_list: formData.tag_list,
                 entity_list: formData.entity_list,
+                start_at: formData.start_at ? `${formData.start_at}:00` : undefined,
+                end_at: formData.end_at ? `${formData.end_at}:00` : undefined,
+                founded_at: formData.founded_at ? `${formData.founded_at}:00` : undefined,
             };
             const { data } = await api.put(`/series/${seriesSlug}`, payload);
             // Invalidate the series query cache to ensure fresh data is loaded on the detail page

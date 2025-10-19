@@ -212,6 +212,9 @@ const SeriesCreate: React.FC = () => {
         min_age: formData.min_age ? Number(formData.min_age) : undefined,
         tag_list: formData.tag_list,
         entity_list: formData.entity_list,
+        start_at: formData.start_at ? `${formData.start_at}:00` : undefined,
+        end_at: formData.end_at ? `${formData.end_at}:00` : undefined,
+        founded_at: formData.founded_at ? `${formData.founded_at}:00` : undefined,
       };
       const { data } = await api.post('/series', payload);
       navigate({ to: '/series/$slug', params: { slug: data.slug } });

@@ -127,6 +127,7 @@ const EntityCreate: React.FC = () => {
                 entity_type_id: formData.entity_type_id ? Number(formData.entity_type_id) : undefined,
                 entity_status_id: formData.entity_status_id ? Number(formData.entity_status_id) : undefined,
                 primary_location_id: formData.primary_location_id ? Number(formData.primary_location_id) : undefined,
+                started_at: formData.started_at ? `${formData.started_at}:00` : undefined,
                 tag_list: formData.tag_list,
                 role_list: formData.role_list,
             };

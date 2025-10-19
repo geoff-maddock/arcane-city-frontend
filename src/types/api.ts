@@ -229,7 +229,7 @@ export interface Entity {
     updated_by: number;
     created_at: string;
     updated_at: string;
-    started_at: string;
+    started_at?: string | null;
     facebook_username?: string;
     twitter_username?: string;
     instagram_username?: string;
