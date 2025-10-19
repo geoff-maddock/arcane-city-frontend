@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { useSlug } from '@/hooks/useSlug';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
@@ -18,10 +17,6 @@ import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { useQuery } from '@tanstack/react-query';
 import type { Event } from '../types/api';
-
-interface ValidationErrors {
-  [key: string]: string[];
-}
 
 const SeriesCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -69,7 +64,7 @@ const SeriesCreate: React.FC = () => {
   const { data: occurrenceTypeOptions } = useSearchOptions('occurrence-types', '', {}, { sort: 'id', direction: 'asc' });
   const { data: occurrenceWeekOptions } = useSearchOptions('occurrence-weeks', '', {}, { sort: 'id', direction: 'asc' });
   const { data: occurrenceDayOptions } = useSearchOptions('occurrence-days', '', {}, { sort: 'id', direction: 'asc' });
-  const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError } = useFormValidation({
+  const { setValues: setFormValuesInternal, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
     initialValues: formData,
     schema: seriesCreateSchema,
     buildValidationValues: (vals) => ({
@@ -219,16 +214,7 @@ const SeriesCreate: React.FC = () => {
       const { data } = await api.post('/series', payload);
       navigate({ to: '/series/$slug', params: { slug: data.slug } });
     } catch (err) {
-      if ((err as AxiosError).response?.status === 422) {
-        const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-        if (resp?.data?.errors) {
-          // Collect first error per field into general error summary (simple fallback)
-          const fieldMsgs = Object.entries(resp.data.errors).map(([f, errs]) => `${f}: ${errs[0]}`);
-          setGeneralError(fieldMsgs.join('; '));
-          return;
-        }
-      }
-      setGeneralError(formatApiError(err));
+      handleFormError(err, applyExternalErrors, setGeneralError);
     }
   };
 

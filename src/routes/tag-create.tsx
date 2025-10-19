@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { useSlug } from '@/hooks/useSlug';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { tagCreateSchema } from '@/validation/schemas';
@@ -115,11 +114,12 @@ const TagCreate: React.FC = () => {
       const { data } = await api.post('/tags', payload);
       navigate({ to: '/tags/$slug', params: { slug: data.slug } });
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 422) {
-        applyExternalErrors(error.response.data.errors || {});
-        return;
-      }
-      setGeneralError(formatApiError(error));
+      // Use centralized error handler
+      handleFormError(
+        error,
+        applyExternalErrors, // Pass function directly - it expects Laravel format
+        setGeneralError
+      );
     }
   };
 

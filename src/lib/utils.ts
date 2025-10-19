@@ -177,6 +177,11 @@ export function formatDateTime(date: string | Date): string {
   return format(d, "PPPp");
 }
 
+/**
+ * Format API error to user-friendly message
+ * @deprecated Use `getErrorMessage` from '@/lib/errorHandler' instead
+ * This function is kept for backward compatibility
+ */
 export function formatApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     return error.response?.data?.message || error.message;

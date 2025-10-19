@@ -1,13 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { createRoute, useNavigate } from '@tanstack/react-router';
-import { AxiosError } from 'axios';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { rootRoute } from './root';
 import { userService } from '../services/user.service';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { formatApiError } from '../lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface FieldErrors {
@@ -72,17 +71,7 @@ const Register: React.FC = () => {
       });
       navigate({ to: '/register/success', search: { name, email } });
     } catch (err) {
-      const axiosErr = err as AxiosError<{ message?: string; errors?: FieldErrors }>;
-      if (axiosErr.response && axiosErr.response.status >= 400 && axiosErr.response.status < 500) {
-        const serverErrors = axiosErr.response.data?.errors;
-        if (serverErrors) {
-          setErrors(serverErrors);
-        } else {
-          setErrors({ general: axiosErr.response.data?.message || formatApiError(err) });
-        }
-        return;
-      }
-      setErrors({ general: formatApiError(err) });
+      handleFormError(err, setErrors, (msg) => setErrors({ general: msg }));
     } finally {
       // Reset reCAPTCHA after submission attempt
       if (recaptchaRef.current) {

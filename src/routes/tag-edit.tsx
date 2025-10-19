@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useTagTypes } from '../hooks/useTagTypes';
@@ -18,8 +17,6 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { tagEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-
-interface ServerValidationErrors { [key: string]: string[]; }
 
 const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
   const navigate = useNavigate();
@@ -140,11 +137,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
       await api.put(`/tags/${slug}`, payload);
       navigate({ to: '/tags/$slug', params: { slug: formData.slug } });
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 422) {
-        applyExternalErrors((error.response.data.errors as ServerValidationErrors) || {});
-        return;
-      }
-      setGeneralError(formatApiError(error));
+      handleFormError(error, applyExternalErrors, setGeneralError);
     }
   };
 
