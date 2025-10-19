@@ -67,7 +67,7 @@ describe('useUserAttendingEvents', () => {
                 },
             },
         });
-        
+
         vi.clearAllMocks();
         vi.mocked(authService.isAuthenticated).mockReturnValue(true);
         vi.mocked(authService.getCurrentUser).mockResolvedValue(mockUser);
@@ -97,7 +97,7 @@ describe('useUserAttendingEvents', () => {
         // Get the params that were passed to the API
         const apiCall = vi.mocked(api.get).mock.calls[0];
         const url = apiCall[0] as string;
-        
+
         // Extract the search params from the URL
         const searchParams = new URLSearchParams(url.split('?')[1]);
         const startAtParam = searchParams.get('filters[start_at][start]');
@@ -105,16 +105,16 @@ describe('useUserAttendingEvents', () => {
         // Verify the start_at parameter is set to midnight (00:00:00.000) of current day
         expect(startAtParam).toBeTruthy();
         const startAtDate = new Date(startAtParam!);
-        
+
         // Check that the time is set to midnight
         expect(startAtDate.getUTCHours()).toBe(0);
         expect(startAtDate.getUTCMinutes()).toBe(0);
         expect(startAtDate.getUTCSeconds()).toBe(0);
         expect(startAtDate.getUTCMilliseconds()).toBe(0);
 
-        // Check that the date is today
+        // Check that the date is today (UTC midnight)
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setUTCHours(0, 0, 0, 0);
         expect(startAtDate.toISOString()).toBe(today.toISOString());
     });
 
