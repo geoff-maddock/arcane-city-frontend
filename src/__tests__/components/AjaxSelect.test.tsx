@@ -133,7 +133,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     expect(screen.getByText('Option 1')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
     await user.type(input, 'filtered');
 
@@ -201,7 +201,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     const option = screen.getByText('Option 1');
@@ -247,7 +247,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
   it('clears selection when X button is clicked', async () => {
@@ -261,7 +261,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     const option = screen.getByText('Option 1');
@@ -316,7 +316,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     // Press Arrow Down to focus first option
@@ -337,7 +337,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     // Verify dropdown is open
@@ -392,7 +392,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
     await user.type(input, 'nonexistent');
 
@@ -408,7 +408,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     expect(input).toBeDisabled();
   });
 
@@ -425,7 +425,7 @@ describe('AjaxSelect', () => {
       </TestWrapper>
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('combobox');
     await user.click(input);
 
     // Press backspace when input is empty

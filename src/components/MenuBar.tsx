@@ -79,6 +79,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search"
+          aria-label="Search events, venues, and artists"
           className="h-8 w-full bg-white dark:bg-black border-gray-300 dark:border-gray-600"
         />
       </form>
@@ -168,14 +169,26 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         </>
       )}
       <div className="mt-auto w-full flex flex-col items-center gap-2">
-        <Button onClick={toggleTheme} data-testid="theme-toggle" className="flex items-center gap-2">
-          {theme === 'light' ? <HiMoon /> : <HiSun />}
+        <Button
+          onClick={toggleTheme}
+          data-testid="theme-toggle"
+          className="flex items-center gap-2"
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          aria-pressed={theme === 'dark'}
+        >
+          {theme === 'light' ? <HiMoon aria-hidden="true" /> : <HiSun aria-hidden="true" />}
           <span className="hidden xl:inline">
             Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
           </span>
         </Button>
-        <Button onClick={toggleMediaPlayers} data-testid="media-player-toggle" className="flex items-center gap-2">
-          {mediaPlayersEnabled ? <HiVolumeUp /> : <HiVolumeOff />}
+        <Button
+          onClick={toggleMediaPlayers}
+          data-testid="media-player-toggle"
+          className="flex items-center gap-2"
+          aria-label={mediaPlayersEnabled ? 'Disable media players' : 'Enable media players'}
+          aria-pressed={mediaPlayersEnabled}
+        >
+          {mediaPlayersEnabled ? <HiVolumeUp aria-hidden="true" /> : <HiVolumeOff aria-hidden="true" />}
           <span className="hidden xl:inline">
             {mediaPlayersEnabled ? 'Disable' : 'Enable'} Media Players
           </span>
@@ -197,11 +210,16 @@ const MenuBar: React.FC = () => {
         <div className="flex items-center">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <HiMenu className="h-6 w-6" />
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open navigation menu"
+                aria-expanded={open}
+              >
+                <HiMenu className="h-6 w-6" aria-hidden="true" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
+            <SheetContent side="left" className="w-64 p-0" aria-label="Main navigation">
               <MenuContent onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
@@ -222,10 +240,11 @@ const MenuBar: React.FC = () => {
           className="px-2"
         >
           <Input
-            id="search-input"
+            id="mobile-search-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
+            aria-label="Search events, venues, and artists"
             className="h-8 w-40"
           />
         </form>
