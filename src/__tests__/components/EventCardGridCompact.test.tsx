@@ -162,4 +162,48 @@ describe('EventCardGridCompact', () => {
         expect(dateBar).toHaveClass('bg-primary')
         expect(dateBar).toHaveClass('text-primary-foreground')
     })
+
+    it('displays event type and tags on hover', () => {
+        const eventWithTypeAndTags: Event = {
+            ...mockEvent,
+            event_type: { 
+                id: 1, 
+                name: 'Concert',
+                slug: 'concert',
+                created_at: '2023-01-01T00:00:00Z',
+                updated_at: '2023-01-01T00:00:00Z'
+            },
+            tags: [
+                { id: 1, name: 'Rock', slug: 'rock' },
+                { id: 2, name: 'Live Music', slug: 'live-music' },
+                { id: 3, name: 'Indie', slug: 'indie' }
+            ]
+        }
+
+        const { container } = render(
+            <EventCardGridCompact
+                event={eventWithTypeAndTags}
+                allImages={mockImages}
+                imageIndex={0}
+            />
+        )
+
+        const imageContainer = container.querySelector('.w-\\[120px\\]')
+        expect(imageContainer).toBeInTheDocument()
+
+        // Initially, overlay should not be visible
+        expect(screen.queryByText('Concert')).not.toBeInTheDocument()
+
+        // Hover over the image container
+        if (imageContainer) {
+            fireEvent.mouseEnter(imageContainer)
+        }
+
+        // Now event type and top 2 tags should be visible
+        expect(screen.getByText('Concert')).toBeInTheDocument()
+        expect(screen.getByText('Rock')).toBeInTheDocument()
+        expect(screen.getByText('Live Music')).toBeInTheDocument()
+        // Third tag should not be displayed
+        expect(screen.queryByText('Indie')).not.toBeInTheDocument()
+    })
 })
