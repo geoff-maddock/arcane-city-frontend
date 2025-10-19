@@ -8,16 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { useSlug } from '@/hooks/useSlug';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-
-interface ValidationErrors {
-    [key: string]: string[];
-}
 
 const EntityCreate: React.FC = () => {
     const navigate = useNavigate();
@@ -40,7 +35,7 @@ const EntityCreate: React.FC = () => {
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
-    const [errors, setErrors] = useState<ValidationErrors>({});
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [generalError, setGeneralError] = useState('');
     const [nameCheck, setNameCheck] = useState<'idle' | 'unique' | 'duplicate'>('idle');
     const [duplicateEntity, setDuplicateEntity] = useState<{ name: string; slug: string } | null>(null);
@@ -134,14 +129,7 @@ const EntityCreate: React.FC = () => {
             const { data } = await api.post('/entities', payload);
             navigate({ to: '/entities/$entitySlug', params: { entitySlug: data.slug } });
         } catch (err) {
-            if ((err as AxiosError).response?.status === 422) {
-                const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-                if (resp?.data?.errors) {
-                    setErrors(resp.data.errors);
-                    return;
-                }
-            }
-            setGeneralError(formatApiError(err));
+            handleFormError(err, setErrors, setGeneralError);
         }
     };
 

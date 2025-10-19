@@ -6,8 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { useSlug } from '@/hooks/useSlug';
 import AjaxMultiSelect from '@/components/AjaxMultiSelect';
 import AjaxSelect from '@/components/AjaxSelect';
@@ -19,10 +18,6 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 import { useQuery } from '@tanstack/react-query';
 import type { Event } from '../types/api';
-
-interface ValidationErrors {
-  [key: string]: string[];
-}
 
 const EventCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -70,7 +65,7 @@ const EventCreate: React.FC = () => {
   const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
 
   const { data: visibilityOptions } = useSearchOptions('visibilities', '');
-  const { setValues: setFormDataProxy, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError } = useFormValidation({
+  const { setValues: setFormDataProxy, handleChange: baseHandleChange, handleBlur, errors, touched, validateForm, getFieldError, errorSummary, generalError, setGeneralError, applyExternalErrors } = useFormValidation({
     initialValues: formData,
     schema: eventCreateSchema,
     buildValidationValues: (vals) => ({
@@ -219,17 +214,8 @@ const EventCreate: React.FC = () => {
       };
       const { data } = await api.post('/events', payload);
       navigate({ to: '/events/$slug', params: { slug: data.slug } });
-    } catch (err) {
-      if ((err as AxiosError).response?.status === 422) {
-        const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-        if (resp?.data?.errors) {
-          // Fallback: put first error of each field into general error summary
-          const fieldMsgs = Object.entries(resp.data.errors).map(([f, errs]) => `${f}: ${errs[0]}`);
-          setGeneralError(fieldMsgs.join('; '));
-          return;
-        }
-      }
-      setGeneralError(formatApiError(err));
+    } catch (error) {
+      handleFormError(error, applyExternalErrors, setGeneralError);
     }
   };
 

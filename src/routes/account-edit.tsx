@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, createRoute } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -14,10 +13,6 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-
-interface ValidationErrors {
-    [key: string]: string[];
-}
 
 const AccountEdit: React.FC = () => {
     const navigate = useNavigate();
@@ -55,7 +50,7 @@ const AccountEdit: React.FC = () => {
         }
     });
 
-    const [errors, setErrors] = useState<ValidationErrors>({});
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [generalError, setGeneralError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -140,14 +135,7 @@ const AccountEdit: React.FC = () => {
             await api.put(`/users/${user?.id}`, payload);
             navigate({ to: '/account' });
         } catch (err) {
-            if ((err as AxiosError).response?.status === 422) {
-                const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-                if (resp?.data?.errors) {
-                    setErrors(resp.data.errors);
-                    return;
-                }
-            }
-            setGeneralError(formatApiError(err));
+            handleFormError(err, setErrors, setGeneralError);
         } finally {
             setIsSubmitting(false);
         }

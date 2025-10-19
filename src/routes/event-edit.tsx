@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError, utcToLocalDatetimeInput } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
+import { utcToLocalDatetimeInput } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Event } from '../types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,10 +18,6 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import AjaxMultiSelect from '@/components/AjaxMultiSelect';
 import AjaxSelect from '@/components/AjaxSelect';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-
-interface ValidationErrors {
-    [key: string]: string[];
-}
 
 const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
     const navigate = useNavigate();
@@ -183,14 +179,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
             await queryClient.invalidateQueries({ queryKey: ['event', data.slug] });
             navigate({ to: `/events/${data.slug}` });
         } catch (err) {
-            if ((err as AxiosError).response?.status === 422) {
-                const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-                if (resp?.data?.errors) {
-                    applyExternalErrors(resp.data.errors);
-                    return;
-                }
-            }
-            setGeneralError(formatApiError(err));
+            handleFormError(err, applyExternalErrors, setGeneralError);
         }
     };
 

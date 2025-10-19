@@ -8,17 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError, utcToLocalDatetimeInput } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
+import { utcToLocalDatetimeInput } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Entity } from '../types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSlug } from '@/hooks/useSlug';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
-
-interface ValidationErrors {
-    [key: string]: string[];
-}
 
 const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
     const navigate = useNavigate();
@@ -51,7 +47,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
 
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const { data: entityStatusOptions } = useSearchOptions('entity-statuses', '');
-    const [errors, setErrors] = useState<ValidationErrors>({});
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [generalError, setGeneralError] = useState('');
 
     // Shared form field classes (light + dark) for consistent contrast
@@ -128,14 +124,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
             await queryClient.invalidateQueries({ queryKey: ['entity', data.slug] });
             navigate({ to: `/entities/${data.slug}` });
         } catch (err) {
-            if ((err as AxiosError).response?.status === 422) {
-                const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-                if (resp?.data?.errors) {
-                    setErrors(resp.data.errors);
-                    return;
-                }
-            }
-            setGeneralError(formatApiError(err));
+            handleFormError(err, setErrors, setGeneralError);
         }
     };
 

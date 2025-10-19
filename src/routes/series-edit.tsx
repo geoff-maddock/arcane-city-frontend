@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
 import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { formatApiError, utcToLocalDatetimeInput } from '@/lib/utils';
+import { handleFormError } from '@/lib/errorHandler';
+import { utcToLocalDatetimeInput } from '@/lib/utils';
 import { useSearchOptions } from '../hooks/useSearchOptions';
 import { Series } from '../types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -17,10 +17,6 @@ import { useSlug } from '@/hooks/useSlug';
 import { seriesEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { useFormValidation } from '@/hooks/useFormValidation';
-
-interface ValidationErrors {
-    [key: string]: string[];
-}
 
 const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
     const navigate = useNavigate();
@@ -172,14 +168,7 @@ const SeriesEdit: React.FC<{ seriesSlug: string }> = ({ seriesSlug }) => {
             await queryClient.invalidateQueries({ queryKey: ['series', data.slug] });
             navigate({ to: `/series/${data.slug}` });
         } catch (err) {
-            if ((err as AxiosError).response?.status === 422) {
-                const resp = (err as AxiosError<{ errors: ValidationErrors }>).response;
-                if (resp?.data?.errors) {
-                    applyExternalErrors(resp.data.errors);
-                    return;
-                }
-            }
-            setGeneralError(formatApiError(err));
+            handleFormError(err, applyExternalErrors, setGeneralError);
         }
     };
 
