@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Entity, PaginatedResponse } from '../types/api';
 import { toKebabCase } from '../lib/utils';
+import { authService } from '../services/auth.service';
 
 interface DateRange {
     start?: string;
@@ -25,11 +26,13 @@ interface UseEntitiesParams {
     filters?: EntityFilters;
     sort?: string;
     direction?: 'desc' | 'asc';
+    followedOnly?: boolean;
 }
 
-export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', direction = 'asc' }: UseEntitiesParams = {}) => {
+export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', direction = 'asc', followedOnly = false }: UseEntitiesParams = {}) => {
+    const isAuthenticated = authService.isAuthenticated();
     return useQuery<PaginatedResponse<Entity>>({
-        queryKey: ['entities', page, itemsPerPage, filters, sort, direction],
+        queryKey: ['entities', followedOnly ? 'followed' : 'all', page, itemsPerPage, filters, sort, direction],
         queryFn: async () => {
             const params = new URLSearchParams();
 
@@ -48,8 +51,10 @@ export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name
             if (sort) params.append('sort', sort);
             if (direction) params.append('direction', direction);
 
-            const { data } = await api.get<PaginatedResponse<Entity>>(`/entities?${params.toString()}`);
+            const endpoint = followedOnly ? '/entities/following' : '/entities';
+            const { data } = await api.get<PaginatedResponse<Entity>>(`${endpoint}?${params.toString()}`);
             return data;
         },
+        enabled: followedOnly ? isAuthenticated : true,
     });
 };
