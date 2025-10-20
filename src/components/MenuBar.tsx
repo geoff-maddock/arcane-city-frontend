@@ -114,6 +114,12 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           <HiOfficeBuilding />
           <span className=" xl:inline">Entity Listings</span>
         </Link>
+        {user && (
+          <Link to="/entities/your" className="flex items-center gap-2 hover:underline text-sm ml-6 text-gray-600 dark:text-gray-300">
+            <HiOfficeBuilding className="h-4 w-4" />
+            <span className=" xl:inline">Your Entities</span>
+          </Link>
+        )}
         <Link to="/series" className="flex items-center gap-2 hover:underline">
           <HiCollection />
           <span className=" xl:inline">Series Listings</span>
