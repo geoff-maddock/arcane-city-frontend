@@ -36,6 +36,7 @@ import { authService } from './services/auth.service';
 import { SearchRoute } from './routes/search';
 import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
 import YourCalendar from './components/YourCalendar';
+import YourEntities from './components/YourEntities';
 import { EventGridRoute } from './routes/event-grid';
 
 // Create routes
@@ -208,6 +209,36 @@ const userCalendarRoute = createRoute({
     },
 });
 
+const userEntitiesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/entities/your',
+    beforeLoad: () => {
+        if (!authService.isAuthenticated()) {
+            throw redirect({
+                to: '/login',
+                search: {
+                    redirect: '/entities/your',
+                },
+            });
+        }
+    },
+    component: YourEntities,
+    head: () => {
+        const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/entities/your';
+        return {
+            meta: [
+                { title: `Your Entities • ${SITE_NAME}` },
+                { property: 'og:url', content: `${url}` },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:title', content: `Your Entities • ${SITE_NAME}` },
+                { property: 'og:image', content: DEFAULT_IMAGE },
+                { property: 'og:description', content: `Entities you follow and are interested in.` },
+                { name: 'description', content: `Entities you follow and are interested in.` },
+            ],
+        };
+    },
+});
+
 // Tag filter routes - redirect to index pages with tag query parameter
 const eventTagRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -271,6 +302,7 @@ const routeTree = rootRoute.addChildren([
     AccountEditRoute,
     calendarRoute,
     userCalendarRoute,
+    userEntitiesRoute,
     EventGridRoute,
     RadarRoute,
     AboutRoute,
