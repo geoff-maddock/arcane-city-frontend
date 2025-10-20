@@ -95,6 +95,10 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           <HiCalendar />
           <span className=" xl:inline">Event Listings</span>
         </Link>
+        <Link to="/event-grid" className="flex items-center gap-2 hover:underline text-sm ml-6 text-gray-600 dark:text-gray-300">
+          <HiCalendar className="h-4 w-4" />
+          <span className=" xl:inline">Event Grid</span>
+        </Link>
         <Link to="/calendar" className="flex items-center gap-2 hover:underline">
           <HiCalendar />
           <span className=" xl:inline">Event Calendar</span>

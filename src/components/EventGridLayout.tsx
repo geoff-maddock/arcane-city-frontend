@@ -32,9 +32,9 @@ const sortOptions = [
  */
 const formatDateBar = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        month: 'short', 
+    return date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
         day: 'numeric',
         year: 'numeric'
     });
@@ -54,7 +54,7 @@ const getDateKey = (dateString: string): string => {
 const isWeekendDate = (dateString: string): boolean => {
     const date = new Date(dateString);
     const day = date.getDay();
-    return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+    return day === 0 || day === 5 || day === 6; // 0 = Sunday, 6 = Saturday
 };
 
 /**
@@ -62,15 +62,15 @@ const isWeekendDate = (dateString: string): boolean => {
  */
 const prepareEventsWithDateBars = (events: Event[]): Array<Event & { showDateBar: boolean; dateLabel: string; isWeekend: boolean }> => {
     let lastDate = '';
-    
+
     return events.map(event => {
         const currentDate = getDateKey(event.start_at);
         const showDateBar = currentDate !== lastDate;
-        
+
         if (showDateBar) {
             lastDate = currentDate;
         }
-        
+
         return {
             ...event,
             showDateBar,
@@ -275,9 +275,9 @@ export default function EventGridLayout() {
                                 {renderPagination()}
 
                                 {/* Responsive grid layout - min 120px per item, scales with container */}
-                                <div 
+                                <div
                                     className="grid gap-4 w-full"
-                                    style={{ 
+                                    style={{
                                         gridTemplateColumns: 'repeat(auto-fill, minmax(max(120px, calc((100% - 15 * 1rem) / 16)), 1fr))'
                                     }}
                                 >

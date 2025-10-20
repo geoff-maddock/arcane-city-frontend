@@ -240,7 +240,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                 <PopoverContent className="w-48 p-2" align="end">
                                                     <div className="space-y-1">
                                                         {/* Instagram Post Button: any authenticated user, public event only */}
-                                                        {user && publicVisibilityId && user.id === event.created_by && event.visibility && event.visibility.id === publicVisibilityId && (
+                                                        {user && publicVisibilityId && event.visibility && event.visibility.id === publicVisibilityId && (
                                                             <button
                                                                 onClick={() => setInstagramDialogOpen(true)}
                                                                 aria-label="Post event to Instagram"
