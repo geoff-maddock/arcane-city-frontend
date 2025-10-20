@@ -36,6 +36,7 @@ import { authService } from './services/auth.service';
 import { SearchRoute } from './routes/search';
 import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
 import YourCalendar from './components/YourCalendar';
+import { EventGridRoute } from './routes/event-grid';
 
 // Create routes
 const indexRoute = createRoute({
@@ -270,6 +271,7 @@ const routeTree = rootRoute.addChildren([
     AccountEditRoute,
     calendarRoute,
     userCalendarRoute,
+    EventGridRoute,
     RadarRoute,
     AboutRoute,
     HelpRoute,
