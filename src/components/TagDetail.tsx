@@ -18,9 +18,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useBackNavigation } from '../context/NavigationContext';
 
 export default function TagDetail({ slug }: { slug: string }) {
     const navigate = useNavigate();
+    const { backHref, isFallback } = useBackNavigation('/tags');
 
     const { data: tag, isLoading, error } = useQuery<Tag>({
         queryKey: ['tag', slug],
@@ -184,9 +186,9 @@ export default function TagDetail({ slug }: { slug: string }) {
                 <div className="space-y-6">
                     <div className="flex items-center gap-4">
                         <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
-                            <Link to="/tags">
+                            <Link to={backHref}>
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Tags
+                                {isFallback ? 'Back to Tags' : 'Back'}
                             </Link>
                         </Button>
                     </div>

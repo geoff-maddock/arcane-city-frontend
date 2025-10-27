@@ -6,12 +6,14 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { userService } from '../services/user.service';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useBackNavigation } from '../context/NavigationContext';
 
 const PasswordRecovery: React.FC = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const { backHref, isFallback } = useBackNavigation('/login');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,10 +43,10 @@ const PasswordRecovery: React.FC = () => {
                 </div>
                 <div className="text-center">
                     <Link
-                        to="/login"
+                        to={backHref}
                         className="text-600 hover:text-800 hover:underline"
                     >
-                        Back to Login
+                        {isFallback ? 'Back to Login' : 'Back'}
                     </Link>
                 </div>
             </div>
@@ -80,10 +82,10 @@ const PasswordRecovery: React.FC = () => {
 
             <div className="text-center space-y-2">
                 <Link
-                    to="/login"
+                    to={backHref}
                     className="text-600 hover:text-800 hover:underline block"
                 >
-                    Back to Login
+                    {isFallback ? 'Back to Login' : 'Back'}
                 </Link>
                 <div className="text-sm text-gray-600">
                     Don't have an account?{' '}

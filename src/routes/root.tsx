@@ -1,7 +1,9 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createRootRoute, Outlet, HeadContent, useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import MenuBar from '../components/MenuBar';
 import { SITE_NAME, SITE_DESCRIPTION, DEFAULT_IMAGE } from '../lib/seo';
+import { NavigationProvider } from '../context/NavigationContext';
 
 function RootLayout() {
     const router = useRouter();
@@ -18,17 +20,18 @@ function RootLayout() {
     return (
         <>
             <HeadContent />
-            <div className="min-h-screen">
-                <MenuBar />
-                <div className="xl:ml-64 pt-16 xl:pt-0">
-                    <Outlet />
+            <NavigationProvider>
+                <div className="min-h-screen">
+                    <MenuBar />
+                    <div className="xl:ml-64 pt-16 xl:pt-0">
+                        <Outlet />
+                    </div>
                 </div>
-            </div>
+            </NavigationProvider>
         </>
     )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const rootRoute = createRootRoute({
     component: RootLayout,
     head: () => ({
