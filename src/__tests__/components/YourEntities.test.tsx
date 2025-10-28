@@ -3,7 +3,6 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { render } from '../test-render' // Use our custom render with QueryClient
 import YourEntities from '../../components/YourEntities'
 import { useEntities } from '../../hooks/useEntities'
-import EntityFilters from '../../components/EntityFilters'
 import { PaginatedResponse, Entity } from '../../types/api';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -12,6 +11,14 @@ vi.mock('../../hooks/useEntities')
 
 vi.mock('../../hooks/useLocalStorage', () => ({
     useLocalStorage: () => [25, vi.fn()]
+}))
+
+// Mock TanStack Router
+vi.mock('@tanstack/react-router', () => ({
+    useSearch: vi.fn(() => ({})),
+    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+        <a href={to}>{children}</a>
+    )
 }))
 
 // Mock child components
@@ -96,6 +103,13 @@ describe('YourEntities Component', () => {
                 name: 'Test Entity 1',
                 primary_photo: 'photo1.jpg',
                 primary_photo_thumbnail: 'thumb1.jpg',
+                entity_type: { id: 1, name: 'Venue', slug: 'venue', created_at: '2022-01-01T00:00:00Z', updated_at: '2022-01-01T00:00:00Z' },
+                entity_status: { id: 1, name: 'Active', created_at: '2022-01-01T00:00:00Z', updated_at: '2022-01-01T00:00:00Z' },
+                created_by: 1,
+                updated_by: 1,
+                links: [],
+                tags: [],
+                roles: [],
                 created_at: '2022-12-01T00:00:00Z',
                 updated_at: '2022-12-15T00:00:00Z'
             },
@@ -105,6 +119,13 @@ describe('YourEntities Component', () => {
                 name: 'Test Entity 2',
                 primary_photo: 'photo2.jpg',
                 primary_photo_thumbnail: 'thumb2.jpg',
+                entity_type: { id: 2, name: 'Artist', slug: 'artist', created_at: '2022-01-01T00:00:00Z', updated_at: '2022-01-01T00:00:00Z' },
+                entity_status: { id: 1, name: 'Active', created_at: '2022-01-01T00:00:00Z', updated_at: '2022-01-01T00:00:00Z' },
+                created_by: 1,
+                updated_by: 1,
+                links: [],
+                tags: [],
+                roles: [],
                 created_at: '2022-12-02T00:00:00Z',
                 updated_at: '2022-12-16T00:00:00Z'
             }
@@ -179,7 +200,9 @@ describe('YourEntities Component', () => {
         }));
 
         render(<YourEntities />);
-        expect(screen.getByRole('status')).toBeInTheDocument();
+        // Look for the loading spinner by its class
+        const spinner = document.querySelector('.animate-spin');
+        expect(spinner).toBeInTheDocument();
     });
 
     it('shows error message when loading fails', () => {
