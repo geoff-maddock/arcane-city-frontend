@@ -13,16 +13,16 @@ interface SortControlsProps {
 const SortControls: React.FC<SortControlsProps> = ({ sort, setSort, direction, setDirection, sortOptions }) => {
     return (
 
-        <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Sort by:</span>
+        <div className="flex items-center gap-1 sm:gap-2">
+            <span className="text-sm text-gray-500 hidden sm:inline">Sort by:</span>
             <Select
                 value={sort}
                 onValueChange={(value) => setSort(value)}
             >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[120px] sm:w-[180px]">
                     <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" align="end" sideOffset={5}>
                     {sortOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                             {option.label}
@@ -34,7 +34,8 @@ const SortControls: React.FC<SortControlsProps> = ({ sort, setSort, direction, s
                 variant="ghost"
                 size="sm"
                 onClick={() => setDirection(direction === 'asc' ? 'desc' : 'asc')}
-                className="text-gray-500"
+                className="text-gray-500 min-w-[32px]"
+                aria-label={`Sort ${direction === 'asc' ? 'ascending' : 'descending'}`}
             >
                 {direction === 'asc' ? '↑' : '↓'}
             </Button>
