@@ -11,6 +11,13 @@ vi.mock('@tanstack/react-router', () => ({
     useNavigate: () => vi.fn(),
 }));
 
+vi.mock('../../context/NavigationContext', () => ({
+    useBackNavigation: () => ({
+        backHref: '/tags',
+        isFallback: true,
+    }),
+}));
+
 vi.mock('../../services/auth.service');
 
 vi.mock('../../lib/api', () => ({

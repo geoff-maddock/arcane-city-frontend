@@ -42,12 +42,14 @@ import PhotoDropzone from './PhotoDropzone';
 import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useBackNavigation } from '../context/NavigationContext';
 // Structured data is injected via the route head() now
 
 
 export default function EventDetail({ slug, initialEvent }: { slug: string; initialEvent?: Event }) {
     const navigate = useNavigate();
     const { mediaPlayersEnabled } = useMediaPlayerContext();
+    const { backHref, isFallback } = useBackNavigation('/events');
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     // Embeds now handled via React Query below; these legacy states removed.
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -204,9 +206,9 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             className="flex items-center gap-2"
                             asChild
                         >
-                            <Link to="/events">
+                            <Link to={backHref}>
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Events
+                                {isFallback ? 'Back to Events' : 'Back'}
                             </Link>
                         </Button>
                     </div>

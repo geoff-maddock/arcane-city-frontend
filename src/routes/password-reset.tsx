@@ -8,6 +8,7 @@ import { userService } from '../services/user.service';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { passwordResetSchema, type PasswordResetFields } from '../validation/schemas';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useBackNavigation } from '../context/NavigationContext';
 
 interface PasswordResetSearchParams {
     email?: string;
@@ -20,6 +21,7 @@ const PasswordReset: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const { backHref, isFallback } = useBackNavigation('/login');
 
     const {
         values,
@@ -86,10 +88,10 @@ const PasswordReset: React.FC = () => {
                 </div>
                 <div className="text-center">
                     <Link
-                        to="/login"
+                        to={backHref}
                         className="text-600 hover:text-800 hover:underline"
                     >
-                        Go to Login
+                        {isFallback ? 'Go to Login' : 'Back'}
                     </Link>
                 </div>
             </div>
@@ -160,10 +162,10 @@ const PasswordReset: React.FC = () => {
 
             <div className="text-center space-y-2">
                 <Link
-                    to="/login"
+                    to={backHref}
                     className="text-600 hover:text-800 hover:underline block"
                 >
-                    Back to Login
+                    {isFallback ? 'Back to Login' : 'Back'}
                 </Link>
                 <div className="text-sm text-gray-600">
                     Don't have an account?{' '}

@@ -26,12 +26,14 @@ import { TagBadges } from './TagBadges';
 import { SeriesFilterContext } from '../context/SeriesFilterContext';
 import { useContext } from 'react';
 import SeriesEvents from './SeriesEvents';
+import { useBackNavigation } from '../context/NavigationContext';
 
 export default function SeriesDetail({ slug, initialSeries }: { slug: string; initialSeries?: Series }) {
     const navigate = useNavigate();
     const placeHolderImage = `${window.location.origin}/event-placeholder.png`;
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+    const { backHref, isFallback } = useBackNavigation('/series');
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -141,9 +143,9 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                             className="flex items-center gap-2"
                             asChild
                         >
-                            <Link to="/series">
+                            <Link to={backHref}>
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Series
+                                {isFallback ? 'Back to Series' : 'Back'}
                             </Link>
                         </Button>
                     </div>

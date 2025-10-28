@@ -13,9 +13,11 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useBackNavigation } from '../context/NavigationContext';
 
 const AccountEdit: React.FC = () => {
     const navigate = useNavigate();
+    const { backHref, isFallback } = useBackNavigation('/account');
 
     useEffect(() => {
         if (!authService.isAuthenticated()) {
@@ -156,9 +158,9 @@ const AccountEdit: React.FC = () => {
         <div className="max-w-2xl md:max-w-4xl mx-auto p-4 space-y-4">
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
-                    <Link to="/account">
+                    <Link to={backHref}>
                         <ArrowLeft className="h-4 w-4" />
-                        Back to Account
+                        {isFallback ? 'Back to Account' : 'Back'}
                     </Link>
                 </Button>
             </div>

@@ -17,9 +17,11 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { tagEditSchema } from '@/validation/schemas';
 import ValidationSummary from '@/components/ValidationSummary';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
+import { useBackNavigation } from '../context/NavigationContext';
 
 const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
   const navigate = useNavigate();
+  const { backHref } = useBackNavigation(`/tags/${slug}`);
 
   const { data: tag, isLoading: tagLoading } = useQuery<Tag>({
     queryKey: ['tag', slug],
@@ -156,7 +158,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
     <div className="max-w-2xl mx-auto p-6 space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" asChild>
-          <Link to="/tags/$slug" params={{ slug }}>
+          <Link to={backHref}>
             Back
           </Link>
         </Button>

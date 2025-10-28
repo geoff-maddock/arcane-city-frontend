@@ -5,8 +5,10 @@ import { api } from '../lib/api';
 import type { User } from '../types/auth';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft } from 'lucide-react';
+import { useBackNavigation } from '../context/NavigationContext';
 
 export default function UserDetail({ id, initialUser }: { id: string; initialUser?: User }) {
+    const { backHref, isFallback } = useBackNavigation('/users');
     const { data: user, isLoading, error } = useQuery<User>({
         queryKey: ['user', id],
         queryFn: async () => {
@@ -42,9 +44,9 @@ export default function UserDetail({ id, initialUser }: { id: string; initialUse
             <div className="mx-auto px-6 py-8 max-w-[2400px] space-y-6">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
-                        <Link to="/users">
+                        <Link to={backHref}>
                             <ArrowLeft className="h-4 w-4" />
-                            Back to Users
+                            {isFallback ? 'Back to Users' : 'Back'}
                         </Link>
                     </Button>
                 </div>

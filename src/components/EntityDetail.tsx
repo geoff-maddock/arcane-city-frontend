@@ -18,6 +18,7 @@ import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
 import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useBackNavigation } from '../context/NavigationContext';
 // SEO handled at route level
 import {
     Dialog,
@@ -36,6 +37,7 @@ import {
 export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug: string; initialEntity?: Entity }) {
     const navigate = useNavigate();
     const { mediaPlayersEnabled } = useMediaPlayerContext();
+    const { backHref, isFallback } = useBackNavigation('/entities');
     const [embeds, setEmbeds] = useState<string[]>([]);
     const [embedsLoading, setEmbedsLoading] = useState(false);
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
@@ -171,9 +173,9 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                             className="flex items-center gap-2"
                             asChild
                         >
-                            <Link to="/entities">
+                            <Link to={backHref}>
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Entities
+                                {isFallback ? 'Back to Entities' : 'Back'}
                             </Link>
                         </Button>
                     </div>
