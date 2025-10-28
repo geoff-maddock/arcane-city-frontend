@@ -68,6 +68,7 @@ describe('MenuBar login indicator', () => {
     await waitFor(() => {
       expect(screen.getByText('My Account')).toBeInTheDocument()
       expect(screen.getByText('Your Calendar')).toBeInTheDocument()
+      expect(screen.getByText('Your Entities')).toBeInTheDocument()
     })
   })
 })
