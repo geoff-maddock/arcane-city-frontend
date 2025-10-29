@@ -34,6 +34,7 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const { backHref, isFallback } = useBackNavigation('/series');
+    const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -100,6 +101,16 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
 
     const handleEntityClick = (entityName: string) => {
         setFilters((prevFilters) => ({ ...prevFilters, entity: entityName }));
+    };
+
+    // Detect image orientation when loaded
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        if (img.naturalWidth > img.naturalHeight) {
+            setImageOrientation('landscape');
+        } else {
+            setImageOrientation('portrait');
+        }
     };
 
     // Fetch the series data
@@ -242,11 +253,12 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                             </div>
 
 
-                            <div className="aspect-video relative overflow-hidden rounded-lg">
+                            <div className={imageOrientation === 'portrait' ? 'flex justify-center bg-card rounded-lg p-6 border shadow' : 'aspect-video relative overflow-hidden rounded-lg'}>
                                 <img
                                     src={series.primary_photo || placeHolderImage}
                                     alt={series.name}
-                                    className="object-cover w-full h-full"
+                                    className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg' : 'object-cover w-full h-full'}
+                                    onLoad={handleImageLoad}
                                     loading="lazy"
                                     decoding="async"
                                 />
