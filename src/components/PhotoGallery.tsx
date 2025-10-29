@@ -27,7 +27,6 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate, openAtIndex, o
     const [error, setError] = useState<Error | null>(null);
     const [showSlideshow, setShowSlideshow] = useState(false);
     const [slideshowIndex, setSlideshowIndex] = useState(0);
-    const [requestedIndex, setRequestedIndex] = useState<number | null>(null);
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -89,21 +88,14 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate, openAtIndex, o
         fetchPhotos();
     }, [fetchPhotos]);
 
-    // Track when openAtIndex changes to trigger slideshow
-    useEffect(() => {
-        if (openAtIndex !== null && openAtIndex !== undefined && openAtIndex !== requestedIndex) {
-            setRequestedIndex(openAtIndex);
-        }
-    }, [openAtIndex, requestedIndex]);
-
     // Handle external request to open slideshow at specific index
     // Use -1 to indicate "open at primary photo"
     useEffect(() => {
-        if (requestedIndex !== null && photos.length > 0) {
-            let targetIndex = requestedIndex;
+        if (openAtIndex !== null && openAtIndex !== undefined && photos.length > 0) {
+            let targetIndex = openAtIndex;
             
             // Special case: -1 means find and open the primary photo
-            if (requestedIndex === -1) {
+            if (openAtIndex === -1) {
                 const primaryIndex = photos.findIndex(photo => photo.is_primary);
                 targetIndex = primaryIndex >= 0 ? primaryIndex : 0;
             }
@@ -114,7 +106,7 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate, openAtIndex, o
                 setShowSlideshow(true);
             }
         }
-    }, [requestedIndex, photos]);
+    }, [openAtIndex, photos]);
 
     if (loading) {
         return (
