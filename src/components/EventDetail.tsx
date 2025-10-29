@@ -57,6 +57,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
     const [instagramDialogOpen, setInstagramDialogOpen] = useState(false);
     const [instagramResult, setInstagramResult] = useState<string | null>(null);
     const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
+    const [openSlideshowAtIndex, setOpenSlideshowAtIndex] = useState<number | null>(null);
     // Load visibility options to determine which id corresponds to Public
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const publicVisibilityId = visibilityOptions?.find(v => v.name.toLowerCase() === 'public')?.id;
@@ -389,14 +390,21 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
 
 
                             <div className={imageOrientation === 'portrait' ? 'flex justify-center bg-card rounded-lg p-6 border shadow' : 'aspect-video relative overflow-hidden rounded-lg'}>
-                                <img
-                                    src={event.primary_photo || placeHolderImage}
-                                    alt={event.name}
-                                    className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg' : 'object-cover w-full h-full'}
-                                    onLoad={handleImageLoad}
-                                    loading="lazy"
-                                    decoding="async"
-                                />
+                                <button
+                                    onClick={() => setOpenSlideshowAtIndex(-1)}
+                                    className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+                                    aria-label="View full size image"
+                                    type="button"
+                                >
+                                    <img
+                                        src={event.primary_photo || placeHolderImage}
+                                        alt={event.name}
+                                        className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity' : 'object-cover w-full h-full cursor-pointer hover:opacity-90 transition-opacity'}
+                                        onLoad={handleImageLoad}
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </button>
                             </div>
 
 
@@ -551,6 +559,8 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             <PhotoGallery
                                 fetchUrl={`/events/${event.slug}/all-photos`}
                                 onPrimaryUpdate={refetch}
+                                openAtIndex={openSlideshowAtIndex}
+                                onSlideshowClose={() => setOpenSlideshowAtIndex(null)}
                             />
                             {/* Audio Embeds Section */}
                             {mediaPlayersEnabled && embeds.length > 0 && !embedsLoading && (
