@@ -391,7 +391,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
 
                             <div className={imageOrientation === 'portrait' ? 'flex justify-center bg-card rounded-lg p-6 border shadow' : 'aspect-video relative overflow-hidden rounded-lg'}>
                                 <button
-                                    onClick={() => setOpenSlideshowAtIndex(0)}
+                                    onClick={() => setOpenSlideshowAtIndex(-1)}
                                     className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
                                     aria-label="View full size image"
                                     type="button"
