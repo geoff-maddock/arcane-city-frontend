@@ -17,9 +17,11 @@ import { authService } from '../services/auth.service';
 interface PhotoGalleryProps {
     fetchUrl: string;
     onPrimaryUpdate?: () => void;
+    openAtIndex?: number | null;
+    onSlideshowClose?: () => void;
 }
 
-export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGalleryProps) {
+export default function PhotoGallery({ fetchUrl, onPrimaryUpdate, openAtIndex, onSlideshowClose }: PhotoGalleryProps) {
     const [photos, setPhotos] = useState<PhotoResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -85,6 +87,14 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
     useEffect(() => {
         fetchPhotos();
     }, [fetchPhotos]);
+
+    // Handle external request to open slideshow at specific index
+    useEffect(() => {
+        if (openAtIndex !== null && openAtIndex !== undefined && openAtIndex >= 0 && photos.length > 0) {
+            setSlideshowIndex(openAtIndex);
+            setShowSlideshow(true);
+        }
+    }, [openAtIndex, photos.length]);
 
     if (loading) {
         return (
@@ -168,7 +178,10 @@ export default function PhotoGallery({ fetchUrl, onPrimaryUpdate }: PhotoGallery
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
                         <button
                             className="absolute top-4 right-4 text-white hover:text-gray-300"
-                            onClick={() => setShowSlideshow(false)}
+                            onClick={() => {
+                                setShowSlideshow(false);
+                                onSlideshowClose?.();
+                            }}
                             aria-label="Close"
                         >
                             <X className="h-8 w-8" />

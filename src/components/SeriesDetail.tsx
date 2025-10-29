@@ -35,6 +35,7 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const { backHref, isFallback } = useBackNavigation('/series');
     const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
+    const [openSlideshowAtIndex, setOpenSlideshowAtIndex] = useState<number | null>(null);
 
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
@@ -254,14 +255,21 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
 
 
                             <div className={imageOrientation === 'portrait' ? 'flex justify-center bg-card rounded-lg p-6 border shadow' : 'aspect-video relative overflow-hidden rounded-lg'}>
-                                <img
-                                    src={series.primary_photo || placeHolderImage}
-                                    alt={series.name}
-                                    className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg' : 'object-cover w-full h-full'}
-                                    onLoad={handleImageLoad}
-                                    loading="lazy"
-                                    decoding="async"
-                                />
+                                <button
+                                    onClick={() => setOpenSlideshowAtIndex(0)}
+                                    className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+                                    aria-label="View full size image"
+                                    type="button"
+                                >
+                                    <img
+                                        src={series.primary_photo || placeHolderImage}
+                                        alt={series.name}
+                                        className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity' : 'object-cover w-full h-full cursor-pointer hover:opacity-90 transition-opacity'}
+                                        onLoad={handleImageLoad}
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </button>
                             </div>
 
 
@@ -414,6 +422,8 @@ export default function SeriesDetail({ slug, initialSeries }: { slug: string; in
                             <PhotoGallery
                                 fetchUrl={`/series/${slug}/all-photos`}
                                 onPrimaryUpdate={refetch}
+                                openAtIndex={openSlideshowAtIndex}
+                                onSlideshowClose={() => setOpenSlideshowAtIndex(null)}
                             />
                         </div>
                     </div>
