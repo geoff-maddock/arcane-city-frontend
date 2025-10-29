@@ -56,6 +56,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [instagramDialogOpen, setInstagramDialogOpen] = useState(false);
     const [instagramResult, setInstagramResult] = useState<string | null>(null);
+    const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
     // Load visibility options to determine which id corresponds to Public
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const publicVisibilityId = visibilityOptions?.find(v => v.name.toLowerCase() === 'public')?.id;
@@ -156,6 +157,16 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
             setAttending(event.attendees.some((u) => u.id === user.id));
         }
     }, [user, event?.attendees]);
+
+    // Detect image orientation when loaded
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        if (img.naturalWidth > img.naturalHeight) {
+            setImageOrientation('landscape');
+        } else {
+            setImageOrientation('portrait');
+        }
+    };
 
     // React Query: fetch embeds when media players enabled & event slug available
     const {
@@ -377,11 +388,12 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                             </div>
 
 
-                            <div className="aspect-video relative overflow-hidden rounded-lg">
+                            <div className={imageOrientation === 'portrait' ? 'flex justify-center bg-card rounded-lg p-6 border shadow' : 'aspect-video relative overflow-hidden rounded-lg'}>
                                 <img
                                     src={event.primary_photo || placeHolderImage}
                                     alt={event.name}
-                                    className="object-cover w-full h-full"
+                                    className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg' : 'object-cover w-full h-full'}
+                                    onLoad={handleImageLoad}
                                     loading="lazy"
                                     decoding="async"
                                 />

@@ -43,6 +43,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     const [embedsError, setEmbedsError] = useState<Error | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+    const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
 
     const { data: entity, isLoading, error, refetch } = useQuery<Entity>({
         queryKey: ['entity', entitySlug],
@@ -113,6 +114,16 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     const handleDelete = () => {
         deleteMutation.mutate();
         setDeleteDialogOpen(false);
+    };
+
+    // Detect image orientation when loaded
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        if (img.naturalWidth > img.naturalHeight) {
+            setImageOrientation('landscape');
+        } else {
+            setImageOrientation('portrait');
+        }
     };
 
     // Fetch event embeds after the entity detail is loaded
@@ -272,11 +283,12 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                             </div>
 
 
-                            <div className="aspect-video relative overflow-hidden rounded-lg">
+                            <div className={imageOrientation === 'portrait' ? 'flex justify-center bg-card rounded-lg p-6 border shadow' : 'aspect-video relative overflow-hidden rounded-lg'}>
                                 <img
                                     src={entity.primary_photo || placeHolderImage}
                                     alt={entity.name}
-                                    className="object-cover w-full h-full"
+                                    className={imageOrientation === 'portrait' ? 'max-h-[600px] w-auto rounded-lg' : 'object-cover w-full h-full'}
+                                    onLoad={handleImageLoad}
                                 />
                             </div>
 
