@@ -224,7 +224,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     value={creating.type}
                                     onValueChange={(value) => setCreating({ ...creating, type: value })}
                                 >
-                                    <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+                                    <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Contact type">
                                         <SelectValue placeholder="Select contact type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -333,7 +333,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                 value={creating.type}
                                 onValueChange={(value) => setCreating({ ...creating, type: value })}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger aria-label="Contact type">
                                     <SelectValue placeholder="Select contact type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -494,7 +494,7 @@ export default function EntityContacts({ entityId, entitySlug, canEdit }: Entity
                                     value={editing.type}
                                     onValueChange={(value) => setEditing({ ...editing, type: value })}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger aria-label="Contact type">
                                         <SelectValue placeholder="Select contact type" />
                                     </SelectTrigger>
                                     <SelectContent>

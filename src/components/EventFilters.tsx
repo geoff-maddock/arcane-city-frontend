@@ -174,7 +174,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                             onValueChange={(value) => onFilterChange({ ...filters, event_type: value === 'all' ? '' : value })}
                             disabled={loadingEventTypes}
                         >
-                            <SelectTrigger id="type" className="pl-9">
+                            <SelectTrigger id="type" className="pl-9" aria-label="Filter by event type">
                                 <SelectValue placeholder={loadingEventTypes ? 'Loading types...' : 'All types'} />
                             </SelectTrigger>
                             <SelectContent>
@@ -240,7 +240,7 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                         value={filters.min_age || 'all'}
                         onValueChange={(value) => onFilterChange({ ...filters, min_age: value === 'all' ? '' : value })}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="Filter by age restriction">
                             <SelectValue placeholder="All Restrictions" />
                         </SelectTrigger>
                         <SelectContent>

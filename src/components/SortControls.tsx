@@ -19,7 +19,7 @@ const SortControls: React.FC<SortControlsProps> = ({ sort, setSort, direction, s
                 value={sort}
                 onValueChange={(value) => setSort(value)}
             >
-                <SelectTrigger className="w-[120px] sm:w-[180px]">
+                <SelectTrigger className="w-[120px] sm:w-[180px]" aria-label="Sort by">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent position="popper" align="end" sideOffset={5}>

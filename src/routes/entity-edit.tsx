@@ -159,7 +159,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                     <div className="space-y-2">
                         <Label htmlFor="visibility_id">Visibility</Label>
                         <Select value={String(formData.visibility_id)} onValueChange={(val) => setFormData((p) => ({ ...p, visibility_id: Number(val) }))}>
-                            <SelectTrigger id="visibility_id" className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+                            <SelectTrigger id="visibility_id" className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Entity visibility">
                                 <SelectValue>{visibilityOptions?.find(o => o.id === Number(formData.visibility_id))?.name}</SelectValue>
                             </SelectTrigger>
                             <SelectContent>

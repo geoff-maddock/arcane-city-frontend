@@ -291,7 +291,7 @@ const SeriesCreate: React.FC = () => {
               value={formData.occurrence_type_id.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_type_id: Number(value) }))}
             >
-              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Occurrence type">
                 <SelectValue placeholder="Select occurrence type" />
               </SelectTrigger>
               <SelectContent>
@@ -310,7 +310,7 @@ const SeriesCreate: React.FC = () => {
               value={formData.occurrence_week_id.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_week_id: Number(value) }))}
             >
-              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Occurrence week">
                 <SelectValue placeholder="Select occurrence week" />
               </SelectTrigger>
               <SelectContent>
@@ -329,7 +329,7 @@ const SeriesCreate: React.FC = () => {
               value={formData.occurrence_day_id.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, occurrence_day_id: Number(value) }))}
             >
-              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Occurrence day">
                 <SelectValue placeholder="Select occurrence day" />
               </SelectTrigger>
               <SelectContent>
@@ -350,7 +350,7 @@ const SeriesCreate: React.FC = () => {
               value={formData.visibility_id.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, visibility_id: Number(value) }))}
             >
-              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Series visibility">
                 <SelectValue placeholder="Select visibility" />
               </SelectTrigger>
               <SelectContent>
@@ -442,7 +442,7 @@ const SeriesCreate: React.FC = () => {
               value={formData.min_age.toString()}
               onValueChange={(value) => setFormData(prev => ({ ...prev, min_age: value }))}
             >
-              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+              <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Minimum age restriction">
                 <SelectValue placeholder="Select minimum age" />
               </SelectTrigger>
               <SelectContent>

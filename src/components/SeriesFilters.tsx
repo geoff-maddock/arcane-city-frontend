@@ -88,7 +88,7 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                         }
                         disabled={loadingTypes}
                     >
-                        <SelectTrigger id="event_type">
+                        <SelectTrigger id="event_type" aria-label="Filter by event type">
                             <SelectValue placeholder={loadingTypes ? 'Loading types...' : 'All types'} />
                         </SelectTrigger>
                         <SelectContent>
@@ -143,7 +143,7 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                         onValueChange={(value) => onFilterChange({ ...filters, occurrence_type: value === '__ALL__' ? '' : value })}
                         disabled={loadingOccTypes}
                     >
-                        <SelectTrigger id="occurrence_type">
+                        <SelectTrigger id="occurrence_type" aria-label="Filter by occurrence type">
                             <SelectValue placeholder={loadingOccTypes ? 'Loading types...' : 'All types'} />
                         </SelectTrigger>
                         <SelectContent>
@@ -164,7 +164,7 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                         onValueChange={(value) => onFilterChange({ ...filters, occurrence_week: value === '__ALL__' ? '' : value })}
                         disabled={loadingOccWeeks}
                     >
-                        <SelectTrigger id="occurrence_week">
+                        <SelectTrigger id="occurrence_week" aria-label="Filter by occurrence week">
                             <SelectValue placeholder={loadingOccWeeks ? 'Loading weeks...' : 'All weeks'} />
                         </SelectTrigger>
                         <SelectContent>
@@ -185,7 +185,7 @@ export default function SeriesFilters({ filters, onFilterChange }: SeriesFilters
                         onValueChange={(value) => onFilterChange({ ...filters, occurrence_day: value === '__ALL__' ? '' : value })}
                         disabled={loadingOccDays}
                     >
-                        <SelectTrigger id="occurrence_day">
+                        <SelectTrigger id="occurrence_day" aria-label="Filter by occurrence day">
                             <SelectValue placeholder={loadingOccDays ? 'Loading days...' : 'All days'} />
                         </SelectTrigger>
                         <SelectContent>
