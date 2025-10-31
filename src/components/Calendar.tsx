@@ -38,6 +38,11 @@ const Calendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const { filtersVisible, toggleFilters } = useFilterToggle();
 
+  // Set time range for week/day views to show only relevant hours
+  // Most events happen between 6 PM and 3 AM
+  const minTime = React.useMemo(() => new Date(0, 0, 0, 18, 0, 0), []); // 6 PM
+  const maxTime = React.useMemo(() => new Date(0, 0, 0, 27, 0, 0), []); // 3 AM next day
+
   const [filters, setFilters] = useState<EventFilters>({
     name: '',
     venue: '',
@@ -167,6 +172,8 @@ const Calendar: React.FC = () => {
         onNavigate={handleDateChange}
         onSelectEvent={handleSelectEvent}
         eventPropGetter={eventStyleGetter}
+        min={minTime}
+        max={maxTime}
         popup
         popupOffset={{ x: 10, y: 10 }}
         style={{ height: 'calc(100vh - 120px)' }}
