@@ -40,6 +40,7 @@ export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath =
             params={{ slug: tag.slug ?? tag.name }}
             className="ml-1 text-gray-500 hover:text-gray-700 dark:text-slate-300 dark:hover:text-white"
             onClick={e => e.stopPropagation()}
+            aria-label={`View ${tag.name} tag details`}
           >
             <LinkIcon className="h-3 w-3" />
           </Link>

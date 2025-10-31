@@ -34,6 +34,7 @@ export const EntityBadges: React.FC<EntityBadgesProps> = ({ entities, onClick })
             params={{ entitySlug: entity.slug ?? entity.name }}
             className="ml-1 text-blue-600 hover:text-blue-800"
             onClick={e => e.stopPropagation()}
+            aria-label={`View ${entity.name} entity details`}
           >
             <LinkIcon className="h-3 w-3" />
           </Link>

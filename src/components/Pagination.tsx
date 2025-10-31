@@ -67,7 +67,7 @@ export function Pagination({
                             }
                         }}
                     >
-                        <SelectTrigger className="w-[140px]">
+                        <SelectTrigger className="w-[140px]" aria-label="Items per page">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -170,7 +170,7 @@ export function Pagination({
                                 value={String(currentPage)}
                                 onValueChange={(v) => onPageChange(Number(v))}
                             >
-                                <SelectTrigger className="w-[96px]">
+                                <SelectTrigger className="w-[96px]" aria-label="Select page">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>

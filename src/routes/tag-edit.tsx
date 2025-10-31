@@ -198,7 +198,7 @@ const TagEdit: React.FC<{ slug: string }> = ({ slug }) => {
               setFormData(p => ({ ...p, tag_type_id: Number(v) }))
             }
           >
-            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400">
+            <SelectTrigger className="bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 focus-visible:ring-0 focus:border-slate-500 focus:dark:border-slate-400" aria-label="Tag type">
               <SelectValue placeholder="Select a tag type" />
             </SelectTrigger>
             <SelectContent>
