@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ActivityList from '../../components/ActivityList';
 import * as useActivitiesHook from '../../hooks/useActivities';
+import type { UseQueryResult } from '@tanstack/react-query';
+import type { PaginatedResponse, Activity } from '../../types/api';
 
 // Mock the router
 vi.mock('@tanstack/react-router', async () => {
@@ -40,7 +42,7 @@ describe('ActivityList', () => {
             data: undefined,
             isLoading: true,
             error: null,
-        } as any);
+        } as Partial<UseQueryResult<PaginatedResponse<Activity>>> as UseQueryResult<PaginatedResponse<Activity>>);
 
         const { container } = render(<ActivityList />, { wrapper });
         expect(screen.getByText('Activity Index')).toBeInTheDocument();
@@ -54,7 +56,7 @@ describe('ActivityList', () => {
             data: undefined,
             isLoading: false,
             error: new Error('Test error'),
-        } as any);
+        } as Partial<UseQueryResult<PaginatedResponse<Activity>>> as UseQueryResult<PaginatedResponse<Activity>>);
 
         render(<ActivityList />, { wrapper });
         expect(screen.getByText(/There was an error loading activities/i)).toBeInTheDocument();
@@ -65,7 +67,7 @@ describe('ActivityList', () => {
             data: { data: [], current_page: 1, last_page: 1, per_page: 25, total: 0 },
             isLoading: false,
             error: null,
-        } as any);
+        } as Partial<UseQueryResult<PaginatedResponse<Activity>>> as UseQueryResult<PaginatedResponse<Activity>>);
 
         render(<ActivityList />, { wrapper });
         expect(screen.getByText(/No activities found/i)).toBeInTheDocument();
@@ -107,7 +109,7 @@ describe('ActivityList', () => {
             data: mockData,
             isLoading: false,
             error: null,
-        } as any);
+        } as Partial<UseQueryResult<PaginatedResponse<Activity>>> as UseQueryResult<PaginatedResponse<Activity>>);
 
         render(<ActivityList />, { wrapper });
 
@@ -143,7 +145,7 @@ describe('ActivityList', () => {
             data: mockData,
             isLoading: false,
             error: null,
-        } as any);
+        } as Partial<UseQueryResult<PaginatedResponse<Activity>>> as UseQueryResult<PaginatedResponse<Activity>>);
 
         render(<ActivityList />, { wrapper });
         expect(screen.getByText(/192.168.1.1/)).toBeInTheDocument();
