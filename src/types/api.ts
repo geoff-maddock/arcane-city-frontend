@@ -328,12 +328,15 @@ export interface UseBlogsParams {
 
 export interface Activity {
     id: number;
-    object_type: string;
+    object_table: string;
     object_id: number;
     object_name: string;
+    child_object_table: string;
+    child_object_id: number;
+    child_object_name: string;
     action: string;
     user_id: number;
-    user_name: string;
+    user_full_name: string;
     ip_address?: string;
     created_at: string;
 }

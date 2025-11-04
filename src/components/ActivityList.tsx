@@ -59,7 +59,7 @@ export default function ActivityList() {
     };
 
     const getActivityLink = (activity: Activity) => {
-        const type = activity.object_type.toLowerCase();
+        const type = activity.object_table.toLowerCase();
         if (type === 'event') {
             return `/events/${activity.object_id}`;
         } else if (type === 'entity') {
@@ -111,7 +111,7 @@ export default function ActivityList() {
                                                     </span>
                                                     <div className="flex-1 text-sm space-y-1">
                                                         <div className="text-gray-900 dark:text-gray-100">
-                                                            <span className="font-medium">[{activity.action} {activity.object_type}</span>{' '}
+                                                            <span className="font-medium">[{activity.action} {activity.object_table}</span>{' '}
                                                             <Link
                                                                 to={getActivityLink(activity)}
                                                                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
@@ -121,7 +121,7 @@ export default function ActivityList() {
                                                             <span className="font-medium">]</span>
                                                         </div>
                                                         <div className="text-gray-600 dark:text-gray-400">
-                                                            by <span className="font-medium">{activity.user_name}</span>
+                                                            by <span className="font-medium">{activity.user_full_name}</span>
                                                             {' '}on {formatDateTime(activity.created_at)}
                                                             {activity.ip_address && (
                                                                 <span className="text-gray-500 dark:text-gray-500">
