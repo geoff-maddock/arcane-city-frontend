@@ -38,6 +38,7 @@ import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
 import YourCalendar from './components/YourCalendar';
 import YourEntities from './components/YourEntities';
 import { EventGridRoute } from './routes/event-grid';
+import { ActivityRoute } from './routes/activity';
 
 // Create routes
 const indexRoute = createRoute({
@@ -305,6 +306,7 @@ const routeTree = rootRoute.addChildren([
     userEntitiesRoute,
     EventGridRoute,
     RadarRoute,
+    ActivityRoute,
     AboutRoute,
     HelpRoute,
     SearchRoute,

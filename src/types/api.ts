@@ -325,3 +325,27 @@ export interface UseBlogsParams {
     sort?: string;
     direction?: 'desc' | 'asc';
 }
+
+export interface Activity {
+    id: number;
+    object_type: string;
+    object_id: number;
+    object_name: string;
+    action: string;
+    user_id: number;
+    user_name: string;
+    ip_address?: string;
+    created_at: string;
+}
+
+export interface UseActivitiesParams {
+    page?: number;
+    itemsPerPage?: number;
+    filters?: {
+        object_type?: string;
+        action?: string;
+        user?: string;
+    };
+    sort?: string;
+    direction?: 'desc' | 'asc';
+}
