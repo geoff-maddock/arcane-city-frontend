@@ -17,23 +17,29 @@ describe('useActivities', () => {
         data: [
             {
                 id: 81078,
-                object_type: 'event',
+                object_table: 'event',
                 object_id: 6833,
                 object_name: "Painted Dog 'Mirror' Album Release Show",
+                child_object_table: '',
+                child_object_id: 0,
+                child_object_name: '',
                 action: 'Instagram Post',
                 user_id: 1,
-                user_name: 'Geoffrey Maddock',
+                user_full_name: 'Geoffrey Maddock',
                 ip_address: '74.109.235.248',
                 created_at: '2025-11-04T00:43:00Z',
             },
             {
                 id: 81077,
-                object_type: 'event',
+                object_table: 'event',
                 object_id: 6833,
                 object_name: "Painted Dog 'Mirror' Album Release Show",
+                child_object_table: '',
+                child_object_id: 0,
+                child_object_name: '',
                 action: 'Update',
                 user_id: 1,
-                user_name: 'Geoffrey Maddock',
+                user_full_name: 'Geoffrey Maddock',
                 ip_address: '74.109.235.248',
                 created_at: '2025-11-04T00:41:00Z',
             },
@@ -111,9 +117,10 @@ describe('useActivities', () => {
         const { result } = renderHook(
             () => useActivities({
                 filters: {
-                    object_type: 'event',
+                    object_table: 'event',
                     action: 'Create',
-                    user: 'TestUser',
+                    message: 'Test message',
+                    user_id: '1',
                 },
             }),
             { wrapper }
@@ -125,9 +132,10 @@ describe('useActivities', () => {
         const url = apiCall[0] as string;
         const searchParams = new URLSearchParams(url.split('?')[1]);
 
-        expect(searchParams.get('filters[object_type]')).toBe('event');
+        expect(searchParams.get('filters[object_table]')).toBe('event');
         expect(searchParams.get('filters[action]')).toBe('Create');
-        expect(searchParams.get('filters[user]')).toBe('TestUser');
+        expect(searchParams.get('filters[message]')).toBe('Test message');
+        expect(searchParams.get('filters[user_id]')).toBe('1');
     });
 
     it('should return correct data structure', async () => {
@@ -140,8 +148,8 @@ describe('useActivities', () => {
         expect(result.current.data).toBeDefined();
         expect(result.current.data?.data).toHaveLength(2);
         expect(result.current.data?.data[0].id).toBe(81078);
-        expect(result.current.data?.data[0].object_type).toBe('event');
-        expect(result.current.data?.data[0].user_name).toBe('Geoffrey Maddock');
+        expect(result.current.data?.data[0].object_table).toBe('event');
+        expect(result.current.data?.data[0].user_full_name).toBe('Geoffrey Maddock');
     });
 
     it('should handle sort and direction parameters', async () => {

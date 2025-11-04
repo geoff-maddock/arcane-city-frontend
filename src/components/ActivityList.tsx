@@ -5,9 +5,13 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useFilterToggle } from '../hooks/useFilterToggle';
 import { formatDateTime } from '../lib/utils';
 import { Link } from '@tanstack/react-router';
 import type { Activity } from '../types/api';
+import ActivityFilters from './ActivityFilters';
+import { ActiveActivityFilters } from './ActiveActivityFilters';
+import { FilterContainer } from './FilterContainer';
 
 const sortOptions = [
     { value: 'created_at', label: 'Created' },
@@ -15,6 +19,15 @@ const sortOptions = [
 ];
 
 export default function ActivityList() {
+    const { filtersVisible, toggleFilters } = useFilterToggle();
+
+    const [filters, setFilters] = useState({
+        action: '',
+        message: '',
+        object_table: '',
+        user_id: '',
+    });
+
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useLocalStorage('activitiesPerPage', 25);
     const [sort, setSort] = useState('created_at');
@@ -23,6 +36,7 @@ export default function ActivityList() {
     const { data, isLoading, error } = useActivities({
         page,
         itemsPerPage,
+        filters,
         sort,
         direction,
     });
@@ -36,6 +50,25 @@ export default function ActivityList() {
         setItemsPerPage(count);
         setPage(1);
     };
+
+    const handleRemoveFilter = (key: keyof typeof filters) => {
+        setFilters(prev => ({
+            ...prev,
+            [key]: ''
+        }));
+    };
+
+    const handleClearAllFilters = () => {
+        setFilters({
+            action: '',
+            message: '',
+            object_table: '',
+            user_id: '',
+        });
+    };
+
+    // Check if any filters are active
+    const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
     const renderPagination = () => {
         if (!data) return null;
@@ -82,6 +115,21 @@ export default function ActivityList() {
                             Recent activity across events, entities, and series.
                         </p>
                     </div>
+
+                    <FilterContainer
+                        filtersVisible={filtersVisible}
+                        onToggleFilters={toggleFilters}
+                        hasActiveFilters={hasActiveFilters}
+                        onClearAllFilters={handleClearAllFilters}
+                        activeFiltersComponent={
+                            <ActiveActivityFilters
+                                filters={filters}
+                                onRemoveFilter={handleRemoveFilter}
+                            />
+                        }
+                    >
+                        <ActivityFilters filters={filters} onFilterChange={setFilters} />
+                    </FilterContainer>
 
                     {error ? (
                         <Alert variant="destructive">

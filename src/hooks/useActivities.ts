@@ -10,9 +10,10 @@ export const useActivities = ({ page = 1, itemsPerPage = 25, filters, sort = 'cr
 
             params.append('page', page.toString());
             params.append('limit', itemsPerPage.toString());
-            if (filters?.object_type) params.append('filters[object_type]', filters.object_type);
+            if (filters?.object_table) params.append('filters[object_table]', filters.object_table);
             if (filters?.action) params.append('filters[action]', filters.action);
-            if (filters?.user) params.append('filters[user]', filters.user);
+            if (filters?.message) params.append('filters[message]', filters.message);
+            if (filters?.user_id) params.append('filters[user_id]', filters.user_id);
             if (sort) params.append('sort', sort);
             if (direction) params.append('direction', direction);
 

@@ -345,9 +345,10 @@ export interface UseActivitiesParams {
     page?: number;
     itemsPerPage?: number;
     filters?: {
-        object_type?: string;
+        object_table?: string;
         action?: string;
-        user?: string;
+        message?: string;
+        user_id?: string;
     };
     sort?: string;
     direction?: 'desc' | 'asc';
