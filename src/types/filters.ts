@@ -45,6 +45,7 @@ export interface EventFiltersProps {
         door_price_max?: string;
         min_age?: string;
         is_benefit?: string;
+        series?: string;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
 }
