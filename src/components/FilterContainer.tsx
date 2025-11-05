@@ -56,34 +56,34 @@ export function FilterContainer({
 }: FilterContainerProps) {
     return (
         <div className={cn("relative", className)}>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 sm:justify-between">
                     <FilterToggleButton
                         filtersVisible={filtersVisible}
                         onToggle={onToggleFilters}
-                        className="sm:mb-0"
+                        className="shrink-0"
                         size="sm"
                     />
 
-                    {/* Show active filters when collapsed */}
-                    {!filtersVisible && activeFiltersComponent && (
-                        <div className="flex-1 basis-full min-w-0 sm:basis-auto">
-                            {activeFiltersComponent}
-                        </div>
+                    {/* Clear all button */}
+                    {hasActiveFilters && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onClearAllFilters}
+                            className="shrink-0 text-gray-500 hover:text-gray-900"
+                        >
+                            {clearAllText}
+                            <X className="ml-2 h-4 w-4" />
+                        </Button>
                     )}
                 </div>
 
-                {/* Clear all button */}
-                {hasActiveFilters && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onClearAllFilters}
-                        className="self-start text-gray-500 hover:text-gray-900 sm:self-auto"
-                    >
-                        {clearAllText}
-                        <X className="ml-2 h-4 w-4" />
-                    </Button>
+                {/* Show active filters when collapsed - full width on its own row */}
+                {!filtersVisible && activeFiltersComponent && (
+                    <div className="w-full min-w-0">
+                        {activeFiltersComponent}
+                    </div>
                 )}
             </div>
 

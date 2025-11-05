@@ -64,7 +64,7 @@ export function ActiveEventFilters({ filters, onRemoveFilter }: ActiveEventFilte
 
     return (
         <div
-            className="flex w-full items-center gap-2 overflow-x-auto pb-1 sm:pb-0"
+            className="flex w-full flex-wrap items-center gap-2"
             aria-label="Active filters"
         >
             {activeFilters.map(({ key, label }) => (
