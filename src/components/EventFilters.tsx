@@ -35,8 +35,10 @@ interface EventFiltersProps {
         door_price_max?: string;
         min_age?: string;
         is_benefit?: string;
+        series?: string;
     };
     onFilterChange: (filters: EventFiltersProps['filters']) => void;
+    showQuickFilters?: boolean;
 }
 
 // Add predefined date range options
@@ -69,7 +71,7 @@ const getDateRanges = () => {
     };
 };
 
-export default function EventFilters({ filters, onFilterChange }: EventFiltersProps) {
+export default function EventFilters({ filters, onFilterChange, showQuickFilters = true }: EventFiltersProps) {
     const { data: eventTypeOptions, isLoading: loadingEventTypes } = useSearchOptions(
         'event-types',
         '',
@@ -376,49 +378,62 @@ export default function EventFilters({ filters, onFilterChange }: EventFiltersPr
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-
-            <div className="space-y-2">
-
-                {/* Quick filter buttons */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleQuickFilter('today')}
-                        className="w-full"
-                    >
-                        Today
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleQuickFilter('week')}
-                        className="w-full"
-                    >
-                        This Week
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleQuickFilter('month')}
-                        className="w-full"
-                    >
-                        This Month
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleQuickFilter('weekend')}
-                        className="w-full"
-                    >
-                        Weekend
-                    </Button>
+                <div className="space-y-2">
+                    <Label htmlFor="Series">Series</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                            id="series"
+                            placeholder="Filter by series..."
+                            className="pl-9"
+                            value={filters.series}
+                            onChange={(e) => onFilterChange({ ...filters, series: e.target.value })}
+                        />
+                    </div>
                 </div>
-
             </div>
+
+            {showQuickFilters && (
+                <div className="space-y-2">
+
+                    {/* Quick filter buttons */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuickFilter('today')}
+                            className="w-full"
+                        >
+                            Today
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuickFilter('week')}
+                            className="w-full"
+                        >
+                            This Week
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuickFilter('month')}
+                            className="w-full"
+                        >
+                            This Month
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuickFilter('weekend')}
+                            className="w-full"
+                        >
+                            Weekend
+                        </Button>
+                    </div>
+
+                </div>
+            )}
 
         </div>
     );

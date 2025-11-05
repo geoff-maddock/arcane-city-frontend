@@ -143,6 +143,7 @@ const Calendar: React.FC = () => {
         <EventFilter
           filters={filters}
           onFilterChange={setFilters}
+          showQuickFilters={false}
         />
       </FilterContainer>
 
