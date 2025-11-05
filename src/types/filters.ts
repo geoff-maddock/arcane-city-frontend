@@ -22,6 +22,7 @@ export interface EventFilters {
     door_price_max?: string;
     min_age?: string;
     is_benefit?: string;
+    series?: string;
 }
 
 interface DateRange {

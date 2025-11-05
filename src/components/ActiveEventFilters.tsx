@@ -16,6 +16,14 @@ export function ActiveEventFilters({ filters, onRemoveFilter }: ActiveEventFilte
             activeFilters.push({ key: 'name', label: `Name: ${filters.name}` });
         }
 
+        if (filters.venue) {
+            activeFilters.push({ key: 'venue', label: `Venue: ${filters.venue}` });
+        }
+
+        if (filters.promoter) {
+            activeFilters.push({ key: 'promoter', label: `Promoter: ${filters.promoter}` });
+        }
+
         if (filters.entity) {
             activeFilters.push({ key: 'entity', label: `Entity: ${filters.entity}` });
         }
@@ -41,6 +49,10 @@ export function ActiveEventFilters({ filters, onRemoveFilter }: ActiveEventFilte
                 }
                 activeFilters.push({ key: 'start_at', label: `Date: ${dateRange.join(' ')}` });
             }
+        }
+
+        if (filters.series) {
+            activeFilters.push({ key: 'series', label: `Series: ${filters.series}` });
         }
 
         return activeFilters;
