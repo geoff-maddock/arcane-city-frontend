@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { authService } from '../services/auth.service';
@@ -30,12 +30,12 @@ const Radar: React.FC = () => {
     );
     const hasRecommendedEvents = recommendedEvents && recommendedEvents.length > 0;
 
-    const scrollToSection = (sectionId: string) => {
+    const scrollToSection = useCallback((sectionId: string) => {
         const element = document.getElementById(sectionId);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-    };
+    }, []);
 
     if (!user) {
         return (

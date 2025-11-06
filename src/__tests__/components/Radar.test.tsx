@@ -5,7 +5,8 @@ import Radar from '../../components/Radar';
 import { useQuery } from '@tanstack/react-query';
 import { useUserAttendingEvents, useUserRecommendedEvents, useRecentEvents } from '../../hooks/useRadar';
 import { UseQueryResult } from '@tanstack/react-query';
-import { PaginatedResponse, Event, User } from '../../types/api';
+import { PaginatedResponse, Event } from '../../types/api';
+import { User } from '../../types/auth';
 
 // Mock the hooks
 vi.mock('@tanstack/react-query', async () => {
@@ -39,12 +40,18 @@ Element.prototype.scrollIntoView = vi.fn();
 describe('Radar Component', () => {
     const mockUser: User = {
         id: 1,
-        username: 'testuser',
+        name: 'Test User',
         email: 'test@example.com',
+        status: { id: 1, name: 'active' },
+        email_verified_at: '2023-01-01',
+        last_active: null,
         created_at: '2023-01-01',
         updated_at: '2023-01-01',
-        followed_entities: [{ id: 1, name: 'Test Entity', slug: 'test-entity', entity_type: 'venue' }],
+        followed_entities: [{ id: 1, name: 'Test Entity', slug: 'test-entity' }],
         followed_tags: [{ id: 1, name: 'Test Tag', slug: 'test-tag' }],
+        followed_series: [],
+        followed_threads: [],
+        photos: [],
     };
 
     const mockAttendingEvents: PaginatedResponse<Event> = {
