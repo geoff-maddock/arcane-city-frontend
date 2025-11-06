@@ -10,6 +10,13 @@ interface PopularTagsProps {
     style?: 'future' | 'past';
 }
 
+const getScoreColor = (score: number): string => {
+    if (score >= 21) return 'text-red-600';
+    if (score >= 10) return 'text-orange-600';
+    if (score >= 5) return 'text-yellow-600';
+    return 'text-primary';
+};
+
 export default function PopularTags({ days = 60, limit = 5, style = 'future' }: PopularTagsProps) {
     const { data, isLoading, error } = usePopularTags({ days, limit, style });
 
@@ -52,24 +59,22 @@ export default function PopularTags({ days = 60, limit = 5, style = 'future' }: 
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <ul className="space-y-2">
-                    {data.data.map((tag) => (
-                        <li key={tag.id} className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-2">
+                    {data.data.map((tag) => {
+                        const score = tag.popularity_score || 0;
+                        const colorClass = getScoreColor(score);
+                        return (
                             <Link
+                                key={tag.id}
                                 to="/tags/$slug"
                                 params={{ slug: tag.slug }}
-                                className="text-primary hover:underline font-medium flex-1"
+                                className={`${colorClass} hover:underline font-medium`}
                             >
-                                {tag.name}
+                                {tag.name} [{score}]
                             </Link>
-                            {tag.popularity_score && (
-                                <span className="text-sm text-gray-500 ml-2">
-                                    {tag.popularity_score}
-                                </span>
-                            )}
-                        </li>
-                    ))}
-                </ul>
+                        );
+                    })}
+                </div>
             </CardContent>
         </Card>
     );

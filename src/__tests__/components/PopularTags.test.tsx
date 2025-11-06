@@ -59,14 +59,11 @@ describe('PopularTags', () => {
 
         render(<PopularTags />);
 
-        // Wait for the tags to load
-        expect(await screen.findByText('Electronic')).toBeInTheDocument();
+        // Wait for the tags to load - check for tag with score in brackets
+        expect(await screen.findByText(/Electronic \[16\]/)).toBeInTheDocument();
         expect(screen.getByText('Popular Tags')).toBeInTheDocument();
-        expect(screen.getByText('Punk')).toBeInTheDocument();
-        expect(screen.getByText('Indie')).toBeInTheDocument();
-        expect(screen.getByText('16')).toBeInTheDocument();
-        expect(screen.getByText('10')).toBeInTheDocument();
-        expect(screen.getByText('6')).toBeInTheDocument();
+        expect(screen.getByText(/Punk \[10\]/)).toBeInTheDocument();
+        expect(screen.getByText(/Indie \[6\]/)).toBeInTheDocument();
     });
 
     it('renders links to tag detail pages', async () => {
@@ -74,13 +71,13 @@ describe('PopularTags', () => {
 
         render(<PopularTags />);
 
-        const electronicLink = await screen.findByRole('link', { name: 'Electronic' });
+        const electronicLink = await screen.findByRole('link', { name: /Electronic \[16\]/ });
         expect(electronicLink).toHaveAttribute('href', '/tags/electronic');
 
-        const punkLink = screen.getByRole('link', { name: 'Punk' });
+        const punkLink = screen.getByRole('link', { name: /Punk \[10\]/ });
         expect(punkLink).toHaveAttribute('href', '/tags/punk');
 
-        const indieLink = screen.getByRole('link', { name: 'Indie' });
+        const indieLink = screen.getByRole('link', { name: /Indie \[6\]/ });
         expect(indieLink).toHaveAttribute('href', '/tags/indie');
     });
 
@@ -133,5 +130,32 @@ describe('PopularTags', () => {
         expect(searchParams.get('days')).toBe('30');
         expect(searchParams.get('limit')).toBe('10');
         expect(searchParams.get('style')).toBe('past');
+    });
+
+    it('applies correct color classes based on popularity score', async () => {
+        const mockDataWithVariedScores = {
+            data: [
+                { id: 1, name: 'HighScore', slug: 'high', popularity_score: 25 },
+                { id: 2, name: 'MediumScore', slug: 'medium', popularity_score: 15 },
+                { id: 3, name: 'LowScore', slug: 'low', popularity_score: 7 },
+                { id: 4, name: 'VeryLowScore', slug: 'verylow', popularity_score: 3 },
+            ],
+            current_page: 1,
+            last_page: 1,
+            per_page: 5,
+            total: 4,
+        };
+
+        vi.mocked(api.get).mockResolvedValue({ data: mockDataWithVariedScores });
+
+        const { container } = render(<PopularTags />);
+
+        await screen.findByText(/HighScore \[25\]/);
+
+        const links = container.querySelectorAll('a');
+        expect(links[0]).toHaveClass('text-red-600'); // 25 >= 21
+        expect(links[1]).toHaveClass('text-orange-600'); // 15 >= 10
+        expect(links[2]).toHaveClass('text-yellow-600'); // 7 >= 5
+        expect(links[3]).toHaveClass('text-primary'); // 3 < 5
     });
 });
