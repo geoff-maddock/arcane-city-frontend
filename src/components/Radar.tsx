@@ -30,6 +30,13 @@ const Radar: React.FC = () => {
     );
     const hasRecommendedEvents = recommendedEvents && recommendedEvents.length > 0;
 
+    const scrollToSection = (sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     if (!user) {
         return (
             <div className="container mx-auto px-4 py-8">
@@ -54,11 +61,57 @@ const Radar: React.FC = () => {
                 <p className="text-gray-600 dark:text-gray-400">
                     Stay up to date with events and activities that matter to you
                 </p>
+                
+                {/* Quick Links Navigation */}
+                <div className="mt-6 flex flex-wrap justify-center gap-2">
+                    {hasAttendingEvents && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => scrollToSection('attending-events')}
+                            className="flex items-center gap-1"
+                        >
+                            <HiCalendar className="text-blue-500" />
+                            <span>Your Events</span>
+                        </Button>
+                    )}
+                    {hasFollowedContent && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => scrollToSection('recommended-events')}
+                            className="flex items-center gap-1"
+                        >
+                            <HiTag className="text-green-500" />
+                            <span>Recommended</span>
+                        </Button>
+                    )}
+                    {!hasAttendingEvents && !hasFollowedContent && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => scrollToSection('get-started')}
+                            className="flex items-center gap-1"
+                        >
+                            <HiOfficeBuilding className="text-purple-500" />
+                            <span>Get Started</span>
+                        </Button>
+                    )}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => scrollToSection('recent-events')}
+                        className="flex items-center gap-1"
+                    >
+                        <HiCalendar className="text-gray-500" />
+                        <span>Recent Events</span>
+                    </Button>
+                </div>
             </div>
 
             {/* Events You're Attending */}
             {hasAttendingEvents && (
-                <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
+                <section id="attending-events" className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
                     <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                         <HiCalendar className="text-blue-500" />
                         Events You're Attending
@@ -85,7 +138,7 @@ const Radar: React.FC = () => {
 
             {/* Recommended Events Based on Follows */}
             {hasFollowedContent && (
-                <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
+                <section id="recommended-events" className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
                     <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                         <HiTag className="text-green-500" />
                         Recommended for You
@@ -122,7 +175,7 @@ const Radar: React.FC = () => {
 
             {/* Call to Action - shown when user has no activity */}
             {!hasAttendingEvents && !hasFollowedContent && (
-                <section className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg shadow p-8 text-center">
+                <section id="get-started" className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg shadow p-8 text-center">
                     <h2 className="text-2xl font-semibold mb-4">Get Started with Your Radar</h2>
                     <p className="text-gray-600 dark:text-gray-300 mb-6">
                         Personalize your experience by attending events and following your favorite entities and tags
@@ -151,7 +204,7 @@ const Radar: React.FC = () => {
             )}
 
             {/* Recently Added Events */}
-            <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
+            <section id="recent-events" className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-6">
                 <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                     <HiCalendar className="text-gray-500" />
                     Recently Added Events
