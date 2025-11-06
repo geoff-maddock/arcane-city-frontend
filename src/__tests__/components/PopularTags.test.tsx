@@ -132,7 +132,7 @@ describe('PopularTags', () => {
         expect(searchParams.get('style')).toBe('past');
     });
 
-    it('applies correct color classes based on popularity score', async () => {
+    it('applies correct background color classes based on popularity score', async () => {
         const mockDataWithVariedScores = {
             data: [
                 { id: 1, name: 'HighScore', slug: 'high', popularity_score: 25 },
@@ -152,10 +152,10 @@ describe('PopularTags', () => {
 
         await screen.findByText(/HighScore \[25\]/);
 
-        const links = container.querySelectorAll('a');
-        expect(links[0]).toHaveClass('text-red-600'); // 25 >= 21
-        expect(links[1]).toHaveClass('text-orange-600'); // 15 >= 10
-        expect(links[2]).toHaveClass('text-yellow-600'); // 7 >= 5
-        expect(links[3]).toHaveClass('text-primary'); // 3 < 5
+        const badges = container.querySelectorAll('.inline-flex');
+        expect(badges[0]).toHaveClass('bg-red-500'); // 25 >= 21
+        expect(badges[1]).toHaveClass('bg-orange-500'); // 15 >= 10
+        expect(badges[2]).toHaveClass('bg-yellow-500'); // 7 >= 5
+        expect(badges[3]).toHaveClass('bg-blue-500'); // 3 < 5
     });
 });
