@@ -1,4 +1,4 @@
-import { render, screen } from '../test-render';
+import { render, screen, waitFor } from '../test-render';
 import PopularTags from '../../components/PopularTags';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
@@ -113,8 +113,10 @@ describe('PopularTags', () => {
 
         const { container } = render(<PopularTags />);
 
-        await new Promise(resolve => setTimeout(resolve, 100));
-        expect(container.firstChild).toBeNull();
+        // Wait for the query to complete
+        await waitFor(() => {
+            expect(container.firstChild).toBeNull();
+        });
     });
 
     it('uses custom parameters', async () => {
