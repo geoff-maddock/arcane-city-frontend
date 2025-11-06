@@ -169,6 +169,7 @@ export interface Tag {
     tag_type_id?: number;
     tag_type?: TagType;
     created_by?: number;
+    popularity_score?: number;
 }
 
 export interface RelatedTags {
