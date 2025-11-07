@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 import { authService } from '@/services/auth.service';
 import { useQuery } from '@tanstack/react-query';
+import PopularTags from './PopularTags';
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
@@ -101,6 +102,8 @@ export default function Tags() {
                                     <Link to="/tag/create">Create Tag</Link>
                                 </Button>
                             )}
+
+                            <PopularTags days={60} limit={5} style="future" />
                         </div>
 
                         <FilterContainer
