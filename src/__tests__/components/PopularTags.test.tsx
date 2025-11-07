@@ -1,18 +1,23 @@
 import { render, screen, waitFor } from '../test-render';
 import PopularTags from '../../components/PopularTags';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import React from 'react';
 import { api } from '../../lib/api';
 
 vi.mock('@tanstack/react-router', () => ({
-    Link: ({ children, to, params, ...props }: { children: React.ReactNode; to: string; params?: { slug: string };[key: string]: unknown }) => (
-        <a href={params ? `/tags/${params.slug}` : to} {...props}>{children}</a>
-    ),
+    useNavigate: () => vi.fn(),
 }));
 
 vi.mock('../../lib/api', () => ({
     api: {
         get: vi.fn(),
+        post: vi.fn(),
+    },
+}));
+
+vi.mock('../../services/auth.service', () => ({
+    authService: {
+        getCurrentUser: vi.fn(),
+        isAuthenticated: () => false,
     },
 }));
 
@@ -52,11 +57,26 @@ describe('PopularTags', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        
+        // Default mock for all API calls to return empty responses
+        vi.mocked(api.get).mockImplementation((url: string) => {
+            if (url.includes('/tags/popular')) {
+                return Promise.resolve({ data: mockPopularTagsResponse });
+            }
+            // Mock responses for tag images and upcoming events
+            return Promise.resolve({
+                data: {
+                    data: [],
+                    current_page: 1,
+                    last_page: 1,
+                    per_page: 1,
+                    total: 0,
+                },
+            });
+        });
     });
 
-    it('renders popular tags with popularity scores', async () => {
-        vi.mocked(api.get).mockResolvedValue({ data: mockPopularTagsResponse });
-
+    it('renders popular tags using EnhancedTagCard', async () => {
         render(<PopularTags />);
 
         // Wait for the tags to load
@@ -70,15 +90,13 @@ describe('PopularTags', () => {
 
         // Verify the links exist and have correct href
         const links = screen.getAllByRole('link');
-        expect(links).toHaveLength(3);
+        expect(links.length).toBeGreaterThanOrEqual(3);
         expect(links[0]).toHaveAttribute('href', '/tags/electronic');
         expect(links[1]).toHaveAttribute('href', '/tags/punk');
         expect(links[2]).toHaveAttribute('href', '/tags/indie');
     });
 
     it('renders links to tag detail pages', async () => {
-        vi.mocked(api.get).mockResolvedValue({ data: mockPopularTagsResponse });
-
         render(<PopularTags />);
 
         const electronicLink = await screen.findByRole('link', { name: /Electronic/ });
@@ -127,14 +145,17 @@ describe('PopularTags', () => {
     });
 
     it('uses custom parameters', async () => {
-        vi.mocked(api.get).mockResolvedValue({ data: mockPopularTagsResponse });
-
         render(<PopularTags days={30} limit={10} style="past" />);
 
         await screen.findByText('Popular Tags');
 
-        const apiCall = vi.mocked(api.get).mock.calls[0];
-        const url = apiCall[0] as string;
+        // Find the popular tags API call
+        const popularTagsCall = vi.mocked(api.get).mock.calls.find(call => 
+            (call[0] as string).includes('/tags/popular')
+        );
+        
+        expect(popularTagsCall).toBeDefined();
+        const url = popularTagsCall![0] as string;
         const searchParams = new URLSearchParams(url.split('?')[1]);
 
         expect(searchParams.get('days')).toBe('30');
@@ -142,7 +163,7 @@ describe('PopularTags', () => {
         expect(searchParams.get('style')).toBe('past');
     });
 
-    it('applies correct background color classes based on popularity score', async () => {
+    it('renders tags with EnhancedTagCard grid layout', async () => {
         const mockDataWithVariedScores = {
             data: [
                 { id: 1, name: 'HighScore', slug: 'high', popularity_score: 25 },
@@ -156,18 +177,27 @@ describe('PopularTags', () => {
             total: 4,
         };
 
-        vi.mocked(api.get).mockResolvedValue({ data: mockDataWithVariedScores });
+        vi.mocked(api.get).mockImplementation((url: string) => {
+            if (url.includes('/tags/popular')) {
+                return Promise.resolve({ data: mockDataWithVariedScores });
+            }
+            return Promise.resolve({
+                data: { data: [], current_page: 1, last_page: 1, per_page: 1, total: 0 },
+            });
+        });
 
         const { container } = render(<PopularTags />);
 
         await screen.findByText(/HighScore/);
 
-        const badges = container.querySelectorAll('.inline-flex');
-        // Note: Current implementation uses same style for all tags
-        // These assertions verify the badges are rendered with consistent styling
-        expect(badges[0]).toHaveClass('bg-gray-100'); // All use gray background
-        expect(badges[1]).toHaveClass('bg-gray-100');
-        expect(badges[2]).toHaveClass('bg-gray-100');
-        expect(badges[3]).toHaveClass('bg-gray-100');
+        // Verify tags are rendered as cards in a grid
+        const grid = container.querySelector('.grid');
+        expect(grid).toBeInTheDocument();
+        
+        // All tag names should be present
+        expect(screen.getByText('HighScore')).toBeInTheDocument();
+        expect(screen.getByText('MediumScore')).toBeInTheDocument();
+        expect(screen.getByText('LowScore')).toBeInTheDocument();
+        expect(screen.getByText('VeryLowScore')).toBeInTheDocument();
     });
 });
