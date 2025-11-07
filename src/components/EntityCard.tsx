@@ -11,7 +11,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
 import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { sanitizeEmbed } from '../lib/sanitize';
 
 

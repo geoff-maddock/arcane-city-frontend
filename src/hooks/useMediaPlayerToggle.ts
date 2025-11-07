@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 
 interface UseMediaPlayerToggleOptions {
     /**

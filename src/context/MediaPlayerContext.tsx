@@ -1,12 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface MediaPlayerContextType {
-  mediaPlayersEnabled: boolean;
-  setMediaPlayersEnabled: (enabled: boolean) => void;
-  toggleMediaPlayers: () => void;
-}
-
-const MediaPlayerContext = createContext<MediaPlayerContextType | undefined>(undefined);
+import React, { useState, useEffect, ReactNode } from 'react';
+import { MediaPlayerContext } from './MediaPlayerContextDefinition';
 
 interface MediaPlayerProviderProps {
   children: ReactNode;
@@ -54,12 +47,4 @@ export const MediaPlayerProvider: React.FC<MediaPlayerProviderProps> = ({
       {children}
     </MediaPlayerContext.Provider>
   );
-};
-
-export const useMediaPlayerContext = (): MediaPlayerContextType => {
-  const context = useContext(MediaPlayerContext);
-  if (context === undefined) {
-    throw new Error('useMediaPlayerContext must be used within a MediaPlayerProvider');
-  }
-  return context;
 };

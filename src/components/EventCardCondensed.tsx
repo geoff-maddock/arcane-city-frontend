@@ -13,7 +13,7 @@ import { authService } from '../services/auth.service';
 import { api } from '../lib/api';
 import { EventFilterContext } from '../context/EventFilterContext';
 import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { sanitizeEmbed } from '../lib/sanitize';
 
 interface EventCardProps {

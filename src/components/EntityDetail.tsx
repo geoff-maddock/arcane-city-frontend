@@ -17,7 +17,7 @@ import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { useBackNavigation } from '../context/NavigationContext';
 // SEO handled at route level
 import {
