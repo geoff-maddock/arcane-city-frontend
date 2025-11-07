@@ -17,7 +17,7 @@ import { SocialLinks } from './SocialLinks';
 import EntityLocations from './EntityLocations';
 import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { useBackNavigation } from '../context/NavigationContext';
 // SEO handled at route level
 import {
@@ -134,7 +134,6 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                 setEmbedsLoading(true);
                 try {
                     const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
-                    console.log('Fetched embeds:', response.data.data, 'Length:', response.data.data.length);
                     setEmbeds(response.data.data);
                 } catch (err) {
                     console.error('Error fetching embeds:', err);

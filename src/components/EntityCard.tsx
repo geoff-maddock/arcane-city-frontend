@@ -11,7 +11,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useState, useEffect } from 'react';
 import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { sanitizeEmbed } from '../lib/sanitize';
 
 
@@ -72,7 +72,6 @@ const EntityCard = ({ entity, allImages, imageIndex }: EntityCardProps) => {
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        console.log('Navigating to entity from entity card handle click:', entity.slug);
         navigate({
             to: '/entities/$entitySlug',
             params: { entitySlug: entity.slug }

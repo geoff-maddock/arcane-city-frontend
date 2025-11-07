@@ -64,7 +64,6 @@ export function useMinimalEmbeds({
             const endpoint = `/${resourceType}/${slug}/minimal-embeds`;
             const response = await api.get<{ data: string[] }>(endpoint);
             const embedsData = response.data.data || [];
-            console.log(`Fetched ${resourceType} embeds for ${slug}:`, embedsData, 'Length:', embedsData.length);
             setEmbeds(embedsData);
         } catch (err) {
             console.error(`Error fetching ${resourceType} embeds for ${slug}:`, err);

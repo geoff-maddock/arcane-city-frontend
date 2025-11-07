@@ -13,7 +13,6 @@ export const useUserAttendingEvents = () => {
     return useQuery<PaginatedResponse<Event>>({
         queryKey: ['userAttendingEvents', user?.id],
         queryFn: async () => {
-            console.log('Fetching user attending events for user:', user?.id);
             if (!user?.id) throw new Error('User ID not available');
 
             const params = new URLSearchParams();

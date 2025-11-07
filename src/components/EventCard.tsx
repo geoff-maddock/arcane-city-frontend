@@ -15,7 +15,7 @@ import { EventFilterContext } from '../context/EventFilterContext';
 import { useState, useEffect } from 'react';
 import { sanitizeEmbed } from '../lib/sanitize';
 import { useMinimalEmbeds } from '../hooks/useMinimalEmbeds';
-import { useMediaPlayerContext } from '../context/MediaPlayerContext';
+import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 
 
 interface EventCardProps {
