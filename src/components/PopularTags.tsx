@@ -1,6 +1,5 @@
 import { usePopularTags } from '../hooks/usePopularTags';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Link } from '@tanstack/react-router';
 import { Loader2, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,13 +9,6 @@ interface PopularTagsProps {
     limit?: number;
     style?: 'future' | 'past';
 }
-
-const getScoreBackgroundColor = (score: number): string => {
-    if (score >= 21) return 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700';
-    if (score >= 10) return 'bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700';
-    if (score >= 5) return 'bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700';
-    return 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700';
-};
 
 export default function PopularTags({ days = 60, limit = 5, style = 'future' }: PopularTagsProps) {
     const { data, isLoading, error } = usePopularTags({ days, limit, style });
@@ -63,18 +55,16 @@ export default function PopularTags({ days = 60, limit = 5, style = 'future' }: 
                 <div className="flex flex-wrap gap-2">
                     {data.data.map((tag) => {
                         const score = tag.popularity_score || 0;
-                        const bgColorClass = getScoreBackgroundColor(score);
                         return (
                             <Link
                                 key={tag.id}
                                 to="/tags/$slug"
                                 params={{ slug: tag.slug }}
+                                className={`inline-flex items-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 transition-colors border border-gray-200 dark:border-slate-600`}
                             >
-                                <Badge
-                                    className={`${bgColorClass} text-white border-transparent cursor-pointer transition-colors`}
-                                >
-                                    {tag.name} [{score}]
-                                </Badge>
+
+                                {tag.name} ({score})
+
                             </Link>
                         );
                     })}

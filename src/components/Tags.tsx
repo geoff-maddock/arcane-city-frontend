@@ -102,6 +102,8 @@ export default function Tags() {
                                     <Link to="/tag/create">Create Tag</Link>
                                 </Button>
                             )}
+
+                            <PopularTags days={60} limit={5} style="future" />
                         </div>
 
                         <FilterContainer
@@ -112,8 +114,6 @@ export default function Tags() {
                         >
                             <TagFilters filters={filters} onFilterChange={setFilters} />
                         </FilterContainer>
-
-                        <PopularTags days={60} limit={5} style="future" />
 
                         {error ? (
                             <Alert variant="destructive">
