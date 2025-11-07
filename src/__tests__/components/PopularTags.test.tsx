@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from '../test-render';
 import PopularTags from '../../components/PopularTags';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import React from 'react';
 import { api } from '../../lib/api';
 
 vi.mock('@tanstack/react-router', () => ({

@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '../test-render';
 import EnhancedTagCard from '../../components/EnhancedTagCard';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { api } from '../../lib/api';
-import React from 'react';
 
 vi.mock('@tanstack/react-router', () => ({
     useNavigate: () => vi.fn(),
@@ -286,7 +285,7 @@ describe('EnhancedTagCard', () => {
     });
 
     it('renders without upcoming events', async () => {
-        vi.mocked(api.get).mockImplementation((url: string) => {
+        vi.mocked(api.get).mockImplementation(() => {
             return Promise.resolve({
                 data: {
                     data: [],

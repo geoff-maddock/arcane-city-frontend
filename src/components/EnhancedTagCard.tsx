@@ -16,7 +16,9 @@ interface EnhancedTagCardProps {
 export default function EnhancedTagCard({ tag }: EnhancedTagCardProps) {
     const navigate = useNavigate();
     const { url, alt } = useTagImage(tag.slug);
-    const placeholder = `${window.location.origin}/event-placeholder.png`;
+    const placeholder = typeof window !== 'undefined' 
+        ? `${window.location.origin}/event-placeholder.png` 
+        : '/event-placeholder.png';
     
     // Fetch upcoming events for this tag
     const { data: upcomingEvents = [] } = useTagUpcomingEvents({ 
@@ -127,15 +129,15 @@ export default function EnhancedTagCard({ tag }: EnhancedTagCardProps) {
                                     alt={event.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
-                                {/* Event Type Tooltip on Hover */}
-                                {event.event_type && (
-                                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
-                                        <div className="text-white text-center text-xs">
-                                            <p className="font-semibold line-clamp-2">{event.name}</p>
+                                {/* Event Name and Type Overlay on Hover */}
+                                <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
+                                    <div className="text-white text-center text-xs">
+                                        <p className="font-semibold line-clamp-2">{event.name}</p>
+                                        {event.event_type && (
                                             <p className="text-gray-300 mt-1">{event.event_type.name}</p>
-                                        </div>
+                                        )}
                                     </div>
-                                )}
+                                </div>
                             </div>
                         ))}
                     </div>
