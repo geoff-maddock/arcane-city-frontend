@@ -1,8 +1,8 @@
 import { usePopularTags } from '../hooks/usePopularTags';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from '@tanstack/react-router';
 import { Loader2, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import EnhancedTagCard from './EnhancedTagCard';
 
 interface PopularTagsProps {
     days?: number;
@@ -44,32 +44,16 @@ export default function PopularTags({ days = 60, limit = 5, style = 'future' }: 
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Popular Tags
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="flex flex-wrap gap-2">
-                    {data.data.map((tag) => {
-                        const score = tag.popularity_score || 0;
-                        return (
-                            <Link
-                                key={tag.id}
-                                to="/tags/$slug"
-                                params={{ slug: tag.slug }}
-                                className={`inline-flex items-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 transition-colors border border-gray-200 dark:border-slate-600`}
-                            >
-
-                                {tag.name} ({score})
-
-                            </Link>
-                        );
-                    })}
-                </div>
-            </CardContent>
-        </Card>
+        <div className="space-y-4">
+            <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                <h2 className="text-xl font-semibold">Popular Tags</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {data.data.map((tag) => (
+                    <EnhancedTagCard key={tag.id} tag={tag} />
+                ))}
+            </div>
+        </div>
     );
 }
