@@ -15,6 +15,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           // Vendor chunks for better caching
+          // NOTE: This list should be maintained when adding/removing major dependencies
           'react-vendor': ['react', 'react-dom'],
           'tanstack-vendor': ['@tanstack/react-query', '@tanstack/react-router'],
           'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-label', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-slot', '@radix-ui/react-switch'],

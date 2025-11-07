@@ -11,21 +11,37 @@ if (!envValidation.isValid) {
   console.error('Environment configuration errors:');
   envValidation.errors.forEach(error => console.error(`  - ${error}`));
   
-  // Show error in the UI
+  // Show error in the UI (using textContent to prevent XSS)
   const root = document.getElementById('root');
   if (root) {
-    root.innerHTML = `
-      <div style="padding: 20px; font-family: system-ui, -apple-system, sans-serif;">
-        <h1 style="color: #e11d48;">Configuration Error</h1>
-        <p>The application cannot start due to missing environment configuration.</p>
-        <ul style="color: #991b1b;">
-          ${envValidation.errors.map(err => `<li>${err}</li>`).join('')}
-        </ul>
-        <p style="margin-top: 20px; color: #64748b;">
-          Please check your .env file and ensure all required variables are set.
-        </p>
-      </div>
-    `;
+    const container = document.createElement('div');
+    container.style.cssText = 'padding: 20px; font-family: system-ui, -apple-system, sans-serif;';
+    
+    const title = document.createElement('h1');
+    title.style.color = '#e11d48';
+    title.textContent = 'Configuration Error';
+    
+    const description = document.createElement('p');
+    description.textContent = 'The application cannot start due to missing environment configuration.';
+    
+    const errorList = document.createElement('ul');
+    errorList.style.color = '#991b1b';
+    envValidation.errors.forEach(err => {
+      const li = document.createElement('li');
+      li.textContent = err;
+      errorList.appendChild(li);
+    });
+    
+    const help = document.createElement('p');
+    help.style.cssText = 'margin-top: 20px; color: #64748b;';
+    help.textContent = 'Please check your .env file and ensure all required variables are set.';
+    
+    container.appendChild(title);
+    container.appendChild(description);
+    container.appendChild(errorList);
+    container.appendChild(help);
+    
+    root.appendChild(container);
   }
   throw new Error('Environment validation failed');
 }

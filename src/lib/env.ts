@@ -63,12 +63,6 @@ export function validateEnvironment(): ValidationResult {
 export function getEnvironmentConfig(): EnvConfig {
   const validation = validateEnvironment();
 
-  // Log warnings to console
-  if (validation.warnings.length > 0) {
-    console.warn('Environment configuration warnings:');
-    validation.warnings.forEach(warning => console.warn(`  - ${warning}`));
-  }
-
   // Throw error if validation fails
   if (!validation.isValid) {
     const errorMessage = [
