@@ -1,4 +1,3 @@
-import React from 'react';
 import { Users, Warehouse, LucideIcon } from 'lucide-react';
 
 interface EntityTypeIconProps {
@@ -14,11 +13,11 @@ interface EntityTypeIconProps {
  * @param className - Additional CSS classes to apply to the icon
  * @param size - Predefined size variants (sm: h-4 w-4, md: h-5 w-5, lg: h-6 w-6)
  */
-export const EntityTypeIcon: React.FC<EntityTypeIconProps> = ({
+export const EntityTypeIcon = ({
     entityTypeName,
     className = '',
     size = 'md'
-}) => {
+}: EntityTypeIconProps) => {
     // Map entity types to their appropriate icons
     const getIconComponent = (): LucideIcon => {
         switch (entityTypeName) {

@@ -1,12 +1,10 @@
-import React from 'react';
-
 export interface ErrorSummaryData { fieldCount: number; messages: string[] }
 interface ValidationSummaryProps {
     errorSummary?: ErrorSummaryData | null;
     className?: string;
 }
 
-export const ValidationSummary: React.FC<ValidationSummaryProps> = ({ errorSummary, className }) => {
+export const ValidationSummary = ({ errorSummary, className }: ValidationSummaryProps) => {
     if (!errorSummary) return null;
     const { fieldCount, messages } = errorSummary;
     return (

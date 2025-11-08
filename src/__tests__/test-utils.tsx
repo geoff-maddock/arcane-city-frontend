@@ -1,4 +1,3 @@
-import React from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createTestQueryClient } from './test-query-client';
 import { MediaPlayerProvider } from '../context/MediaPlayerContext';
@@ -8,7 +7,7 @@ interface AllTheProvidersProps {
     children: React.ReactNode;
 }
 
-export const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
+export const AllTheProviders = ({ children }: AllTheProvidersProps) => {
     const queryClient = createTestQueryClient();
 
     return (

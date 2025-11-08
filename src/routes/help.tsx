@@ -1,8 +1,7 @@
-import React from 'react';
 import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './root';
 
-const Help: React.FC = () => (
+const Help = () => (
     <div className="min-h-[calc(100vh-4rem)] xl:min-h-screen w-full bg-white dark:bg-black transition-colors">
         <div className="max-w-4xl mx-auto p-6 xl:p-8 space-y-8">
             <h1 className="text-4xl font-bold tracking-tight">Help & FAQ</h1>

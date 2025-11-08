@@ -1,4 +1,3 @@
-import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
@@ -10,7 +9,7 @@ interface SortControlsProps {
     sortOptions: { value: string; label: string }[];
 }
 
-const SortControls: React.FC<SortControlsProps> = ({ sort, setSort, direction, setDirection, sortOptions }) => {
+const SortControls = ({ sort, setSort, direction, setDirection, sortOptions }: SortControlsProps) => {
     return (
 
         <div className="flex items-center gap-1 sm:gap-2">
