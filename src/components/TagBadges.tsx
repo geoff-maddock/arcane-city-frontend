@@ -1,4 +1,3 @@
-import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Link as LinkIcon } from 'lucide-react';
@@ -13,7 +12,7 @@ interface TagBadgesProps {
   indexPath?: '/events' | '/entities';
 }
 
-export const TagBadges: React.FC<TagBadgesProps> = ({ tags, onClick, indexPath = '/events' }) => {
+export const TagBadges = ({ tags, onClick, indexPath = '/events' }: TagBadgesProps) => {
   const navigate = useNavigate();
   if (!tags || tags.length === 0) return null;
 

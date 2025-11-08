@@ -1,4 +1,3 @@
-import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Link as LinkIcon } from 'lucide-react';
@@ -8,7 +7,7 @@ interface EntityBadgesProps {
   onClick?: (name: string) => void;
 }
 
-export const EntityBadges: React.FC<EntityBadgesProps> = ({ entities, onClick }) => {
+export const EntityBadges = ({ entities, onClick }: EntityBadgesProps) => {
   const navigate = useNavigate();
   if (!entities || entities.length === 0) return null;
 

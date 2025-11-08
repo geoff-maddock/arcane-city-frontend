@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Calendar as FullCalendar, dateFnsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
@@ -61,7 +60,7 @@ const Calendar: React.FC = () => {
     filters: debouncedFilters
   });
 
-  const formattedEvents = React.useMemo(() => {
+  const formattedEvents = useMemo(() => {
     if (!events?.data) {
       return [];
     }

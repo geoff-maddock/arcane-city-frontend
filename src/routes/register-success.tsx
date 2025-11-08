@@ -1,4 +1,3 @@
-import React from 'react';
 import { createRoute, Link, useSearch } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import { Button } from '../components/ui/button';
@@ -8,7 +7,7 @@ interface SuccessSearch {
   email?: string;
 }
 
-const RegisterSuccess: React.FC = () => {
+const RegisterSuccess = () => {
   const { name, email } = useSearch({ from: '/register/success' }) as SuccessSearch;
 
   return (

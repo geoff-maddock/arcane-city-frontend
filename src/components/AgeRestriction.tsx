@@ -1,5 +1,4 @@
 import { Users } from 'lucide-react';
-import React from 'react';
 
 interface AgeRestrictionProps {
   minAge: number | null | undefined;
@@ -19,7 +18,7 @@ const getAgeRestrictionText = (minAge: number | null | undefined): string => {
   }
 };
 
-export const AgeRestriction: React.FC<AgeRestrictionProps> = ({ minAge }) => (
+export const AgeRestriction = ({ minAge }: AgeRestrictionProps) => (
   <div className="flex items-center text-sm text-gray-500">
     <Users className="mr-2 h-4 w-4" />
     {getAgeRestrictionText(minAge)}

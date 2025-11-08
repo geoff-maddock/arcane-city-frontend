@@ -1,8 +1,7 @@
-import React from 'react';
 import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './root';
 
-const Privacy: React.FC = () => (
+const Privacy = () => (
   <div className="min-h-[calc(100vh-4rem)] xl:min-h-screen w-full bg-white dark:bg-black transition-colors">
     <div className="max-w-3xl mx-auto p-6 xl:p-8 space-y-6">
       <h1 className="text-4xl font-bold tracking-tight">Privacy</h1>

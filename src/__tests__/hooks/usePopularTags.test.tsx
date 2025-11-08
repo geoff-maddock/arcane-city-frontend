@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { usePopularTags } from '../../hooks/usePopularTags';
 import { api } from '../../lib/api';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import { ReactNode } from 'react';
 
 // Mock the API
 vi.mock('../../lib/api', () => ({
@@ -76,7 +76,7 @@ describe('usePopularTags', () => {
         queryClient.clear();
     });
 
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
+    const wrapper = ({ children }: { children: ReactNode }) => (
         <QueryClientProvider client={queryClient}>
             {children}
         </QueryClientProvider>

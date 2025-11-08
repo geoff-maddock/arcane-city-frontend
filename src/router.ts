@@ -1,9 +1,5 @@
-import { createRouter, createRoute, redirect } from '@tanstack/react-router';
+import { createRouter, createRoute, redirect, lazyRouteComponent } from '@tanstack/react-router';
 import { rootRoute } from './routes/root';
-import Events from './components/Events';
-import Entities from './components/Entities';
-import Series from './components/Series';
-import Tags from './components/Tags';
 import { EventDetailRoute } from './routes/event-detail.tsx';
 import { EntityDetailRoute } from './routes/entity-detail.tsx';
 import { SeriesDetailRoute } from './routes/series-detail.tsx';
@@ -19,7 +15,6 @@ import { SeriesCreateRoute } from './routes/series-create.tsx';
 import { SeriesEditRoute } from './routes/series-edit.tsx';
 import { EntityCreateRoute } from './routes/entity-create.tsx';
 import { EntityEditRoute } from './routes/entity-edit.tsx';
-import Account from './routes/account';
 import { AccountEditRoute } from './routes/account-edit.tsx';
 import { LoginRoute } from './routes/login';
 import { RegisterRoute } from './routes/register';
@@ -27,7 +22,6 @@ import { RegisterSuccessRoute } from './routes/register-success';
 import { PasswordRecoveryRoute } from './routes/password-recovery';
 import { PasswordResetRoute } from './routes/password-reset';
 import { EmailVerifyRoute } from './routes/email-verify';
-import Calendar from './components/Calendar';
 import { AboutRoute } from './routes/about';
 import { PrivacyRoute } from './routes/privacy';
 import { HelpRoute } from './routes/help';
@@ -35,10 +29,18 @@ import { RadarRoute } from './routes/radar';
 import { authService } from './services/auth.service';
 import { SearchRoute } from './routes/search';
 import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
-import YourCalendar from './components/YourCalendar';
-import YourEntities from './components/YourEntities';
 import { EventGridRoute } from './routes/event-grid';
 import { ActivityRoute } from './routes/activity';
+
+// Lazy load main list components for better code splitting
+const Events = lazyRouteComponent(() => import('./components/Events'));
+const Entities = lazyRouteComponent(() => import('./components/Entities'));
+const Series = lazyRouteComponent(() => import('./components/Series'));
+const Tags = lazyRouteComponent(() => import('./components/Tags'));
+const Calendar = lazyRouteComponent(() => import('./components/Calendar'));
+const YourCalendar = lazyRouteComponent(() => import('./components/YourCalendar'));
+const YourEntities = lazyRouteComponent(() => import('./components/YourEntities'));
+const Account = lazyRouteComponent(() => import('./routes/account'));
 
 // Create routes
 const indexRoute = createRoute({

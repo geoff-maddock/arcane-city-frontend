@@ -1,4 +1,3 @@
-import React from 'react';
 import { Input } from '@/components/ui/input';
 
 export interface OptionItem { id: number; name: string }
@@ -22,7 +21,7 @@ interface TagEntityMultiSelectProps {
  * Commits selection immediately on exact match (e.g., clicking datalist option),
  * or on blur/Enter if exact name match found.
  */
-export const TagEntityMultiSelect: React.FC<TagEntityMultiSelectProps> = ({
+export const TagEntityMultiSelect = ({
     label,
     datalistId,
     query,
@@ -34,7 +33,7 @@ export const TagEntityMultiSelect: React.FC<TagEntityMultiSelectProps> = ({
     setSelected,
     placeholder,
     ariaLabelRemove = 'Remove'
-}) => {
+}: TagEntityMultiSelectProps) => {
     const commit = (value: string) => {
         if (!value) return;
         const opt = options?.find(o => o.name === value);

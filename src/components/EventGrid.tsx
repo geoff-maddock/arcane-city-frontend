@@ -1,4 +1,3 @@
-import React from 'react';
 import EventCardGrid from './EventCardGrid';
 import { Event } from '../types/api';
 
@@ -17,7 +16,7 @@ interface EventGridProps {
  * - Compact event listings
  * - Mobile-friendly layouts
  */
-const EventGrid: React.FC<EventGridProps> = ({ events, allImages }) => {
+const EventGrid = ({ events, allImages }: EventGridProps) => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
             {events.map((event, index) => (
