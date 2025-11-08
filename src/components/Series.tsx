@@ -110,6 +110,26 @@ export default function Series() {
         });
     };
 
+    const handleResetFilters = () => {
+        setFilters({
+            name: '',
+            venue: '',
+            promoter: '',
+            event_type: '',
+            entity: '',
+            tag: '',
+            founded_at: {
+                start: undefined,
+                end: undefined
+            },
+            occurrence_type: '',
+            occurrence_week: '',
+            occurrence_day: ''
+        });
+        setSort('created_at');
+        setDirection('asc');
+    };
+
     const allSeriesImages = data?.data
         .filter(series => series.primary_photo && series.primary_photo_thumbnail)
         .map(series => ({
@@ -180,6 +200,7 @@ export default function Series() {
                             onToggleFilters={toggleFilters}
                             hasActiveFilters={hasActiveFilters}
                             onClearAllFilters={handleClearAllFilters}
+                            onResetFilters={handleResetFilters}
                             activeFiltersComponent={
                                 <ActiveFilters
                                     filters={filters}

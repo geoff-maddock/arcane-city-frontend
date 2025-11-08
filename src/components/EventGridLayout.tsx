@@ -175,6 +175,29 @@ export default function EventGridLayout() {
         });
     };
 
+    const handleResetFilters = () => {
+        setFilters({
+            name: '',
+            venue: '',
+            promoter: '',
+            event_type: '',
+            entity: '',
+            tag: '',
+            start_at: {
+                start: getTodayStart(),
+                end: undefined
+            },
+            presale_price_min: '',
+            presale_price_max: '',
+            door_price_min: '',
+            door_price_max: '',
+            min_age: '',
+            is_benefit: undefined
+        });
+        setSort('start_at');
+        setDirection('asc');
+    };
+
     // Create array of all event images
     const allEventImages = (data?.data ?? [])
         .filter(event => event.primary_photo && event.primary_photo_thumbnail)
@@ -250,6 +273,7 @@ export default function EventGridLayout() {
                             onToggleFilters={toggleFilters}
                             hasActiveFilters={hasActiveFilters}
                             onClearAllFilters={handleClearAllFilters}
+                            onResetFilters={handleResetFilters}
                             activeFiltersComponent={
                                 <ActiveFilters
                                     filters={filters}
