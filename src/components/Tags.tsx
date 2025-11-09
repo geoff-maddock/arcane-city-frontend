@@ -89,6 +89,12 @@ export default function Tags() {
         setFilters({ name: '' });
     };
 
+    const handleResetFilters = () => {
+        setFilters({ name: '' });
+        setSort('name');
+        setDirection('asc');
+    };
+
     return (
         <TagFilterContext.Provider value={{ filters, setFilters }}>
             <div className="bg-background text-foreground min-h-screen md:p-4 p-2">
@@ -111,6 +117,7 @@ export default function Tags() {
                             onToggleFilters={toggleFilters}
                             hasActiveFilters={hasActiveFilters}
                             onClearAllFilters={handleClearAllFilters}
+                            onResetFilters={handleResetFilters}
                         >
                             <TagFilters filters={filters} onFilterChange={setFilters} />
                         </FilterContainer>

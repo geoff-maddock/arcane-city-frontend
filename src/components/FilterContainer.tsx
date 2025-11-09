@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, RotateCcw } from 'lucide-react';
 import { FilterToggleButton } from './FilterToggleButton';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +23,10 @@ interface FilterContainerProps {
      */
     onClearAllFilters: () => void;
     /**
+     * Optional function to reset filters to their default values
+     */
+    onResetFilters?: () => void;
+    /**
      * The filter form content to display when filters are visible
      */
     children: ReactNode;
@@ -38,21 +42,27 @@ interface FilterContainerProps {
      * Text for the clear all button. Defaults to "Clear All"
      */
     clearAllText?: string;
+    /**
+     * Text for the reset button. Defaults to "Reset"
+     */
+    resetText?: string;
 }
 
 /**
  * A standardized container component that wraps filter controls with consistent layout and behavior.
- * Handles the toggle button, clear all functionality, and responsive filter display.
+ * Handles the toggle button, clear all functionality, reset functionality, and responsive filter display.
  */
 export function FilterContainer({
     filtersVisible,
     onToggleFilters,
     hasActiveFilters,
     onClearAllFilters,
+    onResetFilters,
     children,
     activeFiltersComponent,
     className,
-    clearAllText = "Clear All"
+    clearAllText = "Clear All",
+    resetText = "Reset"
 }: FilterContainerProps) {
     return (
         <div className={cn("relative", className)}>
@@ -65,18 +75,33 @@ export function FilterContainer({
                         size="sm"
                     />
 
-                    {/* Clear all button */}
-                    {hasActiveFilters && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onClearAllFilters}
-                            className="shrink-0 text-gray-500 hover:text-gray-900"
-                        >
-                            {clearAllText}
-                            <X className="ml-2 h-4 w-4" />
-                        </Button>
-                    )}
+                    <div className="flex items-center gap-2">
+                        {/* Clear all button */}
+                        {hasActiveFilters && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={onClearAllFilters}
+                                className="shrink-0 text-gray-500 hover:text-gray-900"
+                            >
+                                {clearAllText}
+                                <X className="ml-2 h-4 w-4" />
+                            </Button>
+                        )}
+
+                        {/* Reset button */}
+                        {onResetFilters && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={onResetFilters}
+                                className="shrink-0 text-gray-600 hover:text-gray-900"
+                            >
+                                {resetText}
+                                <RotateCcw className="ml-2 h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Show active filters when collapsed - full width on its own row */}

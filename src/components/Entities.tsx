@@ -114,6 +114,26 @@ export default function Entities() {
         });
     };
 
+    const handleResetFilters = () => {
+        setFilters({
+            name: '',
+            entity_type: '',
+            role: '',
+            entity_status: '',
+            tag: '',
+            created_at: {
+                start: undefined,
+                end: undefined
+            },
+            started_at: {
+                start: undefined,
+                end: undefined
+            }
+        });
+        setSort('created_at');
+        setDirection('desc');
+    };
+
     // Create array of all entity images
     const allEntityImages = data?.data
         .filter(entity => entity.primary_photo && entity.primary_photo_thumbnail)
@@ -186,6 +206,7 @@ export default function Entities() {
                             onToggleFilters={toggleFilters}
                             hasActiveFilters={hasActiveFilters}
                             onClearAllFilters={handleClearAllFilters}
+                            onResetFilters={handleResetFilters}
                             activeFiltersComponent={
                                 <ActiveFilters
                                     filters={filters}
