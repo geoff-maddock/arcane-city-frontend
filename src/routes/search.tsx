@@ -113,7 +113,25 @@ const Search: React.FC = () => {
   const { data: seriesData } = useSeries({ page: seriesPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
   const { data: tagData } = useTags({ page: tagPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
 
-  // Accumulate event results (merged across three queries)
+  // Location-based entity search: search for entities that have matching locations
+  const { data: entityLocationData } = useEntities({ 
+    page: entityPage, 
+    itemsPerPage: 10, 
+    filters: { location: name }, 
+    sort: 'created_at', 
+    direction: 'desc' 
+  });
+
+  // Location-based event search: search for events at venues in matching locations
+  const { data: eventLocationData } = useEvents({ 
+    page: eventPage, 
+    itemsPerPage: 10, 
+    filters: { venue: name, created_at: dateFilter }, 
+    sort: 'start_at', 
+    direction: 'desc' 
+  });
+
+  // Accumulate event results (merged across four queries)
   useEffect(() => {
     // Use functional update to avoid stale closure and remove need to depend on eventMap
     setEventMap(prev => {
@@ -121,9 +139,10 @@ const Search: React.FC = () => {
       eventNameData?.data?.forEach(ev => updated.set(ev.id, ev));
       eventTagData?.data?.forEach(ev => updated.set(ev.id, ev));
       eventEntityData?.data?.forEach(ev => updated.set(ev.id, ev));
+      eventLocationData?.data?.forEach(ev => updated.set(ev.id, ev));
       return updated;
     });
-  }, [eventNameData, eventTagData, eventEntityData]);
+  }, [eventNameData, eventTagData, eventEntityData, eventLocationData]);
 
   // Accumulate other resource results, avoiding duplicates
   useEffect(() => {
@@ -136,6 +155,17 @@ const Search: React.FC = () => {
       });
     }
   }, [entityData]);
+
+  useEffect(() => {
+    if (entityLocationData?.data) {
+      setEntityResults(prev => {
+        const ids = new Set(prev.map(e => e.id));
+        const merged = [...prev];
+        entityLocationData.data.forEach(e => { if (!ids.has(e.id)) merged.push(e); });
+        return merged;
+      });
+    }
+  }, [entityLocationData]);
 
   useEffect(() => {
     if (seriesData?.data) {
@@ -182,14 +212,18 @@ const Search: React.FC = () => {
   const eventTotal = Math.max(
     eventNameData?.total ?? 0,
     eventTagData?.total ?? 0,
-    eventEntityData?.total ?? 0
+    eventEntityData?.total ?? 0,
+    eventLocationData?.total ?? 0
   );
-  const entityTotal = entityData?.total ?? 0;
+  const entityTotal = Math.max(
+    entityData?.total ?? 0,
+    entityLocationData?.total ?? 0
+  );
   const seriesTotal = seriesData?.total ?? 0;
   const tagTotal = tagData?.total ?? 0;
 
-  const canLoadMoreEvents = [eventNameData, eventTagData, eventEntityData].some(d => d && d.current_page < d.last_page);
-  const canLoadMoreEntities = !!entityData && entityData.current_page < entityData.last_page;
+  const canLoadMoreEvents = [eventNameData, eventTagData, eventEntityData, eventLocationData].some(d => d && d.current_page < d.last_page);
+  const canLoadMoreEntities = [entityData, entityLocationData].some(d => d && d.current_page < d.last_page);
   const canLoadMoreSeries = !!seriesData && seriesData.current_page < seriesData.last_page;
   const canLoadMoreTags = !!tagData && tagData.current_page < tagData.last_page;
 

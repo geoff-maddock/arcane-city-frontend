@@ -16,6 +16,7 @@ interface EntityFilters {
     tag?: string;
     entity_status?: string;
     description?: string;
+    location?: string;
     created_at?: DateRange;
     started_at?: DateRange;
 }
@@ -44,6 +45,7 @@ export const useEntities = ({ page = 1, itemsPerPage = 25, filters, sort = 'name
             if (filters?.tag) params.append('filters[tag]', toKebabCase(filters.tag));
             if (filters?.entity_status) params.append('filters[entity_status]', filters.entity_status);
             if (filters?.description) params.append('filters[description]', filters.description);
+            if (filters?.location) params.append('filters[location]', filters.location);
             if (filters?.created_at?.start) params.append('filters[created_at][start]', filters.created_at.start);
             if (filters?.created_at?.end) params.append('filters[created_at][end]', filters.created_at.end);
             if (filters?.started_at?.start) params.append('filters[started_at][start]', filters.started_at.start);
