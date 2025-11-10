@@ -12,7 +12,10 @@ import { FilterContainer } from './FilterContainer';
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
-    { value: 'created_at', label: 'Created' }
+    { value: 'email', label: 'Email' },
+    { value: 'created_at', label: 'Created' },
+    { value: 'last_active', label: 'Last Active' },
+    { value: 'user_status_id', label: 'User Status' }
 ];
 
 export default function Users() {
@@ -20,6 +23,9 @@ export default function Users() {
 
     const [filters, setFilters] = useState({
         name: '',
+        email: '',
+        status: '',
+        is_verified: '',
     });
 
     const [page, setPage] = useState(1);
@@ -70,14 +76,17 @@ export default function Users() {
         );
     };
 
-    const hasActiveFilters = filters.name.trim() !== '';
+    const hasActiveFilters = filters.name.trim() !== '' || 
+        filters.email.trim() !== '' || 
+        filters.status.trim() !== '' || 
+        filters.is_verified.trim() !== '';
 
     const handleClearAllFilters = () => {
-        setFilters({ name: '' });
+        setFilters({ name: '', email: '', status: '', is_verified: '' });
     };
 
     const handleResetFilters = () => {
-        setFilters({ name: '' });
+        setFilters({ name: '', email: '', status: '', is_verified: '' });
         setSort('name');
         setDirection('asc');
     };
