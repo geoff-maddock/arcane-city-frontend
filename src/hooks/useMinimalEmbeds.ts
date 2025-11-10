@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../lib/api';
+import { getEmbedCache, setEmbedCache } from '../lib/embedCache';
 
 interface UseMinimalEmbedsOptions {
     /**
@@ -38,6 +39,7 @@ interface UseMinimalEmbedsReturn {
 /**
  * A reusable hook for fetching minimal embeds from the API.
  * Supports both events and entities, with optional enable/disable functionality.
+ * Uses browser localStorage for caching with a 7-day TTL.
  * 
  * @param options Configuration for the hook
  * @returns Object containing embeds data, loading state, and error state
@@ -57,6 +59,14 @@ export function useMinimalEmbeds({
             return;
         }
 
+        // Try to get from cache first
+        const cachedEmbeds = getEmbedCache(resourceType, slug, 'minimal-embeds');
+        if (cachedEmbeds !== null) {
+            setEmbeds(cachedEmbeds);
+            setError(null);
+            return;
+        }
+
         setLoading(true);
         setError(null);
         
@@ -65,6 +75,9 @@ export function useMinimalEmbeds({
             const response = await api.get<{ data: string[] }>(endpoint);
             const embedsData = response.data.data || [];
             setEmbeds(embedsData);
+            
+            // Cache the fetched embeds
+            setEmbedCache(resourceType, slug, embedsData, 'minimal-embeds');
         } catch (err) {
             console.error(`Error fetching ${resourceType} embeds for ${slug}:`, err);
             setError(err instanceof Error ? err : new Error(`Failed to load ${resourceType} embeds`));

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { getEmbedCache, setEmbedCache } from '../lib/embedCache';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -133,8 +134,21 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
             const fetchEmbeds = async () => {
                 setEmbedsLoading(true);
                 try {
+                    // Try to get from cache first
+                    const cachedEmbeds = getEmbedCache('entities', entity.slug, 'embeds');
+                    if (cachedEmbeds !== null) {
+                        setEmbeds(cachedEmbeds);
+                        setEmbedsLoading(false);
+                        return;
+                    }
+                    
+                    // Fetch from API if not cached
                     const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
-                    setEmbeds(response.data.data);
+                    const embedsData = response.data.data;
+                    setEmbeds(embedsData);
+                    
+                    // Cache the fetched embeds
+                    setEmbedCache('entities', entity.slug, embedsData, 'embeds');
                 } catch (err) {
                     console.error('Error fetching embeds:', err);
                     setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { getEmbedCache, setEmbedCache } from '../lib/embedCache';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -178,8 +179,21 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         queryKey: ['eventEmbeds', event?.slug],
         queryFn: async () => {
             if (!event?.slug) return [];
+            
+            // Try to get from cache first
+            const cachedEmbeds = getEmbedCache('events', event.slug, 'embeds');
+            if (cachedEmbeds !== null) {
+                return cachedEmbeds;
+            }
+            
+            // Fetch from API if not cached
             const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
-            return data.data;
+            const embedsData = data.data;
+            
+            // Cache the fetched embeds
+            setEmbedCache('events', event.slug, embedsData, 'embeds');
+            
+            return embedsData;
         },
         enabled: !!event?.slug && mediaPlayersEnabled,
         staleTime: 5 * 60 * 1000,
