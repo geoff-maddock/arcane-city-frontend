@@ -1,5 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useAuth } from '../hooks/useAuth';
 import { api } from '../lib/api';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
@@ -45,6 +46,8 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
     const [openSlideshowAtIndex, setOpenSlideshowAtIndex] = useState<number | null>(null);
+
+    const { hasPermission } = useAuth();
 
     const { data: entity, isLoading, error, refetch } = useQuery<Entity>({
         queryKey: ['entity', entitySlug],
@@ -171,7 +174,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     // Replace newlines with <br /> tags in the description
     const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
     const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
-    const canEdit = !!user && user.id === entity.created_by;
+    const canEdit = !!user && (user.id === entity.created_by || hasPermission('admin'));
 
     return (
         <div className="min-h-screen">
@@ -191,6 +194,47 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                         </Button>
                     </div>
 
+                    {/* DEBUG: User Permissions - Remove this section when done debugging */}
+                    {user && (
+                        <details className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 rounded-lg p-4">
+                            <summary className="cursor-pointer font-bold text-yellow-800 dark:text-yellow-200 mb-2">
+                                🐛 DEBUG: User Permissions & Roles (Click to expand)
+                            </summary>
+                            <div className="mt-4 space-y-4 text-sm">
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">User Info:</h3>
+                                    <pre className="bg-white dark:bg-gray-800 p-3 rounded border overflow-auto">
+                                        {JSON.stringify({
+                                            id: user.id,
+                                            name: user.name,
+                                            email: user.email,
+                                        }, null, 2)}
+                                    </pre>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Roles:</h3>
+                                    <pre className="bg-white dark:bg-gray-800 p-3 rounded border overflow-auto">
+                                        {JSON.stringify(user.roles || [], null, 2)}
+                                    </pre>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Permissions:</h3>
+                                    <pre className="bg-white dark:bg-gray-800 p-3 rounded border overflow-auto">
+                                        {JSON.stringify(user.permissions || [], null, 2)}
+                                    </pre>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">hasPermission() Tests:</h3>
+                                    <ul className="bg-white dark:bg-gray-800 p-3 rounded border space-y-1">
+                                        <li>hasPermission('edit_entity'): <strong>{hasPermission('edit_entity') ? '✅ true' : '❌ false'}</strong></li>
+                                        <li>hasPermission('delete_entity'): <strong>{hasPermission('delete_entity') ? '✅ true' : '❌ false'}</strong></li>
+                                        <li>hasPermission('create_event'): <strong>{hasPermission('create_event') ? '✅ true' : '❌ false'}</strong></li>
+                                        <li>hasPermission('edit_event'): <strong>{hasPermission('edit_event') ? '✅ true' : '❌ false'}</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </details>
+                    )}
 
                     <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
                         {/* Main Content */}
