@@ -38,9 +38,6 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     const navigate = useNavigate();
     const { mediaPlayersEnabled } = useMediaPlayerContext();
     const { backHref, isFallback } = useBackNavigation('/entities');
-    const [embeds, setEmbeds] = useState<string[]>([]);
-    const [embedsLoading, setEmbedsLoading] = useState(false);
-    const [embedsError, setEmbedsError] = useState<Error | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [imageOrientation, setImageOrientation] = useState<'landscape' | 'portrait' | null>(null);
@@ -127,29 +124,22 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
         }
     };
 
-    // Fetch event embeds after the entity detail is loaded
-    useEffect(() => {
-        if (entity?.slug && mediaPlayersEnabled) {
-            const fetchEmbeds = async () => {
-                setEmbedsLoading(true);
-                try {
-                    const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
-                    setEmbeds(response.data.data);
-                } catch (err) {
-                    console.error('Error fetching embeds:', err);
-                    setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
-                } finally {
-                    setEmbedsLoading(false);
-                }
-            };
-            fetchEmbeds();
-        } else if (!mediaPlayersEnabled) {
-            // Clear embeds when media players are disabled
-            setEmbeds([]);
-            setEmbedsLoading(false);
-            setEmbedsError(null);
-        }
-    }, [entity?.slug, mediaPlayersEnabled]);
+    // React Query: fetch embeds when media players enabled & entity slug available
+    const {
+        data: embeds = [],
+        isLoading: embedsLoading,
+        error: embedsError,
+    } = useQuery<string[], Error>({
+        queryKey: ['entityEmbeds', entity?.slug],
+        queryFn: async () => {
+            if (!entity?.slug) return [];
+            const { data } = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
+            return data.data;
+        },
+        enabled: !!entity?.slug && mediaPlayersEnabled,
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
 
     if (isLoading) {
