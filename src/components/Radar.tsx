@@ -61,7 +61,7 @@ const Radar: React.FC = () => {
                 <p className="text-gray-600 dark:text-gray-400">
                     Stay up to date with events and activities that matter to you
                 </p>
-                
+
                 {/* Quick Links Navigation */}
                 <div className="mt-6 flex flex-wrap justify-center gap-2">
                     {hasAttendingEvents && (
@@ -105,6 +105,17 @@ const Radar: React.FC = () => {
                     >
                         <HiCalendar className="text-gray-500" />
                         <span>Recent Events</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="flex items-center gap-1"
+                    >
+                        <Link to="/events">
+                            <HiCalendar className="text-yellow-500" />
+                            <span>All Events</span>
+                        </Link>
                     </Button>
                 </div>
             </div>
