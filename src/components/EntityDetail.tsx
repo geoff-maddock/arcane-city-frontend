@@ -131,7 +131,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     // Function to fetch embeds (used in useEffect and for cache refresh)
     const fetchEmbeds = useCallback(async () => {
         if (!entity?.slug) return;
-        
+
         setEmbedsLoading(true);
         try {
             // Try to get from cache first
@@ -141,12 +141,12 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                 setEmbedsLoading(false);
                 return;
             }
-            
+
             // Fetch from API if not cached
             const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
             const embedsData = response.data.data;
             setEmbeds(embedsData);
-            
+
             // Cache the fetched embeds
             setEmbedCache('entities', entity.slug, embedsData, 'embeds');
         } catch (err) {
@@ -160,25 +160,25 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     // Refresh embed cache by fetching from API and storing in cache
     const handleClearEmbedCache = async () => {
         if (!entity?.slug) return;
-        
+
         setActionsMenuOpen(false);
         setEmbedsLoading(true);
-        
+
         try {
             // Clear the old cache first
             clearEmbedCache('entities', entity.slug, 'embeds');
-            
+
             // Fetch fresh embeds from API
             const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
             const embedsData = response.data.data;
-            
+
             // Store in localStorage
             setEmbedCache('entities', entity.slug, embedsData, 'embeds');
-            
+
             // Update display
             setEmbeds(embedsData);
             setEmbedsError(null);
-            
+
             // Show message if no embeds loaded
             if (!embedsData || embedsData.length === 0) {
                 alert('No embeds available for this entity.');
@@ -197,7 +197,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
         if (entity?.slug && mediaPlayersEnabled) {
             fetchEmbeds();
         } else if (!mediaPlayersEnabled) {
-            // Clear embeds when media players are disabled
+            // refresh embeds when media players are disabled
             setEmbeds([]);
             setEmbedsLoading(false);
             setEmbedsError(null);
@@ -286,7 +286,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                                                                     title="Clear cached embeds and reload from API"
                                                                 >
                                                                     <RefreshCw className="h-4 w-4" />
-                                                                    Clear Embed Cache
+                                                                    Refresh Embed Cache
                                                                 </button>
                                                             )}
 
