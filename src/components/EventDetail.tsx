@@ -173,23 +173,23 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
     // Refresh embed cache by fetching from API and storing in cache
     const handleClearEmbedCache = async () => {
         if (!event?.slug) return;
-        
+
         setActionsMenuOpen(false);
-        
+
         try {
             // Clear the old cache first
             clearEmbedCache('events', event.slug, 'embeds');
-            
+
             // Fetch fresh embeds from API
             const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
             const embedsData = data.data;
-            
+
             // Store in localStorage
             setEmbedCache('events', event.slug, embedsData, 'embeds');
-            
+
             // Refetch to display the new data
             await refetchEmbeds();
-            
+
             // Show message if no embeds loaded
             if (!embedsData || embedsData.length === 0) {
                 alert('No embeds available for this event.');
@@ -210,20 +210,20 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         queryKey: ['eventEmbeds', event?.slug],
         queryFn: async () => {
             if (!event?.slug) return [];
-            
+
             // Try to get from cache first
             const cachedEmbeds = getEmbedCache('events', event.slug, 'embeds');
             if (cachedEmbeds !== null) {
                 return cachedEmbeds;
             }
-            
+
             // Fetch from API if not cached
             const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
             const embedsData = data.data;
-            
+
             // Cache the fetched embeds
             setEmbedCache('events', event.slug, embedsData, 'embeds');
-            
+
             return embedsData;
         },
         enabled: !!event?.slug && mediaPlayersEnabled,
@@ -343,7 +343,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                                 title="Clear cached embeds and reload from API"
                                                             >
                                                                 <RefreshCw className="h-4 w-4" />
-                                                                Clear Embed Cache
+                                                                Refresh Embed Cache
                                                             </button>
                                                         )}
                                                         <button
