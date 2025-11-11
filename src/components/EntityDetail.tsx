@@ -157,12 +157,38 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
         }
     }, [entity?.slug]);
 
-    // Clear embed cache and refetch from API
-    const handleClearEmbedCache = () => {
-        if (entity?.slug) {
+    // Refresh embed cache by fetching from API and storing in cache
+    const handleClearEmbedCache = async () => {
+        if (!entity?.slug) return;
+        
+        setActionsMenuOpen(false);
+        setEmbedsLoading(true);
+        
+        try {
+            // Clear the old cache first
             clearEmbedCache('entities', entity.slug, 'embeds');
-            fetchEmbeds();
-            setActionsMenuOpen(false);
+            
+            // Fetch fresh embeds from API
+            const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
+            const embedsData = response.data.data;
+            
+            // Store in localStorage
+            setEmbedCache('entities', entity.slug, embedsData, 'embeds');
+            
+            // Update display
+            setEmbeds(embedsData);
+            setEmbedsError(null);
+            
+            // Show message if no embeds loaded
+            if (!embedsData || embedsData.length === 0) {
+                alert('No embeds available for this entity.');
+            }
+        } catch (err) {
+            console.error('Error refreshing embeds:', err);
+            setEmbedsError(err instanceof Error ? err : new Error('Failed to refresh embeds'));
+            alert('Failed to refresh embeds. Please try again.');
+        } finally {
+            setEmbedsLoading(false);
         }
     };
 

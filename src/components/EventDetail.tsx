@@ -170,12 +170,33 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         }
     };
 
-    // Clear embed cache and refetch from API
-    const handleClearEmbedCache = () => {
-        if (event?.slug) {
+    // Refresh embed cache by fetching from API and storing in cache
+    const handleClearEmbedCache = async () => {
+        if (!event?.slug) return;
+        
+        setActionsMenuOpen(false);
+        
+        try {
+            // Clear the old cache first
             clearEmbedCache('events', event.slug, 'embeds');
-            refetchEmbeds();
-            setActionsMenuOpen(false);
+            
+            // Fetch fresh embeds from API
+            const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
+            const embedsData = data.data;
+            
+            // Store in localStorage
+            setEmbedCache('events', event.slug, embedsData, 'embeds');
+            
+            // Refetch to display the new data
+            await refetchEmbeds();
+            
+            // Show message if no embeds loaded
+            if (!embedsData || embedsData.length === 0) {
+                alert('No embeds available for this event.');
+            }
+        } catch (err) {
+            console.error('Error refreshing embeds:', err);
+            alert('Failed to refresh embeds. Please try again.');
         }
     };
 
