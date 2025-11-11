@@ -5,6 +5,9 @@ import type { User } from '../types/auth';
 
 export interface UserFilters {
     name: string;
+    email: string;
+    status: string;
+    is_verified: string;
 }
 
 interface UseUsersParams {
@@ -23,6 +26,9 @@ export const useUsers = ({ page = 1, itemsPerPage = 25, filters, sort = 'name', 
             params.append('page', page.toString());
             params.append('limit', itemsPerPage.toString());
             if (filters?.name) params.append('filters[name]', filters.name);
+            if (filters?.email) params.append('filters[email]', filters.email);
+            if (filters?.status) params.append('filters[status]', filters.status);
+            if (filters?.is_verified) params.append('filters[is_verified]', filters.is_verified);
             if (sort) params.append('sort', sort);
             if (direction) params.append('direction', direction);
 
