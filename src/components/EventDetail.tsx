@@ -336,7 +336,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                             <Edit className="h-4 w-4" />
                                                             Edit Event
                                                         </Link>
-                                                        {mediaPlayersEnabled && embeds.length > 0 && (
+                                                        {mediaPlayersEnabled && (
                                                             <button
                                                                 className="flex items-center gap-2 px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-md transition-colors w-full text-left"
                                                                 onClick={handleClearEmbedCache}
