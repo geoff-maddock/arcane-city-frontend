@@ -1,11 +1,12 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { getEmbedCache, setEmbedCache, clearEmbedCache } from '../lib/embedCache';
 import { Entity } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MapPin, Music, Star, Pencil, Power, Target, Trash2, MoreHorizontal } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Loader2, ArrowLeft, MapPin, Music, Star, Pencil, Power, Target, Trash2, MoreHorizontal, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 import { sanitizeHTML, sanitizeEmbed } from '../lib/sanitize';
 import PhotoGallery from './PhotoGallery';
 import EntityEvents from './EntityEvents';
@@ -127,21 +128,73 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
         }
     };
 
+    // Function to fetch embeds (used in useEffect and for cache refresh)
+    const fetchEmbeds = useCallback(async () => {
+        if (!entity?.slug) return;
+        
+        setEmbedsLoading(true);
+        try {
+            // Try to get from cache first
+            const cachedEmbeds = getEmbedCache('entities', entity.slug, 'embeds');
+            if (cachedEmbeds !== null) {
+                setEmbeds(cachedEmbeds);
+                setEmbedsLoading(false);
+                return;
+            }
+            
+            // Fetch from API if not cached
+            const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
+            const embedsData = response.data.data;
+            setEmbeds(embedsData);
+            
+            // Cache the fetched embeds
+            setEmbedCache('entities', entity.slug, embedsData, 'embeds');
+        } catch (err) {
+            console.error('Error fetching embeds:', err);
+            setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
+        } finally {
+            setEmbedsLoading(false);
+        }
+    }, [entity?.slug]);
+
+    // Refresh embed cache by fetching from API and storing in cache
+    const handleClearEmbedCache = async () => {
+        if (!entity?.slug) return;
+        
+        setActionsMenuOpen(false);
+        setEmbedsLoading(true);
+        
+        try {
+            // Clear the old cache first
+            clearEmbedCache('entities', entity.slug, 'embeds');
+            
+            // Fetch fresh embeds from API
+            const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
+            const embedsData = response.data.data;
+            
+            // Store in localStorage
+            setEmbedCache('entities', entity.slug, embedsData, 'embeds');
+            
+            // Update display
+            setEmbeds(embedsData);
+            setEmbedsError(null);
+            
+            // Show message if no embeds loaded
+            if (!embedsData || embedsData.length === 0) {
+                alert('No embeds available for this entity.');
+            }
+        } catch (err) {
+            console.error('Error refreshing embeds:', err);
+            setEmbedsError(err instanceof Error ? err : new Error('Failed to refresh embeds'));
+            alert('Failed to refresh embeds. Please try again.');
+        } finally {
+            setEmbedsLoading(false);
+        }
+    };
+
     // Fetch event embeds after the entity detail is loaded
     useEffect(() => {
         if (entity?.slug && mediaPlayersEnabled) {
-            const fetchEmbeds = async () => {
-                setEmbedsLoading(true);
-                try {
-                    const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
-                    setEmbeds(response.data.data);
-                } catch (err) {
-                    console.error('Error fetching embeds:', err);
-                    setEmbedsError(err instanceof Error ? err : new Error('Failed to load embeds'));
-                } finally {
-                    setEmbedsLoading(false);
-                }
-            };
             fetchEmbeds();
         } else if (!mediaPlayersEnabled) {
             // Clear embeds when media players are disabled
@@ -149,7 +202,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
             setEmbedsLoading(false);
             setEmbedsError(null);
         }
-    }, [entity?.slug, mediaPlayersEnabled]);
+    }, [entity?.slug, mediaPlayersEnabled, fetchEmbeds]);
 
 
     if (isLoading) {
@@ -225,6 +278,17 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                                                                 <Pencil className="h-4 w-4" />
                                                                 Edit Entity
                                                             </Link>
+
+                                                            {mediaPlayersEnabled && (
+                                                                <button
+                                                                    className="flex items-center gap-2 px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-md transition-colors w-full text-left"
+                                                                    onClick={handleClearEmbedCache}
+                                                                    title="Clear cached embeds and reload from API"
+                                                                >
+                                                                    <RefreshCw className="h-4 w-4" />
+                                                                    Clear Embed Cache
+                                                                </button>
+                                                            )}
 
                                                             <button
                                                                 className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"

@@ -18,6 +18,8 @@ const mockApi = api as unknown as MockedApi;
 
 describe('useMinimalEmbeds', () => {
     beforeEach(() => {
+        // Clear localStorage and mocks before each test
+        localStorage.clear();
         vi.clearAllMocks();
         vi.spyOn(console, 'log').mockImplementation(() => { });
         vi.spyOn(console, 'error').mockImplementation(() => { });
@@ -106,6 +108,8 @@ describe('useMinimalEmbeds', () => {
 
         expect(result.current.embeds).toEqual([]);
         expect(result.current.error).toEqual(mockError);
+        // Ensure API was called (cache miss)
+        expect(mockApi.get).toHaveBeenCalled();
     });
 
     it('should handle null/undefined data from API', async () => {
@@ -123,6 +127,8 @@ describe('useMinimalEmbeds', () => {
 
         expect(result.current.embeds).toEqual([]);
         expect(result.current.error).toBe(null);
+        // Ensure API was called (cache miss)
+        expect(mockApi.get).toHaveBeenCalled();
     });
 
     it('should refetch embeds when refetch is called', async () => {
@@ -139,13 +145,16 @@ describe('useMinimalEmbeds', () => {
             expect(result.current.loading).toBe(false);
         });
 
-        // Clear previous calls
+        // Clear previous calls and cache
         mockApi.get.mockClear();
+        localStorage.clear();
 
         // Call refetch
         result.current.refetch();
 
-        expect(mockApi.get).toHaveBeenCalledWith('/events/test-event/minimal-embeds');
+        await waitFor(() => {
+            expect(mockApi.get).toHaveBeenCalledWith('/events/test-event/minimal-embeds');
+        });
     });
 
     it('should update when dependencies change', async () => {
@@ -178,5 +187,42 @@ describe('useMinimalEmbeds', () => {
         });
 
         expect(mockApi.get).toHaveBeenLastCalledWith('/events/test-event-2/minimal-embeds');
+    });
+
+    it('should use cache on subsequent calls with same slug', async () => {
+        const mockEmbeds = ['<iframe src="https://player.soundcloud.com/test"></iframe>'];
+        mockApi.get.mockResolvedValue({ data: { data: mockEmbeds } });
+
+        // First render - should fetch from API
+        const { result, unmount } = renderHook(() => useMinimalEmbeds({
+            resourceType: 'events',
+            slug: 'test-event',
+            enabled: true
+        }));
+
+        await waitFor(() => {
+            expect(result.current.loading).toBe(false);
+        });
+
+        expect(result.current.embeds).toEqual(mockEmbeds);
+        expect(mockApi.get).toHaveBeenCalledTimes(1);
+
+        // Unmount and clear mock call history
+        unmount();
+        mockApi.get.mockClear();
+
+        // Second render - should use cache, not fetch from API
+        const { result: result2 } = renderHook(() => useMinimalEmbeds({
+            resourceType: 'events',
+            slug: 'test-event',
+            enabled: true
+        }));
+
+        // Embeds should be available immediately from cache
+        expect(result2.current.embeds).toEqual(mockEmbeds);
+        expect(result2.current.loading).toBe(false);
+        
+        // API should not have been called
+        expect(mockApi.get).not.toHaveBeenCalled();
     });
 });
