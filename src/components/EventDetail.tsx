@@ -1,7 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { getEmbedCache, setEmbedCache } from '../lib/embedCache';
+import { getEmbedCache, setEmbedCache, clearEmbedCache } from '../lib/embedCache';
 import { Event } from '../types/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2, Copy, Plus, ExternalLink } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarDays, CalendarPlus, MapPin, DollarSign, Ticket, Music, Star, MoreHorizontal, Edit, Trash2, Copy, Plus, ExternalLink, RefreshCw } from 'lucide-react';
 // Lucide doesn't ship an Instagram brand icon; create a lightweight inline SVG component
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -170,11 +170,21 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         }
     };
 
+    // Clear embed cache and refetch from API
+    const handleClearEmbedCache = () => {
+        if (event?.slug) {
+            clearEmbedCache('events', event.slug, 'embeds');
+            refetchEmbeds();
+            setActionsMenuOpen(false);
+        }
+    };
+
     // React Query: fetch embeds when media players enabled & event slug available
     const {
         data: embeds = [],
         isLoading: embedsLoading,
         error: embedsError,
+        refetch: refetchEmbeds,
     } = useQuery<string[], Error>({
         queryKey: ['eventEmbeds', event?.slug],
         queryFn: async () => {
@@ -305,6 +315,16 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                             <Edit className="h-4 w-4" />
                                                             Edit Event
                                                         </Link>
+                                                        {mediaPlayersEnabled && embeds.length > 0 && (
+                                                            <button
+                                                                className="flex items-center gap-2 px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-md transition-colors w-full text-left"
+                                                                onClick={handleClearEmbedCache}
+                                                                title="Clear cached embeds and reload from API"
+                                                            >
+                                                                <RefreshCw className="h-4 w-4" />
+                                                                Clear Embed Cache
+                                                            </button>
+                                                        )}
                                                         <button
                                                             className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left"
                                                             onClick={() => {
