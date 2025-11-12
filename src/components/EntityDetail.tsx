@@ -20,6 +20,7 @@ import EntityContacts from './EntityContacts';
 import EntityLinks from './EntityLinks';
 import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { useBackNavigation } from '../context/NavigationContext';
+import { canUserEdit } from '../lib/permissions';
 // SEO handled at route level
 import {
     Dialog,
@@ -174,7 +175,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
     // Replace newlines with <br /> tags in the description
     const formattedDescription = entity.description ? entity.description.replace(/\n/g, '<br />') : '';
     const placeHolderImage = `${window.location.origin}/entity-placeholder.png`;
-    const canEdit = !!user && (user.id === entity.created_by || hasPermission('admin'));
+    const canEdit = canUserEdit(user, entity.created_by);
 
     return (
         <div className="min-h-screen">

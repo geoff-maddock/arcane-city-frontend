@@ -31,7 +31,6 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
         <circle cx="17.5" cy="6.5" r="1" />
     </svg>
 );
-import { authService } from '../services/auth.service';
 import { AgeRestriction } from './AgeRestriction';
 import { formatEventDate, generateGoogleCalendarLink } from '../lib/utils';
 import { useState, useEffect } from 'react';
@@ -43,6 +42,8 @@ import { EntityBadges } from './EntityBadges';
 import { TagBadges } from './TagBadges';
 import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { useBackNavigation } from '../context/NavigationContext';
+import { useAuth } from '../hooks/useAuth';
+import { canUserEdit } from '../lib/permissions';
 // Structured data is injected via the route head() now
 
 
@@ -62,11 +63,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
     const { data: visibilityOptions } = useSearchOptions('visibilities', '');
     const publicVisibilityId = visibilityOptions?.find(v => v.name.toLowerCase() === 'public')?.id;
 
-    const { data: user } = useQuery({
-        queryKey: ['currentUser'],
-        queryFn: authService.getCurrentUser,
-        enabled: authService.isAuthenticated(),
-    });
+    const { user } = useAuth();
     const [attending, setAttending] = useState(false);
 
     const attendMutation = useMutation({
@@ -159,6 +156,10 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         }
     }, [user, event?.attendees]);
 
+    // Check if user can edit this event
+    // User can edit if they created it OR have admin permission
+    const canEdit = canUserEdit(user, event?.created_by);
+
     // Detect image orientation when loaded
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const img = e.currentTarget;
@@ -240,7 +241,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                                 />
                                             </button>
                                         )}
-                                        {user && event.created_by && user.id === event.created_by && (
+                                        {canEdit && (
                                             <Popover open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
                                                 <PopoverTrigger asChild>
                                                     <button
@@ -552,7 +553,7 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
                                 </CardContent>
                             </Card>
 
-                            {user && event.created_by && user.id === event.created_by && (
+                            {canEdit && (
                                 <PhotoDropzone eventId={event.id} />
                             )}
 
