@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createRoute, useNavigate, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
-import { authService } from '../services/auth.service';
+import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -9,6 +9,7 @@ import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login, isLoggingIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,8 +17,14 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authService.login({ username, password });
-      navigate({ to: '/account' });
+      login({ username, password }, {
+        onSuccess: () => {
+          navigate({ to: '/account' });
+        },
+        onError: () => {
+          setError('Login failed');
+        },
+      });
     } catch {
       setError('Login failed');
     }
@@ -46,7 +53,9 @@ const Login: React.FC = () => {
             />
           </div>
           {error && <div className="text-red-500 text-sm">{error}</div>}
-          <Button type="submit" className="w-full">Login</Button>
+          <Button type="submit" className="w-full" disabled={isLoggingIn}>
+            {isLoggingIn ? 'Logging in...' : 'Login'}
+          </Button>
         </form>
         <div className="pt-2 space-y-1 text-sm">
           <Link to="/register" className="underline hover:text-blue-600 dark:hover:text-blue-400 block">Need an account? Register</Link>

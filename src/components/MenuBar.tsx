@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { authService } from '../services/auth.service';
+import { useAuth } from '../hooks/useAuth';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { Button } from './ui/button';
@@ -14,11 +13,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
   const { mediaPlayersEnabled, toggleMediaPlayers } = useMediaPlayerContext();
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: authService.getCurrentUser,
-    enabled: authService.isAuthenticated(),
-  });
+  const { user, logout, isLoggingOut } = useAuth();
 
   // Ensure the HTML element reflects the stored theme value
   useEffect(() => {
@@ -164,8 +159,8 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
               <span className="lg:inline">My Account</span>
             </Link>
           </Button>
-          <Button onClick={() => { authService.logout(); window.location.reload(); }} className="w-full mb-2">
-            Log out
+          <Button onClick={() => { logout(); }} className="w-full mb-2" disabled={isLoggingOut}>
+            {isLoggingOut ? 'Logging out...' : 'Log out'}
           </Button>
         </>
       ) : (

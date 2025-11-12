@@ -67,6 +67,18 @@ export interface Activity {
     ip_address: string;
 }
 
+export interface Role {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+export interface Permission {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -82,6 +94,8 @@ export interface User {
     followed_series: MinimalSlugResource[];
     followed_threads: MinimalSlugResource[];
     photos: Photo[];
+    roles?: Role[];
+    permissions?: Permission[];
 }
 
 export interface LoginCredentials {
