@@ -38,6 +38,32 @@ export default function EventMap({ events }: EventMapProps) {
     const [mapReady, setMapReady] = useState(false);
     const [eventLocations, setEventLocations] = useState<EventLocation[]>([]);
     const [isGeocoding, setIsGeocoding] = useState(false);
+    const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
+
+    // Debug logging
+    useEffect(() => {
+        console.log(`EventMap received ${events.length} events`);
+        if (events.length > 0) {
+            const withVenue = events.filter(e => e.venue?.primary_location);
+            const withCoords = events.filter(e => e.venue?.primary_location?.latitude && e.venue?.primary_location?.longitude);
+            const withAddress = events.filter(e => {
+                const loc = e.venue?.primary_location;
+                return loc && (loc.address_one || loc.city);
+            });
+            console.log(`- ${withVenue.length} have venue/location`);
+            console.log(`- ${withCoords.length} have coordinates`);
+            console.log(`- ${withAddress.length} have address data`);
+            
+            // Log first event for inspection
+            if (events[0]) {
+                console.log('First event sample:', {
+                    name: events[0].name,
+                    venue: events[0].venue?.name,
+                    location: events[0].venue?.primary_location
+                });
+            }
+        }
+    }, [events]);
 
     // Geocode addresses to get coordinates
     useEffect(() => {
@@ -46,7 +72,18 @@ export default function EventMap({ events }: EventMapProps) {
         const geocodeEvents = async () => {
             setIsGeocoding(true);
             const locationMap = new Map<string, EventLocation>();
+            
+            // Count events that need geocoding
+            const eventsNeedingGeocode = events.filter(event => {
+                if (!event.venue?.primary_location) return false;
+                const location = event.venue.primary_location;
+                // Don't need to geocode if we have lat/lng already
+                return !(location.latitude && location.longitude);
+            });
+            
+            setGeocodingProgress({ current: 0, total: eventsNeedingGeocode.length });
 
+            // First, add all events that already have coordinates
             for (const event of events) {
                 if (!event.venue?.primary_location) continue;
                 
@@ -64,12 +101,32 @@ export default function EventMap({ events }: EventMapProps) {
                             events: [event]
                         });
                     }
-                    continue;
                 }
+            }
+            
+            // Update map immediately with events that have coordinates
+            if (isMounted && locationMap.size > 0) {
+                setEventLocations(Array.from(locationMap.values()));
+                setMapReady(true);
+            }
+            
+            // Then geocode addresses for events without coordinates
+            let geocodedCount = 0;
+            for (const event of events) {
+                if (!isMounted) break;
+                if (!event.venue?.primary_location) continue;
+                
+                const location = event.venue.primary_location;
+                
+                // Skip if we already have lat/lng
+                if (location.latitude && location.longitude) continue;
                 
                 // Try to geocode from address
                 const addressKey = buildAddressQuery(location);
-                if (!addressKey) continue;
+                if (!addressKey) {
+                    console.warn(`Event "${event.name}" has no geocodable address`);
+                    continue;
+                }
                 
                 // Check if we already have this address geocoded in current batch
                 if (locationMap.has(addressKey)) {
@@ -79,15 +136,26 @@ export default function EventMap({ events }: EventMapProps) {
                 
                 try {
                     const geocoded = await geocodeAddress(location);
+                    geocodedCount++;
+                    
+                    if (isMounted) {
+                        setGeocodingProgress({ current: geocodedCount, total: eventsNeedingGeocode.length });
+                    }
+                    
                     if (geocoded && isMounted) {
                         locationMap.set(addressKey, {
                             lat: geocoded.lat,
                             lng: geocoded.lng,
                             events: [event]
                         });
+                        
+                        // Update map progressively as we geocode
+                        setEventLocations(Array.from(locationMap.values()));
+                    } else {
+                        console.warn(`Could not geocode address for event "${event.name}": ${addressKey}`);
                     }
                 } catch (error) {
-                    console.error('Error geocoding event location:', error);
+                    console.error(`Error geocoding event location for "${event.name}":`, error);
                 }
             }
 
@@ -126,13 +194,22 @@ export default function EventMap({ events }: EventMapProps) {
         return (
             <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 dark:bg-gray-800">
                 <div className="text-center">
-                    <p className="text-gray-500">
-                        {isGeocoding ? 'Geocoding event locations...' : 'Loading map...'}
-                    </p>
-                    {isGeocoding && (
-                        <p className="text-sm text-gray-400 mt-2">
-                            This may take a moment for multiple events
-                        </p>
+                    {isGeocoding ? (
+                        <>
+                            <p className="text-gray-500 mb-2">
+                                Geocoding event locations...
+                            </p>
+                            {geocodingProgress.total > 0 && (
+                                <p className="text-sm text-gray-400">
+                                    {geocodingProgress.current} of {geocodingProgress.total} addresses processed
+                                </p>
+                            )}
+                            <p className="text-xs text-gray-400 mt-2">
+                                This may take a moment for multiple events
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-gray-500">Loading map...</p>
                     )}
                 </div>
             </div>
@@ -144,8 +221,11 @@ export default function EventMap({ events }: EventMapProps) {
             <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
                 <div className="text-center px-4">
                     <p className="text-gray-500 mb-2">No events with location data found.</p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-400 mb-2">
                         Events need either coordinates or a valid address to appear on the map.
+                    </p>
+                    <p className="text-xs text-gray-400">
+                        Received {events.length} event(s) but none could be positioned on the map.
                     </p>
                 </div>
             </div>
