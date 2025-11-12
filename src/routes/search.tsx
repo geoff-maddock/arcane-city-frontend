@@ -5,6 +5,7 @@ import { useEvents } from '../hooks/useEvents';
 import { useEntities } from '../hooks/useEntities';
 import { useSeries } from '../hooks/useSeries';
 import { useTags } from '../hooks/useTags';
+import { useLocations } from '../hooks/useLocations';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -12,7 +13,8 @@ import EventCardCondensed from '../components/EventCardCondensed';
 import EntityCardCondensed from '../components/EntityCardCondensed';
 import SeriesCardCondensed from '../components/SeriesCardCondensed';
 import TagCard from '../components/TagCard';
-import type { Event, Entity, Series, Tag } from '../types/api';
+import LocationCardCondensed from '../components/LocationCardCondensed';
+import type { Event, Entity, Series, Tag, LocationResponse } from '../types/api';
 import { SITE_NAME, DEFAULT_IMAGE } from './../lib/seo';
 
 interface ParsedQuery {
@@ -92,18 +94,20 @@ const Search: React.FC = () => {
   const [entityPage, setEntityPage] = useState(1);
   const [seriesPage, setSeriesPage] = useState(1);
   const [tagPage, setTagPage] = useState(1);
+  const [locationPage, setLocationPage] = useState(1);
 
   // Accumulated results
   const [eventMap, setEventMap] = useState<Map<number, Event>>(new Map());
   const [entityResults, setEntityResults] = useState<Entity[]>([]);
   const [seriesResults, setSeriesResults] = useState<Series[]>([]);
   const [tagResults, setTagResults] = useState<Tag[]>([]);
+  const [locationResults, setLocationResults] = useState<LocationResponse[]>([]);
 
   // Reset pagination & accumulators when query/deep changes
   useEffect(() => {
-    setEventPage(1); setEntityPage(1); setSeriesPage(1); setTagPage(1);
+    setEventPage(1); setEntityPage(1); setSeriesPage(1); setTagPage(1); setLocationPage(1);
     setEventMap(new Map());
-    setEntityResults([]); setSeriesResults([]); setTagResults([]);
+    setEntityResults([]); setSeriesResults([]); setTagResults([]); setLocationResults([]);
   }, [q, isDeep]);
 
   const { data: eventNameData } = useEvents({ page: eventPage, itemsPerPage: 10, filters: baseFilters, sort: 'start_at', direction: 'desc' });
@@ -112,6 +116,15 @@ const Search: React.FC = () => {
   const { data: entityData } = useEntities({ page: entityPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
   const { data: seriesData } = useSeries({ page: seriesPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
   const { data: tagData } = useTags({ page: tagPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
+  
+  // Location search - search across name, address, neighborhood, and city
+  const locationFilters = {
+    name,
+    address_one: name,
+    neighborhood: name,
+    city: name,
+  };
+  const { data: locationData } = useLocations({ page: locationPage, itemsPerPage: 10, filters: locationFilters, sort: 'name', direction: 'asc' });
 
   // Accumulate event results (merged across three queries)
   useEffect(() => {
@@ -159,6 +172,17 @@ const Search: React.FC = () => {
     }
   }, [tagData]);
 
+  useEffect(() => {
+    if (locationData?.data) {
+      setLocationResults(prev => {
+        const ids = new Set(prev.map(l => l.id));
+        const merged = [...prev];
+        locationData.data.forEach(l => { if (!ids.has(l.id)) merged.push(l); });
+        return merged;
+      });
+    }
+  }, [locationData]);
+
   const events = useMemo(() => Array.from(eventMap.values()), [eventMap]);
 
   const allEventImages = events
@@ -177,6 +201,7 @@ const Search: React.FC = () => {
   const entityCount = entityResults.length;
   const seriesCount = seriesResults.length;
   const tagCount = tagResults.length;
+  const locationCount = locationResults.length;
 
   // Totals from API (events need special handling due to multiple queries)
   const eventTotal = Math.max(
@@ -187,11 +212,13 @@ const Search: React.FC = () => {
   const entityTotal = entityData?.total ?? 0;
   const seriesTotal = seriesData?.total ?? 0;
   const tagTotal = tagData?.total ?? 0;
+  const locationTotal = locationData?.total ?? 0;
 
   const canLoadMoreEvents = [eventNameData, eventTagData, eventEntityData].some(d => d && d.current_page < d.last_page);
   const canLoadMoreEntities = !!entityData && entityData.current_page < entityData.last_page;
   const canLoadMoreSeries = !!seriesData && seriesData.current_page < seriesData.last_page;
   const canLoadMoreTags = !!tagData && tagData.current_page < tagData.last_page;
+  const canLoadMoreLocations = !!locationData && locationData.current_page < locationData.last_page;
 
   const [activeSection, setActiveSection] = useState<string | undefined>();
 
@@ -211,7 +238,7 @@ const Search: React.FC = () => {
 
   // Observe sections for active highlighting
   useEffect(() => {
-    const sectionIds = ['events', 'entities', 'series', 'tags'];
+    const sectionIds = ['events', 'entities', 'series', 'tags', 'locations'];
     const observer = new IntersectionObserver(
       (entries) => {
         // Find entry with highest intersection ratio that is intersecting
@@ -233,7 +260,7 @@ const Search: React.FC = () => {
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, [eventCount, entityCount, seriesCount, tagCount]);
+  }, [eventCount, entityCount, seriesCount, tagCount, locationCount]);
 
   // Sync hash with activeSection (without adding history entries)
   useEffect(() => {
@@ -271,7 +298,7 @@ const Search: React.FC = () => {
       <div className="mx-auto md:px-6 md:py-8 px-3 py-4 max-w-[2400px] space-y-8">
         <div className="flex flex-col space-y-2">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">Search</h1>
-          <p className="text-lg text-gray-500">Find events, entities, series and tags</p>
+          <p className="text-lg text-gray-500">Find events, entities, series, tags and locations</p>
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2 max-w-md items-center">
           <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Search" />
@@ -305,7 +332,12 @@ const Search: React.FC = () => {
                 href="#tags"
                 onClick={(e) => handleSectionLink(e, 'tags')}
                 className={linkClass('tags', tagTotal)}
-              >{tagCount} of {tagTotal} tags</a>
+              >{tagCount} of {tagTotal} tags</a>,
+              <a
+                href="#locations"
+                onClick={(e) => handleSectionLink(e, 'locations')}
+                className={linkClass('locations', locationTotal)}
+              >{locationCount} of {locationTotal} locations</a>
             </p>
             {eventCount ? (
               <section id="events">
@@ -385,7 +417,23 @@ const Search: React.FC = () => {
                 )}
               </section>
             ) : null}
-            {(!eventCount && !entityCount && !seriesCount && !tagCount) && (
+
+            {locationCount ? (
+              <section id="locations">
+                <h2 className="text-2xl font-semibold mb-4">Locations ({locationCount} of {locationTotal})</h2>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
+                  {locationResults.map((location) => (
+                    <LocationCardCondensed key={location.id} location={location} />
+                  ))}
+                </div>
+                {canLoadMoreLocations && (
+                  <div className="mt-4 flex justify-center">
+                    <button type="button" onClick={() => setLocationPage(p => p + 1)} className="px-4 py-2 border rounded">Load more locations</button>
+                  </div>
+                )}
+              </section>
+            ) : null}
+            {(!eventCount && !entityCount && !seriesCount && !tagCount && !locationCount) && (
               <p>No results found.</p>
             )}
           </div>
@@ -409,8 +457,8 @@ export const SearchRoute = createRoute({
         { property: 'og:type', content: 'website' },
         { property: 'og:title', content: `Search • ${SITE_NAME}` },
         { property: 'og:image', content: DEFAULT_IMAGE },
-        { property: 'og:description', content: `Search results for events, entities, series, and tags in Pittsburgh.` },
-        { name: 'description', content: `Search results for events, entities, series, and tags in Pittsburgh.` },
+        { property: 'og:description', content: `Search results for events, entities, series, tags, and locations in Pittsburgh.` },
+        { name: 'description', content: `Search results for events, entities, series, tags, and locations in Pittsburgh.` },
       ],
     };
   },
