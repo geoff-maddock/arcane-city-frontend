@@ -14,6 +14,7 @@ import { Link } from '@tanstack/react-router';
 import { authService } from '@/services/auth.service';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
+import { buildAddressQuery } from '../lib/geocoding';
 
 export default function EventMapLayout() {
     const { filtersVisible, toggleFilters } = useFilterToggle();
@@ -130,11 +131,19 @@ export default function EventMapLayout() {
         return value !== '' && value !== undefined;
     });
 
-    // Filter events to only include those with location data
-    const eventsWithLocation = data?.data.filter(event =>
-        event.venue?.primary_location?.latitude &&
-        event.venue?.primary_location?.longitude
-    ) ?? [];
+    // Filter events to only include those with location data (lat/lng or address)
+    const eventsWithLocation = data?.data.filter(event => {
+        if (!event.venue?.primary_location) return false;
+        
+        const location = event.venue.primary_location;
+        
+        // Has coordinates
+        if (location.latitude && location.longitude) return true;
+        
+        // Has geocodable address
+        const addressQuery = buildAddressQuery(location);
+        return addressQuery !== null;
+    }) ?? [];
 
     return (
         <EventFilterContext.Provider value={{ filters, setFilters }}>
@@ -188,11 +197,19 @@ export default function EventMapLayout() {
                                         <CardContent className="p-4">
                                             <p className="text-sm text-yellow-800 dark:text-yellow-200">
                                                 Showing {eventsWithLocation.length} of {data.data.length} events. 
-                                                Some events don't have location data and can't be displayed on the map.
+                                                Some events lack sufficient address information for geocoding.
                                             </p>
                                         </CardContent>
                                     </Card>
                                 )}
+                                <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700">
+                                    <CardContent className="p-4">
+                                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                                            📍 Events are geocoded from their venue addresses using OpenStreetMap. 
+                                            This may take a moment for the initial load.
+                                        </p>
+                                    </CardContent>
+                                </Card>
                                 <EventMap events={eventsWithLocation} />
                             </>
                         ) : (

@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Event } from '../types/api';
 import { format } from 'date-fns';
+import { geocodeAddress, buildAddressQuery } from '../lib/geocoding';
 
 // Fix for default marker icons in Leaflet with Webpack/Vite
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -35,34 +36,73 @@ interface EventLocation {
 
 export default function EventMap({ events }: EventMapProps) {
     const [mapReady, setMapReady] = useState(false);
+    const [eventLocations, setEventLocations] = useState<EventLocation[]>([]);
+    const [isGeocoding, setIsGeocoding] = useState(false);
 
+    // Geocode addresses to get coordinates
     useEffect(() => {
-        setMapReady(true);
-    }, []);
+        let isMounted = true;
+        
+        const geocodeEvents = async () => {
+            setIsGeocoding(true);
+            const locationMap = new Map<string, EventLocation>();
 
-    // Group events by location (venue coordinates)
-    const eventLocations = useMemo(() => {
-        const locationMap = new Map<string, EventLocation>();
-
-        events.forEach(event => {
-            if (event.venue?.primary_location?.latitude && event.venue?.primary_location?.longitude) {
-                const lat = event.venue.primary_location.latitude;
-                const lng = event.venue.primary_location.longitude;
-                const key = `${lat},${lng}`;
-
-                if (locationMap.has(key)) {
-                    locationMap.get(key)!.events.push(event);
-                } else {
-                    locationMap.set(key, {
-                        lat,
-                        lng,
-                        events: [event]
-                    });
+            for (const event of events) {
+                if (!event.venue?.primary_location) continue;
+                
+                const location = event.venue.primary_location;
+                
+                // First check if we have lat/lng already
+                if (location.latitude && location.longitude) {
+                    const key = `${location.latitude},${location.longitude}`;
+                    if (locationMap.has(key)) {
+                        locationMap.get(key)!.events.push(event);
+                    } else {
+                        locationMap.set(key, {
+                            lat: location.latitude,
+                            lng: location.longitude,
+                            events: [event]
+                        });
+                    }
+                    continue;
+                }
+                
+                // Try to geocode from address
+                const addressKey = buildAddressQuery(location);
+                if (!addressKey) continue;
+                
+                // Check if we already have this address geocoded in current batch
+                if (locationMap.has(addressKey)) {
+                    locationMap.get(addressKey)!.events.push(event);
+                    continue;
+                }
+                
+                try {
+                    const geocoded = await geocodeAddress(location);
+                    if (geocoded && isMounted) {
+                        locationMap.set(addressKey, {
+                            lat: geocoded.lat,
+                            lng: geocoded.lng,
+                            events: [event]
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error geocoding event location:', error);
                 }
             }
-        });
 
-        return Array.from(locationMap.values());
+            if (isMounted) {
+                setEventLocations(Array.from(locationMap.values()));
+                setIsGeocoding(false);
+                setMapReady(true);
+            }
+        };
+
+        geocodeEvents();
+        
+        return () => {
+            isMounted = false;
+        };
     }, [events]);
 
     // Calculate bounds to fit all markers
@@ -82,10 +122,19 @@ export default function EventMap({ events }: EventMapProps) {
     const defaultCenter: [number, number] = [40.4406, -79.9959];
     const defaultZoom = 12;
 
-    if (!mapReady) {
+    if (!mapReady || isGeocoding) {
         return (
             <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                <p className="text-gray-500">Loading map...</p>
+                <div className="text-center">
+                    <p className="text-gray-500">
+                        {isGeocoding ? 'Geocoding event locations...' : 'Loading map...'}
+                    </p>
+                    {isGeocoding && (
+                        <p className="text-sm text-gray-400 mt-2">
+                            This may take a moment for multiple events
+                        </p>
+                    )}
+                </div>
             </div>
         );
     }
@@ -93,7 +142,12 @@ export default function EventMap({ events }: EventMapProps) {
     if (eventLocations.length === 0) {
         return (
             <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <p className="text-gray-500">No events with location data found. Try adjusting your filters.</p>
+                <div className="text-center px-4">
+                    <p className="text-gray-500 mb-2">No events with location data found.</p>
+                    <p className="text-sm text-gray-400">
+                        Events need either coordinates or a valid address to appear on the map.
+                    </p>
+                </div>
             </div>
         );
     }

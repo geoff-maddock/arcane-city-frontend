@@ -1,7 +1,31 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import EventMap from '../../components/EventMap';
 import { Event } from '../../types/api';
+
+// Mock the geocoding module
+vi.mock('../../lib/geocoding', () => ({
+    geocodeAddress: vi.fn(async (location) => {
+        // Simulate successful geocoding for addresses
+        if (location.address_one && location.city) {
+            return {
+                lat: 40.4406,
+                lng: -79.9959,
+                address: `${location.address_one}, ${location.city}`
+            };
+        }
+        return null;
+    }),
+    buildAddressQuery: vi.fn((location) => {
+        if (location.address_one || location.city) {
+            const parts = [];
+            if (location.address_one) parts.push(location.address_one);
+            if (location.city) parts.push(location.city);
+            return parts.join(', ');
+        }
+        return null;
+    })
+}));
 
 // Mock the Link component from react-router
 vi.mock('@tanstack/react-router', () => ({
@@ -35,6 +59,10 @@ vi.mock('react-leaflet', () => ({
 }));
 
 describe('EventMap', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     const mockVenue = {
         id: 1,
         name: 'Test Venue',
@@ -62,21 +90,28 @@ describe('EventMap', () => {
         updated_at: '2024-01-01T00:00:00Z'
     };
 
-    it('renders map when events have location data', () => {
+    it('renders map when events have location data', async () => {
         render(<EventMap events={[mockEvent]} />);
-        expect(screen.getByTestId('map-container')).toBeInTheDocument();
+        
+        // Wait for geocoding to complete
+        await waitFor(() => {
+            expect(screen.getByTestId('map-container')).toBeInTheDocument();
+        });
     });
 
-    it('displays message when no events have location data', () => {
+    it('displays message when no events have location data', async () => {
         const eventWithoutLocation: Event = {
             ...mockEvent,
             venue: undefined
         };
         render(<EventMap events={[eventWithoutLocation]} />);
-        expect(screen.getByText(/No events with location data found/i)).toBeInTheDocument();
+        
+        await waitFor(() => {
+            expect(screen.getByText(/No events with location data found/i)).toBeInTheDocument();
+        });
     });
 
-    it('groups multiple events at same location', () => {
+    it('groups multiple events at same location', async () => {
         const event2: Event = {
             ...mockEvent,
             id: 2,
@@ -86,12 +121,15 @@ describe('EventMap', () => {
         
         render(<EventMap events={[mockEvent, event2]} />);
         
-        // Should only have 1 marker for 2 events at same location
-        const markers = screen.getAllByTestId('marker');
-        expect(markers).toHaveLength(1);
+        // Wait for geocoding and rendering
+        await waitFor(() => {
+            const markers = screen.getAllByTestId('marker');
+            // Should only have 1 marker for 2 events at same location
+            expect(markers).toHaveLength(1);
+        });
     });
 
-    it('creates separate markers for different locations', () => {
+    it('creates separate markers for different locations', async () => {
         const differentVenue = {
             ...mockVenue,
             id: 2,
@@ -115,8 +153,11 @@ describe('EventMap', () => {
         
         render(<EventMap events={[mockEvent, event2]} />);
         
-        // Should have 2 markers for events at different locations
-        const markers = screen.getAllByTestId('marker');
-        expect(markers).toHaveLength(2);
+        // Wait for geocoding and rendering
+        await waitFor(() => {
+            const markers = screen.getAllByTestId('marker');
+            // Should have 2 markers for events at different locations
+            expect(markers).toHaveLength(2);
+        });
     });
 });
