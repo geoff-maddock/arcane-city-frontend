@@ -1,4 +1,5 @@
 import { Location } from '../types/api';
+import { updateLocationCoordinates } from '../services/location.service';
 
 interface GeocodedLocation {
     lat: number;
@@ -42,6 +43,7 @@ export function buildAddressQuery(location: Location): string | null {
 /**
  * Geocode an address using Nominatim (OpenStreetMap's geocoding service)
  * Free to use with proper attribution and rate limiting
+ * Saves geocoded coordinates to the database for future use
  */
 export async function geocodeAddress(location: Location): Promise<GeocodedLocation | null> {
     // First check if we already have lat/lng
@@ -102,6 +104,19 @@ export async function geocodeAddress(location: Location): Promise<GeocodedLocati
         };
         
         geocodeCache.set(addressQuery, result);
+        
+        // Save coordinates to database for future use
+        // This runs in the background and doesn't block the UI
+        updateLocationCoordinates(location.id, result.lat, result.lng)
+            .then((updated) => {
+                if (updated) {
+                    console.log(`Saved coordinates for location ${location.id} (${location.name})`);
+                }
+            })
+            .catch((error) => {
+                console.warn(`Could not save coordinates for location ${location.id}:`, error);
+            });
+        
         return result;
         
     } catch (error) {
