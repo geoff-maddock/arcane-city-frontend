@@ -7,6 +7,7 @@ export interface LocationFilters {
     address_one?: string;
     neighborhood?: string;
     city?: string;
+    search?: string;
 }
 
 interface UseLocationsParams {
@@ -28,6 +29,7 @@ export const useLocations = ({ page = 1, itemsPerPage = 25, filters, sort = 'nam
             if (filters?.address_one) params.append('filters[address_one]', filters.address_one);
             if (filters?.neighborhood) params.append('filters[neighborhood]', filters.neighborhood);
             if (filters?.city) params.append('filters[city]', filters.city);
+            if (filters?.search) params.append('filters[search]', filters.search);
             if (sort) params.append('sort', sort);
             if (direction) params.append('direction', direction);
 

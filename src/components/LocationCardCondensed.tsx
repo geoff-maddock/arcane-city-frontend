@@ -1,6 +1,7 @@
 import { LocationResponse } from '../types/api';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import MapPin from '@/components/icons/MapPin';
+import { Link } from '@tanstack/react-router';
 
 interface LocationCardCondensedProps {
     location: LocationResponse;
@@ -18,6 +19,15 @@ export default function LocationCardCondensed({ location }: LocationCardCondense
                         <h3 className="text-xl font-semibold leading-tight text-gray-900 mb-2">
                             {location.name}
                         </h3>
+                        {location.entity && (
+                            <Link
+                                to="/entities/$entitySlug"
+                                params={{ entitySlug: location.entity.slug }}
+                                className="text-sm text-primary hover:underline font-medium mb-2 inline-block"
+                            >
+                                {location.entity.name}
+                            </Link>
+                        )}
                         <div className="space-y-1 text-sm text-gray-600">
                             {location.address_one && (
                                 <p>{location.address_one}</p>

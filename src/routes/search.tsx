@@ -116,13 +116,10 @@ const Search: React.FC = () => {
   const { data: entityData } = useEntities({ page: entityPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
   const { data: seriesData } = useSeries({ page: seriesPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
   const { data: tagData } = useTags({ page: tagPage, itemsPerPage: 10, filters: baseFilters, sort: 'created_at', direction: 'desc' });
-  
+
   // Location search - search across name, address, neighborhood, and city
   const locationFilters = {
-    name,
-    address_one: name,
-    neighborhood: name,
-    city: name,
+    search: name,
   };
   const { data: locationData } = useLocations({ page: locationPage, itemsPerPage: 10, filters: locationFilters, sort: 'name', direction: 'asc' });
 
