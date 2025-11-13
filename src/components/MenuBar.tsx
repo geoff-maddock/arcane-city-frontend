@@ -157,17 +157,17 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
       </nav>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
       {user ? (
-        <>
-          <Button asChild className="w-full flex items-center justify-center gap-2 mb-2">
+        <div className="w-full flex flex-row xl:flex-col gap-2 mb-2">
+          <Button asChild className="flex items-center justify-center gap-2 flex-1 xl:w-full">
             <Link to="/account">
               <HiUser />
               <span className="lg:inline">My Account</span>
             </Link>
           </Button>
-          <Button onClick={() => { authService.logout(); window.location.reload(); }} className="w-full mb-2">
+          <Button onClick={() => { authService.logout(); window.location.reload(); }} className="flex-1 xl:w-full">
             Log out
           </Button>
-        </>
+        </div>
       ) : (
         <>
           <Button asChild className="w-full flex items-center justify-center gap-2 mb-2">
@@ -178,11 +178,11 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
           </Button>
         </>
       )}
-      <div className="mt-auto w-full flex flex-col items-center gap-2">
+      <div className="mt-auto w-full flex flex-row xl:flex-col items-center gap-2">
         <Button
           onClick={toggleTheme}
           data-testid="theme-toggle"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 flex-1 xl:w-full"
           aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           aria-pressed={theme === 'dark'}
         >
@@ -194,7 +194,7 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         <Button
           onClick={toggleMediaPlayers}
           data-testid="media-player-toggle"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 flex-1 xl:w-full"
           aria-label={mediaPlayersEnabled ? 'Disable media players' : 'Enable media players'}
           aria-pressed={mediaPlayersEnabled}
         >
