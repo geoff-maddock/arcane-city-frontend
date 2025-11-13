@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import { Link } from '@tanstack/react-router';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -245,36 +245,47 @@ export default function EventMap({ events }: EventMapProps) {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {eventLocations.map((location, idx) => (
-                    <Marker
-                        key={idx}
-                        position={[location.lat, location.lng]}
-                    >
-                        <Popup maxWidth={300} className="event-popup">
-                            <div className="p-2">
-                                {location.events.length === 1 ? (
-                                    // Single event at this location
-                                    <EventPopupContent event={location.events[0]} />
-                                ) : (
-                                    // Multiple events at this location
-                                    <div>
-                                        <h3 className="font-bold mb-2">
-                                            {location.events[0].venue?.name}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 mb-2">
-                                            {location.events.length} events at this location
-                                        </p>
-                                        <div className="space-y-2 max-h-64 overflow-y-auto">
-                                            {location.events.map(event => (
-                                                <EventPopupContent key={event.id} event={event} compact />
-                                            ))}
+                {eventLocations.map((location, idx) => {
+                    const venueName = location.events[0]?.venue?.name || 'Unknown Venue';
+                    const eventCount = location.events.length;
+                    const tooltipText = eventCount === 1 
+                        ? venueName 
+                        : `${venueName} (${eventCount} events)`;
+                    
+                    return (
+                        <Marker
+                            key={idx}
+                            position={[location.lat, location.lng]}
+                        >
+                            <Tooltip direction="top" offset={[0, -40]} opacity={0.9}>
+                                {tooltipText}
+                            </Tooltip>
+                            <Popup maxWidth={300} className="event-popup">
+                                <div className="p-2">
+                                    {location.events.length === 1 ? (
+                                        // Single event at this location
+                                        <EventPopupContent event={location.events[0]} />
+                                    ) : (
+                                        // Multiple events at this location
+                                        <div>
+                                            <h3 className="font-bold mb-2">
+                                                {location.events[0].venue?.name}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 mb-2">
+                                                {location.events.length} events at this location
+                                            </p>
+                                            <div className="space-y-2 max-h-64 overflow-y-auto">
+                                                {location.events.map(event => (
+                                                    <EventPopupContent key={event.id} event={event} compact />
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
+                                    )}
+                                </div>
+                            </Popup>
+                        </Marker>
+                    );
+                })}
             </MapContainer>
         </div>
     );
