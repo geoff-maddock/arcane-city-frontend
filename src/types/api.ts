@@ -125,7 +125,15 @@ export interface LocationResponse {
     visibility_id?: number;
     location_type_id?: number;
     map_url?: string;
+    entity: EntityMinimalSlugResponse;
 }
+
+export interface EntityMinimalSlugResponse {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 
 export interface Contact {
     id: number;

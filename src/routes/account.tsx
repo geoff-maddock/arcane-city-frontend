@@ -48,7 +48,7 @@ const Account: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            {user.photos.length > 0 && (
+            {user.photos && user.photos.length > 0 && (
               <img
                 src={user.photos[0].thumbnail_path}
                 alt={user.name}
@@ -179,7 +179,7 @@ const Account: React.FC = () => {
           {/* Right Column - Following/Activity */}
           <div className="lg:col-span-2 space-y-6">
             {/* Photos Section */}
-            {user.photos.length > 1 && (
+            {user.photos && user.photos.length > 1 && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Photos</h2>
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
