@@ -60,6 +60,49 @@ const eventRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/events',
     component: Events,
+    validateSearch: (search: Record<string, unknown>): Partial<{
+        name: string;
+        venue: string;
+        promoter: string;
+        entity: string;
+        event_type: string;
+        tag: string;
+        start_at_start: string;
+        start_at_end: string;
+        presale_price_min: string;
+        presale_price_max: string;
+        door_price_min: string;
+        door_price_max: string;
+        min_age: string;
+        is_benefit: string;
+        series: string;
+        page: string;
+        itemsPerPage: string;
+        sort: string;
+        direction: string;
+    }> => {
+        return {
+            name: (search.name as string) ?? undefined,
+            venue: (search.venue as string) ?? undefined,
+            promoter: (search.promoter as string) ?? undefined,
+            entity: (search.entity as string) ?? undefined,
+            event_type: (search.event_type as string) ?? undefined,
+            tag: (search.tag as string) ?? undefined,
+            start_at_start: (search.start_at_start as string) ?? undefined,
+            start_at_end: (search.start_at_end as string) ?? undefined,
+            presale_price_min: (search.presale_price_min as string) ?? undefined,
+            presale_price_max: (search.presale_price_max as string) ?? undefined,
+            door_price_min: (search.door_price_min as string) ?? undefined,
+            door_price_max: (search.door_price_max as string) ?? undefined,
+            min_age: (search.min_age as string) ?? undefined,
+            is_benefit: (search.is_benefit as string) ?? undefined,
+            series: (search.series as string) ?? undefined,
+            page: (search.page as string) ?? undefined,
+            itemsPerPage: (search.itemsPerPage as string) ?? undefined,
+            sort: (search.sort as string) ?? undefined,
+            direction: (search.direction as string) ?? undefined,
+        };
+    },
     head: () => {
         // Build current absolute URL in the client; SSR fallback to site root
         const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/events';
@@ -81,6 +124,37 @@ const entityRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/entities',
     component: Entities,
+    validateSearch: (search: Record<string, unknown>): Partial<{
+        name: string;
+        entity_type: string;
+        role: string;
+        entity_status: string;
+        tag: string;
+        created_at_start: string;
+        created_at_end: string;
+        started_at_start: string;
+        started_at_end: string;
+        page: string;
+        itemsPerPage: string;
+        sort: string;
+        direction: string;
+    }> => {
+        return {
+            name: (search.name as string) ?? undefined,
+            entity_type: (search.entity_type as string) ?? undefined,
+            role: (search.role as string) ?? undefined,
+            entity_status: (search.entity_status as string) ?? undefined,
+            tag: (search.tag as string) ?? undefined,
+            created_at_start: (search.created_at_start as string) ?? undefined,
+            created_at_end: (search.created_at_end as string) ?? undefined,
+            started_at_start: (search.started_at_start as string) ?? undefined,
+            started_at_end: (search.started_at_end as string) ?? undefined,
+            page: (search.page as string) ?? undefined,
+            itemsPerPage: (search.itemsPerPage as string) ?? undefined,
+            sort: (search.sort as string) ?? undefined,
+            direction: (search.direction as string) ?? undefined,
+        };
+    },
     head: () => {
         // Build current absolute URL in the client; SSR fallback to site root
         const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/entities';
@@ -102,6 +176,41 @@ const seriesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/series',
     component: Series,
+    validateSearch: (search: Record<string, unknown>): Partial<{
+        name: string;
+        venue: string;
+        promoter: string;
+        entity: string;
+        event_type: string;
+        tag: string;
+        founded_at_start: string;
+        founded_at_end: string;
+        occurrence_type: string;
+        occurrence_week: string;
+        occurrence_day: string;
+        page: string;
+        itemsPerPage: string;
+        sort: string;
+        direction: string;
+    }> => {
+        return {
+            name: (search.name as string) ?? undefined,
+            venue: (search.venue as string) ?? undefined,
+            promoter: (search.promoter as string) ?? undefined,
+            entity: (search.entity as string) ?? undefined,
+            event_type: (search.event_type as string) ?? undefined,
+            tag: (search.tag as string) ?? undefined,
+            founded_at_start: (search.founded_at_start as string) ?? undefined,
+            founded_at_end: (search.founded_at_end as string) ?? undefined,
+            occurrence_type: (search.occurrence_type as string) ?? undefined,
+            occurrence_week: (search.occurrence_week as string) ?? undefined,
+            occurrence_day: (search.occurrence_day as string) ?? undefined,
+            page: (search.page as string) ?? undefined,
+            itemsPerPage: (search.itemsPerPage as string) ?? undefined,
+            sort: (search.sort as string) ?? undefined,
+            direction: (search.direction as string) ?? undefined,
+        };
+    },
     head: () => {
         // Build current absolute URL in the client; SSR fallback to site root
         const url = typeof window !== 'undefined' ? window.location.href : 'https://arcane.city/series';
