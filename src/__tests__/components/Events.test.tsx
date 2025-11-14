@@ -15,6 +15,17 @@ vi.mock('../../hooks/useLocalStorage', () => ({
     useLocalStorage: () => [25, vi.fn()]
 }))
 
+// Mock TanStack Router hooks
+vi.mock('@tanstack/react-router', async () => {
+    const actual = await vi.importActual('@tanstack/react-router');
+    return {
+        ...actual,
+        useSearch: vi.fn(() => ({})),
+        useNavigate: vi.fn(() => vi.fn()),
+        Link: ({ children, ...props }: React.PropsWithChildren) => <a {...props}>{children}</a>,
+    };
+});
+
 // Mock child components
 vi.mock('../../components/EventCard', () => ({
     default: ({ event }: { event: { name: string } }) => (
