@@ -1,6 +1,13 @@
 import { render, screen } from '../test-render';
 import LocationCardCondensed from '../../components/LocationCardCondensed';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// Mock Link component from react-router to avoid needing RouterProvider
+vi.mock('@tanstack/react-router', () => ({
+    Link: ({ children, to, params }: { children: React.ReactNode; to: string; params: Record<string, string> }) => (
+        <a href={`${to}/${params?.entitySlug || ''}`}>{children}</a>
+    ),
+}));
 
 describe('LocationCardCondensed', () => {
     const mockLocation = {
@@ -14,11 +21,16 @@ describe('LocationCardCondensed', () => {
         postcode: '15203',
         country: 'USA',
         map_url: 'https://maps.google.com/?q=The+Rex+Theater',
+        entity: {
+            id: 1,
+            name: 'The Rex Theater',
+            slug: 'the-rex-theater',
+        },
     };
 
     it('renders location name', () => {
         render(<LocationCardCondensed location={mockLocation} />);
-        expect(screen.getByText('The Rex Theater')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'The Rex Theater' })).toBeInTheDocument();
     });
 
     it('displays address information', () => {
@@ -39,9 +51,14 @@ describe('LocationCardCondensed', () => {
             id: 2,
             name: 'Minimal Venue',
             slug: 'minimal-venue',
+            entity: {
+                id: 2,
+                name: 'Minimal Venue',
+                slug: 'minimal-venue',
+            },
         };
         render(<LocationCardCondensed location={minimalLocation} />);
-        expect(screen.getByText('Minimal Venue')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Minimal Venue' })).toBeInTheDocument();
     });
 
     it('displays map link when map_url is present', () => {

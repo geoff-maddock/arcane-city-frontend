@@ -259,17 +259,6 @@ const Search: React.FC = () => {
     return () => observer.disconnect();
   }, [eventCount, entityCount, seriesCount, tagCount, locationCount]);
 
-  // Sync hash with activeSection (without adding history entries)
-  useEffect(() => {
-    if (activeSection) {
-      const url = new URL(window.location.href);
-      if (url.hash !== `#${activeSection}`) {
-        url.hash = activeSection;
-        window.history.replaceState(null, '', url.toString());
-      }
-    }
-  }, [activeSection]);
-
   // On initial mount, scroll to hash if present
   useEffect(() => {
     if (window.location.hash) {
