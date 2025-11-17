@@ -1,5 +1,5 @@
 // src/routes/event-detail.tsx
-import { createRoute } from '@tanstack/react-router';
+import { createRoute, Link } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import SeriesDetail from '../components/SeriesDetail';
 import type { Series } from '../types/api';
@@ -12,17 +12,50 @@ async function loadSeries(slug: string): Promise<Series> {
     return data;
 }
 
+// Error component for when series is not found
+const SeriesNotFound = () => (
+    <div className="min-h-[calc(100vh-4rem)] xl:min-h-screen w-full bg-white dark:bg-black transition-colors">
+        <div className="max-w-3xl mx-auto p-6 xl:p-8 space-y-6">
+            <h1 className="text-4xl font-bold tracking-tight">404 - Series Not Found</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+                Sorry, the series you're looking for doesn't exist.
+            </p>
+            <div className="space-y-4">
+                <p>
+                    The series you requested could not be found. This might be because:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                    <li>The series slug was typed incorrectly</li>
+                    <li>The series has been moved or deleted</li>
+                    <li>The link you followed is outdated</li>
+                </ul>
+            </div>
+            <div className="pt-4 flex gap-4">
+                <Link 
+                    to="/series" 
+                    className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                >
+                    Browse Series
+                </Link>
+                <Link 
+                    to="/" 
+                    className="inline-block px-6 py-3 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-900 dark:text-gray-100 font-medium rounded-lg transition-colors"
+                >
+                    Go to Homepage
+                </Link>
+            </div>
+        </div>
+    </div>
+);
 
 export const SeriesDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/series/$slug',
     loader: async ({ params }) => loadSeries(params.slug),
-    component: function SeriesDetailWrapper() {
-        const params = SeriesDetailRoute.useParams();
-        const series = SeriesDetailRoute.useLoaderData() as Series;
-        return <SeriesDetail slug={params.slug} initialSeries={series} />;
-    },
+    errorComponent: SeriesNotFound,
     head: ({ loaderData }) => {
+        if (!loaderData) return { meta: [] };
+        
         const series = loaderData as Series;
         const title = buildSeriesTitle(series);
         const description = truncate(series.short || series.description) || SITE_NAME;
@@ -39,5 +72,10 @@ export const SeriesDetailRoute = createRoute({
                 { name: 'twitter:image', content: ogImage },
             ],
         };
+    },
+    component: function SeriesDetailWrapper() {
+        const params = SeriesDetailRoute.useParams();
+        const series = SeriesDetailRoute.useLoaderData() as Series;
+        return <SeriesDetail slug={params.slug} initialSeries={series} />;
     },
 });
