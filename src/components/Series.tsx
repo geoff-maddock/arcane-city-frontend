@@ -13,9 +13,10 @@ import { SeriesFilters } from '../types/filters';
 import { ActiveSeriesFilters as ActiveFilters } from './ActiveSeriesFilters';
 import { FilterContainer } from './FilterContainer';
 import { Button } from '@/components/ui/button';
-import { Link } from '@tanstack/react-router';
+import { Link, useSearch, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
+import { ShareButton } from './ShareButton';
 
 const sortOptions = [
     { value: 'name', label: 'Name' },
@@ -26,6 +27,8 @@ const sortOptions = [
 
 
 export default function Series() {
+    const searchParams = useSearch({ from: '/series' });
+    const navigate = useNavigate();
     const { filtersVisible, toggleFilters } = useFilterToggle();
 
     const { data: user } = useQuery({
@@ -50,10 +53,36 @@ export default function Series() {
         occurrence_day: ''
     });
 
-    const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useLocalStorage('seriesPerPage', 25);
-    const [sort, setSort] = useState('created_at');
-    const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
+    // Initialize filters from URL parameters
+    useEffect(() => {
+        if (Object.keys(searchParams).length > 0) {
+            setFilters({
+                name: searchParams.name || '',
+                venue: searchParams.venue || '',
+                promoter: searchParams.promoter || '',
+                event_type: searchParams.event_type || '',
+                entity: searchParams.entity || '',
+                tag: searchParams.tag || '',
+                founded_at: {
+                    start: searchParams.founded_at_start || undefined,
+                    end: searchParams.founded_at_end || undefined
+                },
+                occurrence_type: searchParams.occurrence_type || '',
+                occurrence_week: searchParams.occurrence_week || '',
+                occurrence_day: searchParams.occurrence_day || ''
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run on mount
+
+    const [page, setPage] = useState(parseInt(searchParams.page || '1', 10));
+    const [itemsPerPage, setItemsPerPage] = useLocalStorage('seriesPerPage', 
+        searchParams.itemsPerPage ? parseInt(searchParams.itemsPerPage, 10) : 25
+    );
+    const [sort, setSort] = useState(searchParams.sort || 'created_at');
+    const [direction, setDirection] = useState<'asc' | 'desc'>(
+        (searchParams.direction as 'asc' | 'desc') || 'asc'
+    );
 
     const { data, isLoading, error } = useSeries({
         filters,
@@ -63,14 +92,36 @@ export default function Series() {
         direction
     });
 
-    // Initialize filters from query parameters
+    // Update URL when filters, page, sort, or direction change
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const tag = params.get('tag');
-        if (tag) {
-            setFilters(prev => ({ ...prev, tag }));
-        }
-    }, []);
+        const searchObj: Record<string, string> = {};
+        
+        // Add filter parameters
+        if (filters.name) searchObj.name = filters.name;
+        if (filters.venue) searchObj.venue = filters.venue;
+        if (filters.promoter) searchObj.promoter = filters.promoter;
+        if (filters.event_type) searchObj.event_type = filters.event_type;
+        if (filters.entity) searchObj.entity = filters.entity;
+        if (filters.tag) searchObj.tag = filters.tag;
+        if (filters.founded_at?.start) searchObj.founded_at_start = filters.founded_at.start;
+        if (filters.founded_at?.end) searchObj.founded_at_end = filters.founded_at.end;
+        if (filters.occurrence_type) searchObj.occurrence_type = filters.occurrence_type;
+        if (filters.occurrence_week) searchObj.occurrence_week = filters.occurrence_week;
+        if (filters.occurrence_day) searchObj.occurrence_day = filters.occurrence_day;
+        
+        // Add pagination and sorting parameters
+        if (page > 1) searchObj.page = page.toString();
+        if (itemsPerPage !== 25) searchObj.itemsPerPage = itemsPerPage.toString();
+        if (sort !== 'created_at') searchObj.sort = sort;
+        if (direction !== 'asc') searchObj.direction = direction;
+
+        navigate({
+            to: '/series',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            search: searchObj as any,
+            replace: true,
+        });
+    }, [filters, page, itemsPerPage, sort, direction, navigate]);
 
     // Reset pagination when filters change
     useEffect(() => {
@@ -182,12 +233,17 @@ export default function Series() {
                 <div className="mx-auto md:px-6 md:py-8 px-3 py-4 max-w-[2400px]">
                     <div className="space-y-8">
                         <div className="flex flex-col space-y-2">
-                            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                                Series Listings
-                            </h1>
-                            <p className="text-lg text-gray-500">
-                                Discover and explore series in our database.
-                            </p>
+                            <div className="flex justify-between items-start">
+                                <div className="flex flex-col space-y-2">
+                                    <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+                                        Series Listings
+                                    </h1>
+                                    <p className="text-lg text-gray-500">
+                                        Discover and explore series in our database.
+                                    </p>
+                                </div>
+                                <ShareButton />
+                            </div>
                             {user && (
                                 <Button asChild className="self-start">
                                     <Link to="/series/create" search={{ fromEvent: undefined }}>Create Series</Link>

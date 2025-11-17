@@ -12,10 +12,11 @@ import { EntityFilterContext } from '../context/EntityFilterContext';
 import { EntityFilters } from '../types/filters';
 import { ActiveEntityFilters as ActiveFilters } from './ActiveEntityFilters';
 import { FilterContainer } from './FilterContainer';
-import { useSearch, Link } from '@tanstack/react-router';
+import { useSearch, Link, useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { authService } from '@/services/auth.service';
 import { useQuery } from '@tanstack/react-query';
+import { ShareButton } from './ShareButton';
 
 
 const sortOptions = [
@@ -26,7 +27,8 @@ const sortOptions = [
 ];
 
 export default function Entities() {
-    const search = useSearch({ from: '/entities' }) as EntityFilters;
+    const searchParams = useSearch({ from: '/entities' });
+    const navigate = useNavigate();
     const { filtersVisible, toggleFilters } = useFilterToggle();
 
     const { data: user } = useQuery({
@@ -51,26 +53,37 @@ export default function Entities() {
         }
     });
 
+    // Initialize filters from URL parameters
     useEffect(() => {
-        if (search.tag) {
-            setFilters(prev => ({ ...prev, tag: search.tag }));
+        if (Object.keys(searchParams).length > 0) {
+            setFilters({
+                name: searchParams.name || '',
+                entity_type: searchParams.entity_type || '',
+                role: searchParams.role || '',
+                entity_status: searchParams.entity_status || '',
+                tag: searchParams.tag || '',
+                created_at: {
+                    start: searchParams.created_at_start || undefined,
+                    end: searchParams.created_at_end || undefined
+                },
+                started_at: {
+                    start: searchParams.started_at_start || undefined,
+                    end: searchParams.started_at_end || undefined
+                }
+            });
         }
-    }, [search.tag]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run on mount
 
-    // Initialize filters from query parameters
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const tag = params.get('tag');
-        if (tag) {
-            setFilters(prev => ({ ...prev, tag }));
-        }
-    }, []);
-
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(parseInt(searchParams.page || '1', 10));
     // Replace useState with useLocalStorage
-    const [itemsPerPage, setItemsPerPage] = useLocalStorage('entitiesPerPage', 25);
-    const [sort, setSort] = useState('created_at');
-    const [direction, setDirection] = useState<'asc' | 'desc'>('desc');
+    const [itemsPerPage, setItemsPerPage] = useLocalStorage('entitiesPerPage', 
+        searchParams.itemsPerPage ? parseInt(searchParams.itemsPerPage, 10) : 25
+    );
+    const [sort, setSort] = useState(searchParams.sort || 'created_at');
+    const [direction, setDirection] = useState<'asc' | 'desc'>(
+        (searchParams.direction as 'asc' | 'desc') || 'desc'
+    );
 
     const { data, isLoading, error } = useEntities({
         filters,
@@ -79,6 +92,35 @@ export default function Entities() {
         sort,
         direction
     });
+
+    // Update URL when filters, page, sort, or direction change
+    useEffect(() => {
+        const searchObj: Record<string, string> = {};
+        
+        // Add filter parameters
+        if (filters.name) searchObj.name = filters.name;
+        if (filters.entity_type) searchObj.entity_type = filters.entity_type;
+        if (filters.role) searchObj.role = filters.role;
+        if (filters.entity_status) searchObj.entity_status = filters.entity_status;
+        if (filters.tag) searchObj.tag = filters.tag;
+        if (filters.created_at?.start) searchObj.created_at_start = filters.created_at.start;
+        if (filters.created_at?.end) searchObj.created_at_end = filters.created_at.end;
+        if (filters.started_at?.start) searchObj.started_at_start = filters.started_at.start;
+        if (filters.started_at?.end) searchObj.started_at_end = filters.started_at.end;
+        
+        // Add pagination and sorting parameters
+        if (page > 1) searchObj.page = page.toString();
+        if (itemsPerPage !== 25) searchObj.itemsPerPage = itemsPerPage.toString();
+        if (sort !== 'created_at') searchObj.sort = sort;
+        if (direction !== 'desc') searchObj.direction = direction;
+
+        navigate({
+            to: '/entities',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            search: searchObj as any,
+            replace: true,
+        });
+    }, [filters, page, itemsPerPage, sort, direction, navigate]);
 
     // Reset pagination when filters change
     useEffect(() => {
@@ -188,12 +230,17 @@ export default function Entities() {
                 <div className="mx-auto md:px-6 md:py-8 px-3 py-4 max-w-[2400px]">
                     <div className="space-y-8">
                         <div className="flex flex-col space-y-2">
-                            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                                Entity Listings
-                            </h1>
-                            <p className="text-lg text-gray-500">
-                                Discover and explore entities in our database.
-                            </p>
+                            <div className="flex justify-between items-start">
+                                <div className="flex flex-col space-y-2">
+                                    <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+                                        Entity Listings
+                                    </h1>
+                                    <p className="text-lg text-gray-500">
+                                        Discover and explore entities in our database.
+                                    </p>
+                                </div>
+                                <ShareButton />
+                            </div>
                             {user && (
                                 <Button asChild className="self-start">
                                     <Link to="/entity/create">Create Entity</Link>
