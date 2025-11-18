@@ -186,7 +186,7 @@ export default function Series() {
                                 Series Listings
                             </h1>
                             <p className="text-lg text-gray-500">
-                                Discover and explore series in our database.
+                                Discover and explore event series.
                             </p>
                             {user && (
                                 <Button asChild className="self-start">

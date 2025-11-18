@@ -204,7 +204,7 @@ export default function Events() {
                                 Event Listings
                             </h1>
                             <p className="text-lg text-gray-500">
-                                Discover and explore upcoming events in your area
+                                Discover and explore upcoming events.
                             </p>
                             {user && (
                                 <Button asChild className="self-start">
