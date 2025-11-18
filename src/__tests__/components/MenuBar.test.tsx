@@ -81,7 +81,36 @@ describe('MenuBar More submenu', () => {
     vi.mocked(authService.isAuthenticated).mockReturnValue(false)
   })
 
-  it('initially hides About, Blogs, Help, and Privacy links', async () => {
+  it('shows direct links when viewport has enough vertical space', async () => {
+    // Mock viewport height to be large enough
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 800,
+    })
+
+    await renderMenuBar()
+
+    // Links should be visible directly, not behind More button
+    await waitFor(() => {
+      expect(screen.getByText('About')).toBeInTheDocument()
+      expect(screen.getByText('Blogs')).toBeInTheDocument()
+      expect(screen.getByText('Help')).toBeInTheDocument()
+      expect(screen.getByText('Privacy')).toBeInTheDocument()
+    })
+
+    // More button should not exist
+    expect(screen.queryByRole('button', { name: /toggle more menu options/i })).not.toBeInTheDocument()
+  })
+
+  it('initially hides About, Blogs, Help, and Privacy links when viewport has limited space', async () => {
+    // Mock viewport height to be small
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 600,
+    })
+
     await renderMenuBar()
 
     expect(screen.queryByText('About')).not.toBeInTheDocument()
@@ -90,7 +119,14 @@ describe('MenuBar More submenu', () => {
     expect(screen.queryByText('Privacy')).not.toBeInTheDocument()
   })
 
-  it('shows More button', async () => {
+  it('shows More button when viewport has limited space', async () => {
+    // Mock viewport height to be small
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 600,
+    })
+
     await renderMenuBar()
 
     const moreButton = screen.getByRole('button', { name: /toggle more menu options/i })
@@ -99,6 +135,13 @@ describe('MenuBar More submenu', () => {
   })
 
   it('expands and shows menu items when More button is clicked', async () => {
+    // Mock viewport height to be small
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 600,
+    })
+
     const user = userEvent.setup()
     await renderMenuBar()
 
@@ -116,6 +159,13 @@ describe('MenuBar More submenu', () => {
   })
 
   it('collapses menu items when More button is clicked again', async () => {
+    // Mock viewport height to be small
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 600,
+    })
+
     const user = userEvent.setup()
     await renderMenuBar()
 
