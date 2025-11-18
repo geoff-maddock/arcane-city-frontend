@@ -6,7 +6,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff, HiWifi } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff, HiWifi, HiMap } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
@@ -99,6 +99,10 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         <Link to="/event-grid" className="flex items-center gap-2 hover:underline text-sm ml-6 text-gray-600 dark:text-gray-300">
           <HiCalendar className="h-4 w-4" />
           <span className=" xl:inline">Event Grid</span>
+        </Link>
+        <Link to="/event-map" className="flex items-center gap-2 hover:underline text-sm ml-6 text-gray-600 dark:text-gray-300">
+          <HiMap className="h-4 w-4" />
+          <span className=" xl:inline">Event Map</span>
         </Link>
         <Link to="/calendar" className="flex items-center gap-2 hover:underline">
           <HiCalendar />

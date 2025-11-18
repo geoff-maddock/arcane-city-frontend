@@ -30,6 +30,7 @@ import { authService } from './services/auth.service';
 import { SearchRoute } from './routes/search';
 import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
 import { EventGridRoute } from './routes/event-grid';
+import { EventMapRoute } from './routes/event-map';
 import { ActivityRoute } from './routes/activity';
 import { NotFoundRoute } from './routes/not-found';
 
@@ -308,6 +309,7 @@ const routeTree = rootRoute.addChildren([
     userCalendarRoute,
     userEntitiesRoute,
     EventGridRoute,
+    EventMapRoute,
     RadarRoute,
     ActivityRoute,
     AboutRoute,
