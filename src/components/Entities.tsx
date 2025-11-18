@@ -192,7 +192,7 @@ export default function Entities() {
                                 Entity Listings
                             </h1>
                             <p className="text-lg text-gray-500">
-                                Discover and explore entities in our database.
+                                Discover and explore bands, DJs, artists, venues, promoters, and more.
                             </p>
                             {user && (
                                 <Button asChild className="self-start">

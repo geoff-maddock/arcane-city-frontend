@@ -102,7 +102,7 @@ export default function Tags() {
                     <div className="space-y-8">
                         <div className="flex flex-col space-y-2">
                             <h1 className="text-4xl font-bold tracking-tight text-gray-900">Tags</h1>
-                            <p className="text-lg text-gray-500">Browse all tags</p>
+                            <p className="text-lg text-gray-500">Browse genres and keyword tags.</p>
                             {user && (
                                 <Button asChild className="self-start">
                                     <Link to="/tag/create">Create Tag</Link>
