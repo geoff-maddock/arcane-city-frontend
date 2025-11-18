@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { render } from '../test-render' // Use our custom render with QueryClient
 import MenuBar from '../../components/MenuBar'
 import { authService } from '../../services/auth.service'
@@ -70,5 +71,71 @@ describe('MenuBar login indicator', () => {
       expect(screen.getByText('Your Calendar')).toBeInTheDocument()
       expect(screen.getByText('Your Entities')).toBeInTheDocument()
     })
+  })
+})
+
+describe('MenuBar More submenu', () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+    localStorage.clear()
+    vi.mocked(authService.isAuthenticated).mockReturnValue(false)
+  })
+
+  it('initially hides About, Blogs, Help, and Privacy links', async () => {
+    await renderMenuBar()
+
+    expect(screen.queryByText('About')).not.toBeInTheDocument()
+    expect(screen.queryByText('Blogs')).not.toBeInTheDocument()
+    expect(screen.queryByText('Help')).not.toBeInTheDocument()
+    expect(screen.queryByText('Privacy')).not.toBeInTheDocument()
+  })
+
+  it('shows More button', async () => {
+    await renderMenuBar()
+
+    const moreButton = screen.getByRole('button', { name: /toggle more menu options/i })
+    expect(moreButton).toBeInTheDocument()
+    expect(moreButton).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('expands and shows menu items when More button is clicked', async () => {
+    const user = userEvent.setup()
+    await renderMenuBar()
+
+    const moreButton = screen.getByRole('button', { name: /toggle more menu options/i })
+    await user.click(moreButton)
+
+    await waitFor(() => {
+      expect(screen.getByText('About')).toBeInTheDocument()
+      expect(screen.getByText('Blogs')).toBeInTheDocument()
+      expect(screen.getByText('Help')).toBeInTheDocument()
+      expect(screen.getByText('Privacy')).toBeInTheDocument()
+    })
+
+    expect(moreButton).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('collapses menu items when More button is clicked again', async () => {
+    const user = userEvent.setup()
+    await renderMenuBar()
+
+    const moreButton = screen.getByRole('button', { name: /toggle more menu options/i })
+    
+    // Expand
+    await user.click(moreButton)
+    await waitFor(() => {
+      expect(screen.getByText('About')).toBeInTheDocument()
+    })
+
+    // Collapse
+    await user.click(moreButton)
+    await waitFor(() => {
+      expect(screen.queryByText('About')).not.toBeInTheDocument()
+      expect(screen.queryByText('Blogs')).not.toBeInTheDocument()
+      expect(screen.queryByText('Help')).not.toBeInTheDocument()
+      expect(screen.queryByText('Privacy')).not.toBeInTheDocument()
+    })
+
+    expect(moreButton).toHaveAttribute('aria-expanded', 'false')
   })
 })

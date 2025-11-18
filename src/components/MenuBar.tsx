@@ -6,13 +6,14 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff, HiWifi } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff, HiWifi, HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
   const { mediaPlayersEnabled, toggleMediaPlayers } = useMediaPlayerContext();
   const [search, setSearch] = useState('');
+  const [moreMenuExpanded, setMoreMenuExpanded] = useState(false);
   const navigate = useNavigate();
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -138,22 +139,35 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         </Link>
 
         <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
-        <Link to="/about" className="flex items-center gap-2 hover:underline">
-          <HiInformationCircle />
-          <span className=" xl:inline">About</span>
-        </Link>
-        <Link to="/blogs" className="flex items-center gap-2 hover:underline">
-          <HiBookOpen />
-          <span className=" xl:inline">Blogs</span>
-        </Link>
-        <Link to="/help" className="flex items-center gap-2 hover:underline">
-          <HiQuestionMarkCircle />
-          <span className=" xl:inline">Help</span>
-        </Link>
-        <Link to="/privacy" className="flex items-center gap-2 hover:underline">
-          <HiInformationCircle />
-          <span className=" xl:inline">Privacy</span>
-        </Link>
+        <button
+          onClick={() => setMoreMenuExpanded(!moreMenuExpanded)}
+          className="flex items-center gap-2 hover:underline w-full text-left"
+          aria-expanded={moreMenuExpanded}
+          aria-label="Toggle more menu options"
+        >
+          {moreMenuExpanded ? <HiChevronUp /> : <HiChevronDown />}
+          <span className=" xl:inline">More</span>
+        </button>
+        {moreMenuExpanded && (
+          <div className="flex flex-col gap-2 items-start ml-6">
+            <Link to="/about" className="flex items-center gap-2 hover:underline">
+              <HiInformationCircle />
+              <span className=" xl:inline">About</span>
+            </Link>
+            <Link to="/blogs" className="flex items-center gap-2 hover:underline">
+              <HiBookOpen />
+              <span className=" xl:inline">Blogs</span>
+            </Link>
+            <Link to="/help" className="flex items-center gap-2 hover:underline">
+              <HiQuestionMarkCircle />
+              <span className=" xl:inline">Help</span>
+            </Link>
+            <Link to="/privacy" className="flex items-center gap-2 hover:underline">
+              <HiInformationCircle />
+              <span className=" xl:inline">Privacy</span>
+            </Link>
+          </div>
+        )}
       </nav>
       <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>
       {user ? (
