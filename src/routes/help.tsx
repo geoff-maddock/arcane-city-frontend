@@ -108,6 +108,33 @@ const Help = () => (
                     </div>
                 </section>
 
+                {/* Events Section */}
+                <section>
+                    <h2 className="text-2xl font-semibold mb-4">Working with Entities</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <h3 className="text-lg font-medium mb-2">Finding Events</h3>
+                            <ul className="list-disc list-inside pl-4 space-y-1">
+                                <li>Browse the main Entities page and filter by different criteria like type, role, tag, etc</li>
+                                <li>Use the search bar to search by free text</li>
+                                <li>Click on any entity card to see full details</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-medium mb-2">Adding an Entity</h3>
+                            <ul className="list-disc list-inside pl-4 space-y-1">
+                                <li>Anyone with a verified account can log in and add an entity</li>
+                                <li>You might want to add an entity if you are a band, dj, promoter, venue or other part of the scene.</li>
+                                <li>Always make sure to add the entity type - these include Group, Individual, Interest and Space.</li>
+                                <li>Always make sure to add the entity role - these include Band, DJ, Promoter, Venue, and more.  Setting venue or promoter will cause the enity to show up in those select lists.</li>
+                                <li>Add as many tags as are completely relevant to help people find the entity, but I think a sweet spot is 3-5 tags.</li>
+                                <li>If you include a soundcloud or bandcamp link, an embedded player will show up on the entity and any events they are related to.</li>
+                                <li>After saving the entity, go to the detail page and add the primary photo.  This will be used as the main image for the entity.  You can change it later as well.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Common Questions Section */}
                 <section>
                     <h2 className="text-2xl font-semibold mb-4">Frequently Asked Questions</h2>
