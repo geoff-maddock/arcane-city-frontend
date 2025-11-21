@@ -8,9 +8,9 @@ import { NavigationProvider } from '../context/NavigationContext';
 function RootLayout() {
     const router = useRouter();
 
-    // Scroll to top on route changes
+    // Scroll to top on route changes (only on actual navigation, not preload)
     useEffect(() => {
-        const unsubscribe = router.subscribe('onResolved', () => {
+        const unsubscribe = router.subscribe('onBeforeNavigate', () => {
             window.scrollTo(0, 0);
         });
 
