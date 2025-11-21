@@ -20,7 +20,7 @@ Arcane City Frontend is a Single Page Application (SPA) built with React and Tan
 When you share a link like `https://arcane.city/events/some-event`, social media crawlers see only the static HTML from `index.html`:
 
 ```html
-<meta property="og:image" content="https://beta.arcane.city/arcane-city-pgh.gif">
+<meta property="og:image" content="https://arcane.city/arcane-city-pgh.gif">
 ```
 
 They never execute the JavaScript that would update this to the event-specific image.
