@@ -1,0 +1,157 @@
+# Nginx Configuration for Arcane City Frontend
+# This configuration handles crawler detection and serves appropriate content
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name arcane.city www.arcane.city;
+    
+    # Redirect HTTP to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name arcane.city www.arcane.city;
+    
+    # SSL Configuration (update paths as needed)
+    ssl_certificate /path/to/ssl/certificate.crt;
+    ssl_certificate_key /path/to/ssl/private.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    
+    # Document root
+    root /var/www/arcane-city-frontend/dist;
+    index index.html;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types
+        text/css
+        text/javascript
+        text/xml
+        text/plain
+        application/javascript
+        application/x-javascript
+        application/json
+        application/xml
+        application/rss+xml
+        application/atom+xml
+        font/truetype
+        font/opentype
+        image/svg+xml;
+    
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # Special handling for manifest and robots
+    location = /site.webmanifest {
+        add_header Content-Type application/manifest+json;
+        expires 1d;
+    }
+    
+    location = /robots.txt {
+        add_header Content-Type text/plain;
+        expires 1d;
+    }
+    
+    # Main location block with crawler detection
+    location / {
+        # Initialize prerender flag
+        set $prerender 0;
+        
+        # Check if request is from a known crawler/bot
+        if ($http_user_agent ~* "bot|crawler|spider|crawling|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|pinterest|telegrambot|discordbot|skype|metainspector") {
+            set $prerender 1;
+        }
+        
+        # Check for _escaped_fragment_ query parameter (AJAX crawling scheme)
+        if ($args ~ "_escaped_fragment_") {
+            set $prerender 1;
+        }
+        
+        # Don't prerender if it's a prerender request (prevent loops)
+        if ($http_user_agent ~ "Prerender") {
+            set $prerender 0;
+        }
+        
+        # Don't prerender if the request is for a file that exists
+        if (-f $request_filename) {
+            set $prerender 0;
+        }
+        
+        # OPTION A: Use Prerender.io (commercial service)
+        # Uncomment these lines if using Prerender.io
+        # if ($prerender = 1) {
+        #     set $prerender_token "YOUR_PRERENDER_IO_TOKEN";
+        #     rewrite .* /$scheme://$host$request_uri? break;
+        #     proxy_pass https://service.prerender.io;
+        #     proxy_set_header X-Prerender-Token $prerender_token;
+        # }
+        
+        # OPTION B: Use Rendertron (self-hosted)
+        # Uncomment these lines if using Rendertron
+        # if ($prerender = 1) {
+        #     rewrite .* /render/$scheme://$host$request_uri? break;
+        #     proxy_pass http://localhost:3000;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+        # }
+        
+        # Log crawler requests for monitoring
+        if ($prerender = 1) {
+            access_log /var/log/nginx/arcane-city-crawler.log combined;
+        }
+        
+        # Fallback to SPA routing
+        try_files $uri $uri/ /index.html;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "no-referrer-when-downgrade" always;
+        
+        # CORS headers (if needed for API calls)
+        # add_header Access-Control-Allow-Origin "https://arcane.city" always;
+    }
+    
+    # API proxy (if backend API is on same server)
+    # Uncomment and configure if your API is hosted separately
+    # location /api {
+    #     proxy_pass http://localhost:8000;
+    #     proxy_set_header Host $host;
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    # }
+    
+    # Error pages
+    error_page 404 /index.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        internal;
+    }
+}
+
+# Redirect www to non-www (or vice versa, adjust as needed)
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name www.arcane.city;
+    
+    ssl_certificate /path/to/ssl/certificate.crt;
+    ssl_certificate_key /path/to/ssl/private.key;
+    
+    return 301 https://arcane.city$request_uri;
+}

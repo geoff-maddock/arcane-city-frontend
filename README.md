@@ -7,6 +7,11 @@ This is a frontend for the Arcane City project, which leverages the [Events-Trac
 
 It is built using React, TypeScript and Tailwind.
 
+## Important Documentation
+
+- **[SEO and Social Sharing Guide](docs/SEO_AND_SOCIAL_SHARING.md)** - Understanding and improving SEO for social media crawlers
+- **[Rendertron Setup Guide](docs/RENDERTRON_SETUP.md)** - Setting up prerendering for web crawlers
+
 # Getting Started
 
 To get started, clone the repository and run `npm install` to install the dependencies.  
