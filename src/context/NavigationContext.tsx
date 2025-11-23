@@ -7,6 +7,32 @@ type NavigationContextValue = {
 
 const NavigationContext = createContext<NavigationContextValue | undefined>(undefined);
 
+/**
+ * Determines if a path should be excluded from navigation history.
+ * Edit and create pages should not be tracked as previous pages.
+ */
+function isExcludedFromHistory(path: string): boolean {
+    // Remove query params and hash for pattern matching
+    const pathname = path.split('?')[0].split('#')[0];
+    
+    // Exclude edit pages (ends with /edit)
+    if (pathname.endsWith('/edit')) {
+        return true;
+    }
+    
+    // Exclude create pages (ends with /create)
+    if (pathname.endsWith('/create')) {
+        return true;
+    }
+    
+    // Exclude password recovery and reset pages
+    if (pathname.includes('/password-recovery') || pathname.includes('/password/reset/')) {
+        return true;
+    }
+    
+    return false;
+}
+
 function getInitialPreviousPath(): string | null {
     if (typeof document === 'undefined' || typeof window === 'undefined') {
         return null;
@@ -23,7 +49,14 @@ function getInitialPreviousPath(): string | null {
             return null;
         }
 
-        return `${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`;
+        const referrerPath = `${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`;
+        
+        // Don't set initial previous path if it's an edit/create page
+        if (isExcludedFromHistory(referrerPath)) {
+            return null;
+        }
+
+        return referrerPath;
     } catch {
         return null;
     }
@@ -46,7 +79,10 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            setPreviousPath(fromHref);
+            // Only track pages that are not edit/create pages
+            if (!isExcludedFromHistory(fromHref)) {
+                setPreviousPath(fromHref);
+            }
         });
 
         return () => unsubscribe();
