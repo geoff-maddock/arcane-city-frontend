@@ -61,6 +61,8 @@ describe('MenuBar login indicator', () => {
       followed_entities: [],
       followed_series: [],
       followed_threads: [],
+      groups: [],
+      permissions: [],
       photos: []
     })
 

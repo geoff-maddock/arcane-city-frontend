@@ -71,6 +71,8 @@ describe('TagDetail', () => {
             followed_entities: [],
             followed_series: [],
             followed_threads: [],
+            groups: [],
+            permissions: [],
             photos: [],
         });
     });
