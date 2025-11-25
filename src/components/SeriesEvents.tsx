@@ -44,7 +44,6 @@ export default function SeriesEvents({ seriesName }: SeriesEventsProps) {
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleItemsPerPageChange = (count: number) => {
