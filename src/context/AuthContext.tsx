@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         const hasAnyPermission = (permissionSlugs: string[]): boolean => {
             if (!user?.permissions) return false;
-            return permissionSlugs.some(slug => hasPermission(slug));
+            return user.permissions.some(p => permissionSlugs.includes(p.slug));
         };
 
         const hasAllPermissions = (permissionSlugs: string[]): boolean => {
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         const hasAnyGroup = (groupSlugs: string[]): boolean => {
             if (!user?.groups) return false;
-            return groupSlugs.some(slug => hasGroup(slug));
+            return user.groups.some(g => groupSlugs.includes(g.slug));
         };
 
         const hasAllGroups = (groupSlugs: string[]): boolean => {
