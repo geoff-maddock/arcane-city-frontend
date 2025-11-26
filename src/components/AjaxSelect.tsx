@@ -17,6 +17,7 @@ interface AjaxSelectProps {
   extraParams?: Record<string, string | number>;
   className?: string;
   disabled?: boolean;
+  clientSideFiltering?: boolean;
 }
 
 export const AjaxSelect: React.FC<AjaxSelectProps> = ({
@@ -29,6 +30,7 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   extraParams = {},
   className = '',
   disabled = false,
+  clientSideFiltering = false,
 }) => {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -54,8 +56,9 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   // Fetch search results based on user query
   const { data: searchResults = [], isLoading } = useSearchOptions(
     endpoint,
-    debouncedQuery,
-    extraParams
+    clientSideFiltering ? '' : debouncedQuery,
+    extraParams,
+    clientSideFiltering ? { limit: 100 } : {}
   );
 
   // Merge and deduplicate options from both queries
@@ -76,9 +79,18 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
   }, [selectedOptionsData, searchResults]);
 
   // Filter out already selected option for the dropdown
-  const availableOptions = value
-    ? allOptions.filter(option => option.id !== value)
-    : allOptions;
+  const availableOptions = useMemo(() => {
+    let options = value
+      ? allOptions.filter(option => option.id !== value)
+      : allOptions;
+
+    if (clientSideFiltering && query) {
+      const lowerQuery = query.toLowerCase();
+      options = options.filter(option => option.name.toLowerCase().includes(lowerQuery));
+    }
+
+    return options;
+  }, [allOptions, value, clientSideFiltering, query]);
 
   // Get selected option for display
   const selectedOption = value
@@ -95,7 +107,7 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
     ? 'Searching...'
     : availableOptions.length > 0
       ? `${availableOptions.length} result${availableOptions.length === 1 ? '' : 's'} available`
-      : query && debouncedQuery
+      : query && (clientSideFiltering || debouncedQuery)
         ? 'No results found'
         : '';
 
@@ -309,7 +321,7 @@ export const AjaxSelect: React.FC<AjaxSelectProps> = ({
                   {option.name}
                 </button>
               ))
-            ) : query && debouncedQuery ? (
+            ) : query && (clientSideFiltering || debouncedQuery) ? (
               <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm" role="status">
                 No results found for "{query}"
               </div>

@@ -256,6 +256,7 @@ const EventEdit: React.FC<{ eventSlug: string }> = ({ eventSlug }) => {
                         value={formData.event_type_id}
                         onChange={(val) => setFormData((p) => ({ ...p, event_type_id: val }))}
                         placeholder="Type to search event types..."
+                        clientSideFiltering={true}
                     />
                     {renderError('event_type_id')}
                 </div>
