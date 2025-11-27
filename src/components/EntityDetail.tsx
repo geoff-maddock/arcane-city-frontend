@@ -171,7 +171,7 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
 
             // Fetch fresh embeds from API
             const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
-            const embedsData = response.data.data;
+            const embedsData = response.data.data || [];
 
             // Store in localStorage
             setEmbedCache('entities', entity.slug, embedsData, 'embeds');
