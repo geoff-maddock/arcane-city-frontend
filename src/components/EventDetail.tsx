@@ -177,15 +177,21 @@ export default function EventDetail({ slug, initialEvent }: { slug: string; init
         setActionsMenuOpen(false);
 
         try {
-            // Clear the old cache first
+            // Clear the old cache first (both standard and minimal embeds)
             clearEmbedCache('events', event.slug, 'embeds');
+            clearEmbedCache('events', event.slug, 'minimal-embeds');
 
-            // Fetch fresh embeds from API
+            // Fetch fresh embeds from API (standard embeds)
             const { data } = await api.get<{ data: string[] }>(`/events/${event.slug}/embeds`);
-            const embedsData = data.data;
+            const embedsData = data.data || [];
 
             // Store in localStorage
             setEmbedCache('events', event.slug, embedsData, 'embeds');
+
+            // Fetch and cache minimal embeds as well
+            const { data: minimalData } = await api.get<{ data: string[] }>(`/events/${event.slug}/minimal-embeds`);
+            const minimalEmbedsData = minimalData.data || [];
+            setEmbedCache('events', event.slug, minimalEmbedsData, 'minimal-embeds');
 
             // Refetch to display the new data
             await refetchEmbeds();
