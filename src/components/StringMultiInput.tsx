@@ -60,8 +60,8 @@ export const StringMultiInput: React.FC<StringMultiInputProps> = ({
       <div
         className={`
           flex flex-wrap items-center gap-1 p-2 border rounded-md bg-white dark:bg-slate-800 
-          border-gray-300 dark:border-slate-600 min-h-[2.5rem] cursor-text
-          ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-slate-500'}
+          border-slate-300 dark:border-slate-600 min-h-[2.5rem] cursor-text
+          ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-slate-400 dark:hover:border-slate-500'}
         `}
         onClick={() => inputRef.current?.focus()}
       >
@@ -98,7 +98,7 @@ export const StringMultiInput: React.FC<StringMultiInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={value.length === 0 ? placeholder : ''}
           disabled={disabled}
-          className="flex-1 min-w-[120px] border-0 outline-none bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus-visible:ring-0 p-0 h-auto"
+          className="flex-1 min-w-[120px] border-0 outline-none bg-transparent text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus-visible:ring-0 p-0 h-auto"
         />
       </div>
     </div>
