@@ -165,15 +165,21 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
         setEmbedsLoading(true);
 
         try {
-            // Clear the old cache first
+            // Clear the old cache first (both standard and minimal embeds)
             clearEmbedCache('entities', entity.slug, 'embeds');
+            clearEmbedCache('entities', entity.slug, 'minimal-embeds');
 
             // Fetch fresh embeds from API
             const response = await api.get<{ data: string[] }>(`/entities/${entity.slug}/embeds`);
-            const embedsData = response.data.data;
+            const embedsData = response.data.data || [];
 
             // Store in localStorage
             setEmbedCache('entities', entity.slug, embedsData, 'embeds');
+
+            // Fetch and cache minimal embeds as well
+            const minimalResponse = await api.get<{ data: string[] }>(`/entities/${entity.slug}/minimal-embeds`);
+            const minimalEmbedsData = minimalResponse.data.data || [];
+            setEmbedCache('entities', entity.slug, minimalEmbedsData, 'minimal-embeds');
 
             // Update display
             setEmbeds(embedsData);
