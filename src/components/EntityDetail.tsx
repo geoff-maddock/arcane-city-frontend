@@ -432,6 +432,22 @@ export default function EntityDetail({ entitySlug, initialEntity }: { entitySlug
                                             instagramUsername={entity.instagram_username}
                                         />
 
+                                        {entity.aliases && entity.aliases.length > 0 && (
+                                            <div className="space-y-2">
+                                                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Aliases</div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {entity.aliases.map((alias, index) => (
+                                                        <span
+                                                            key={index}
+                                                            className="inline-flex items-center px-2 py-1 rounded text-sm bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                                                        >
+                                                            {alias}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {/* Deprecated inline links list is replaced by the EntityLinks card below */}
                                         {entity.tags.length > 0 && (
                                             <div className="space-y-2">

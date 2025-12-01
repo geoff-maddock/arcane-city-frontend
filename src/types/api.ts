@@ -248,6 +248,7 @@ export interface Entity {
     primary_photo?: string;
     primary_photo_thumbnail?: string;
     primary_location?: Location;
+    aliases?: string[];
 }
 
 export interface PaginatedResponse<T> {
