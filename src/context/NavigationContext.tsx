@@ -104,14 +104,16 @@ export function useBackNavigation(fallbackPath: string) {
 
     const { previousPath } = context;
     
-    // Get current location href
-    const currentLocation = router.state.location;
-    const currentHref = currentLocation.maskedLocation?.href ?? currentLocation.href;
+    // Get current location href (memoized to avoid recalculation on every render)
+    const currentHref = useMemo(() => {
+        const currentLocation = router.state.location;
+        return currentLocation.maskedLocation?.href ?? currentLocation.href;
+    }, [router.state.location]);
     
     // If previousPath is the same as current location, use fallback instead
-    const shouldUseFallback = !previousPath || previousPath === currentHref;
-    const backHref = shouldUseFallback ? fallbackPath : previousPath;
-    const isFallback = shouldUseFallback;
+    const backPointsToCurrentPage = !previousPath || previousPath === currentHref;
+    const backHref = backPointsToCurrentPage ? fallbackPath : previousPath;
+    const isFallback = backPointsToCurrentPage;
 
     return { backHref, isFallback };
 }
