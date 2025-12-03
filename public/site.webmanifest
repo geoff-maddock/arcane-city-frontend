@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Arcane City",
   "short_name": "ArcaneCity",
-  "description": "Arcane City – event discovery and management platform for venues, artists, series, and fans.",
+  "description": "Arcane City – discover and explore the music and arts events scene in Pittsburgh, for venues, artists, series, and fans.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "/?source=pwa",
