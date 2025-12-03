@@ -96,14 +96,24 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useBackNavigation(fallbackPath: string) {
     const context = useContext(NavigationContext);
+    const router = useRouter();
 
     if (!context) {
         throw new Error('useBackNavigation must be used within a NavigationProvider');
     }
 
     const { previousPath } = context;
-    const backHref = previousPath ?? fallbackPath;
-    const isFallback = !previousPath;
+    
+    // Get current location href (memoized to avoid recalculation on every render)
+    const currentHref = useMemo(() => {
+        const currentLocation = router.state.location;
+        return currentLocation.maskedLocation?.href ?? currentLocation.href;
+    }, [router.state.location]);
+    
+    // If previousPath is the same as current location, use fallback instead
+    const backPointsToCurrentPage = !previousPath || previousPath === currentHref;
+    const backHref = backPointsToCurrentPage ? fallbackPath : previousPath;
+    const isFallback = backPointsToCurrentPage;
 
     return { backHref, isFallback };
 }
