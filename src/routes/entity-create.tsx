@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
+import StringMultiInput from '../components/StringMultiInput';
 import { api } from '@/lib/api';
 import { handleFormError } from '@/lib/errorHandler';
 import { useSlug } from '@/hooks/useSlug';
@@ -30,6 +31,7 @@ const EntityCreate: React.FC = () => {
         primary_location_id: '' as number | '',
         tag_list: [] as number[],
         role_list: [] as number[],
+        aliases: [] as string[],
     });
     const { name, slug, setName, setSlug, manuallyOverridden } = useSlug('', '');
 
@@ -125,6 +127,7 @@ const EntityCreate: React.FC = () => {
                 started_at: formData.started_at ? `${formData.started_at}:00` : undefined,
                 tag_list: formData.tag_list,
                 role_list: formData.role_list,
+                aliases: formData.aliases,
             };
             const { data } = await api.post('/entities', payload);
             navigate({ to: '/entities/$entitySlug', params: { entitySlug: data.slug } });
@@ -311,6 +314,15 @@ const EntityCreate: React.FC = () => {
                         onChange={(ids) => setFormData(p => ({ ...p, role_list: ids }))}
                         placeholder="Type to add role..."
                     />
+                </div>
+                <div className="space-y-2">
+                    <StringMultiInput
+                        label="Aliases"
+                        value={formData.aliases}
+                        onChange={(aliases) => setFormData(p => ({ ...p, aliases }))}
+                        placeholder="Type an alias and press Enter..."
+                    />
+                    {renderError('aliases')}
                 </div>
                 <Button type="submit" className="w-full">Create Entity</Button>
             </form>

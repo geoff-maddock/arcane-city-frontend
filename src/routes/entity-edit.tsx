@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AjaxSelect from '../components/AjaxSelect';
 import AjaxMultiSelect from '../components/AjaxMultiSelect';
+import StringMultiInput from '../components/StringMultiInput';
 import { api } from '@/lib/api';
 import { handleFormError } from '@/lib/errorHandler';
 import { utcToLocalDatetimeInput } from '@/lib/utils';
@@ -41,6 +42,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
         primary_location_id: '' as number | '',
         tag_list: [] as number[],
         role_list: [] as number[],
+        aliases: [] as string[],
     });
 
     const { name, slug, setName, setSlug, initialize, manuallyOverridden } = useSlug('', '');
@@ -69,6 +71,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 primary_location_id: entity.primary_location?.id || '',
                 tag_list: entity.tags?.map(t => t.id) || [],
                 role_list: entity.roles?.map(r => r.id) || [],
+                aliases: entity.aliases || [],
             });
             initialize(entity.name || '', entity.slug || '');
         }
@@ -118,6 +121,7 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                 started_at: formData.started_at ? `${formData.started_at}:00` : undefined,
                 tag_list: formData.tag_list,
                 role_list: formData.role_list,
+                aliases: formData.aliases,
             };
             const { data } = await api.put(`/entities/${entitySlug}`, payload);
             // Invalidate the entity query cache to ensure fresh data is loaded on the detail page
@@ -244,6 +248,15 @@ const EntityEdit: React.FC<{ entitySlug: string }> = ({ entitySlug }) => {
                         onChange={(ids) => setFormData(p => ({ ...p, role_list: ids }))}
                         placeholder="Type to add role..."
                     />
+                </div>
+                <div className="space-y-2">
+                    <StringMultiInput
+                        label="Aliases"
+                        value={formData.aliases}
+                        onChange={(aliases) => setFormData(p => ({ ...p, aliases }))}
+                        placeholder="Type an alias and press Enter..."
+                    />
+                    {renderError('aliases')}
                 </div>
                 <Button type="submit" className="w-full">Save Entity</Button>
             </form>
