@@ -2,7 +2,7 @@
 import { createRootRoute, Outlet, HeadContent, useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import MenuBar from '../components/MenuBar';
-import { SITE_NAME, SITE_DESCRIPTION, DEFAULT_IMAGE } from '../lib/seo';
+import { SITE_NAME, SITE_DESCRIPTION, DEFAULT_IMAGE, SITE_ORIGIN } from '../lib/seo';
 import { NavigationProvider } from '../context/NavigationContext';
 
 function RootLayout() {
@@ -46,12 +46,12 @@ export const rootRoute = createRootRoute({
             { property: 'og:title', content: SITE_NAME },
             { property: 'og:description', content: SITE_DESCRIPTION },
             { property: 'og:image', content: DEFAULT_IMAGE },
-            { property: 'og:url', content: 'https://arcane.city/' },
+            { property: 'og:url', content: SITE_ORIGIN + '/' },
             { name: 'twitter:card', content: 'summary_large_image' },
             { name: 'twitter:title', content: SITE_NAME },
             { name: 'twitter:description', content: SITE_DESCRIPTION },
             { name: 'twitter:image', content: DEFAULT_IMAGE },
-            { name: 'twitter:url', content: 'https://arcane.city/' },
+            { name: 'twitter:url', content: SITE_ORIGIN + '/' },
         ],
     }),
 });
