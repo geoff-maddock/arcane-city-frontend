@@ -170,6 +170,128 @@
     @apply bg-blue-900;
   }
 
+  /* Improved calendar styling - reduce prominent grid lines */
+  .rbc-month-view,
+  .rbc-time-view,
+  .rbc-agenda-view {
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .rbc-header {
+    border-bottom: 1px solid hsl(var(--border) / 0.3);
+    padding: 8px 4px;
+    font-weight: 500;
+  }
+
+  /* Month view - lighter grid lines */
+  .rbc-month-row {
+    border-top: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .rbc-day-bg {
+    border-left: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .rbc-month-row + .rbc-month-row {
+    border-top: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  /* Week and Day view - lighter grid lines */
+  .rbc-time-content {
+    border-top: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .rbc-time-slot {
+    border-top: 1px solid hsl(var(--border) / 0.15);
+  }
+
+  .rbc-day-slot {
+    border-left: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .rbc-time-header-content {
+    border-left: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .rbc-current-time-indicator {
+    background-color: hsl(var(--primary));
+    height: 2px;
+  }
+
+  /* Agenda view - improved column alignment */
+  .rbc-agenda-view table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .rbc-agenda-view .rbc-agenda-date-cell,
+  .rbc-agenda-view .rbc-agenda-time-cell {
+    white-space: nowrap;
+    width: 120px;
+  }
+
+  .rbc-agenda-view .rbc-agenda-event-cell {
+    width: auto;
+  }
+
+  /* Dark mode improvements for reduced grid lines */
+  .dark .rbc-month-view,
+  .dark .rbc-time-view,
+  .dark .rbc-agenda-view {
+    border-color: hsl(var(--border) / 0.3);
+  }
+
+  .dark .rbc-header {
+    border-bottom-color: hsl(var(--border) / 0.3);
+  }
+
+  .dark .rbc-month-row,
+  .dark .rbc-day-bg,
+  .dark .rbc-time-content,
+  .dark .rbc-day-slot,
+  .dark .rbc-time-header-content {
+    border-color: hsl(var(--border) / 0.2);
+  }
+
+  .dark .rbc-time-slot {
+    border-top-color: hsl(var(--border) / 0.15);
+  }
+
+  /* Responsive improvements for mobile */
+  @media (max-width: 768px) {
+    .rbc-toolbar {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rbc-toolbar-label {
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .rbc-btn-group {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .rbc-btn-group button {
+      padding: 6px 12px;
+      font-size: 0.875rem;
+    }
+
+    .rbc-header {
+      font-size: 0.75rem;
+      padding: 4px 2px;
+    }
+
+    .rbc-agenda-view .rbc-agenda-date-cell,
+    .rbc-agenda-view .rbc-agenda-time-cell {
+      width: 80px;
+      font-size: 0.875rem;
+    }
+  }
+
   /* Screen reader only utility class for accessibility */
   .sr-only {
     position: absolute;
