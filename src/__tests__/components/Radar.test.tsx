@@ -51,6 +51,8 @@ describe('Radar Component', () => {
         followed_tags: [{ id: 1, name: 'Test Tag', slug: 'test-tag' }],
         followed_series: [],
         followed_threads: [],
+        groups: [],
+        permissions: [],
         photos: [],
     };
 

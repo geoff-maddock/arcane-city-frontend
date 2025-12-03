@@ -21,6 +21,18 @@ export interface MinimalSlugResource {
     slug: string;
 }
 
+export interface Group {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+export interface Permission {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 
 export interface Photo {
     id: number;
@@ -81,6 +93,8 @@ export interface User {
     followed_entities: MinimalSlugResource[];
     followed_series: MinimalSlugResource[];
     followed_threads: MinimalSlugResource[];
+    groups: Group[];
+    permissions: Permission[];
     photos: Photo[];
 }
 
