@@ -6,7 +6,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMediaPlayerContext } from '../hooks/useMediaPlayerContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff, HiWifi, HiChevronDown, HiChevronUp } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiUser, HiUserGroup, HiMoon, HiSun, HiMenu, HiCollection, HiTag, HiBookOpen, HiInformationCircle, HiQuestionMarkCircle, HiSearch, HiVolumeUp, HiVolumeOff, HiWifi, HiChevronDown, HiChevronUp, HiSparkles } from 'react-icons/hi';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = ({ className = '', onNavigate }) => {
@@ -151,6 +151,10 @@ const MenuContent: React.FC<{ className?: string; onNavigate?: () => void }> = (
         <Link to="/search" className="flex items-center gap-2 hover:underline">
           <HiSearch />
           <span className=" xl:inline">Search</span>
+        </Link>
+        <Link to="/fantasy-flip" className="flex items-center gap-2 hover:underline">
+          <HiSparkles />
+          <span className=" xl:inline">Fantasy Flip</span>
         </Link>
 
         <div className="w-full border-b border-gray-200 dark:border-gray-700 my-4"></div>

@@ -32,6 +32,7 @@ import { SITE_NAME, DEFAULT_IMAGE } from './lib/seo';
 import { EventGridRoute } from './routes/event-grid';
 import { ActivityRoute } from './routes/activity';
 import { NotFoundRoute } from './routes/not-found';
+import { FantasyFlipRoute } from './routes/fantasy-flip';
 
 // Lazy load main list components for better code splitting
 const Events = lazyRouteComponent(() => import('./components/Events'));
@@ -310,6 +311,7 @@ const routeTree = rootRoute.addChildren([
     EventGridRoute,
     RadarRoute,
     ActivityRoute,
+    FantasyFlipRoute,
     AboutRoute,
     HelpRoute,
     SearchRoute,
